@@ -20,27 +20,23 @@ export type EventManagementMetrics = {
 /**
  * Shared data hook for Event Management dashboards.
  *
- * - Fetches recent events scoped by organization OR user (for personal events)
+ * - Fetches recent events (optionally scoped by organization)
  * - Aggregates registrations per event
  * - Exposes summary metrics for tiles / widgets
  */
-export const useEventManagementMetrics = (organizationId?: string, userId?: string) => {
-  // Prefetch recent events - scoped by org or user
+export const useEventManagementMetrics = (organizationId?: string) => {
+  // Prefetch recent events
   const { data: events } = useQuery<DashboardEventRow[]>({
-    queryKey: ['event-service-dashboard-events', organizationId ?? 'user', userId ?? 'none'],
+    queryKey: ['event-service-dashboard-events', organizationId ?? 'all'],
     queryFn: async () => {
       let query = supabase
         .from('events')
-        .select('id, name, status, start_date, organization_id, owner_id')
+        .select('id, name, status, start_date, organization_id')
         .order('start_date', { ascending: false })
         .limit(10);
 
       if (organizationId) {
-        // Filter by organization
         query = query.eq('organization_id', organizationId);
-      } else if (userId) {
-        // Filter by user's personal events (no org, owned by user)
-        query = query.is('organization_id', null).eq('owner_id', userId);
       }
 
       const { data, error } = await query;
@@ -53,7 +49,6 @@ export const useEventManagementMetrics = (organizationId?: string, userId?: stri
         start_date: row.start_date,
       })) as DashboardEventRow[];
     },
-    enabled: !!(organizationId || userId),
   });
 
   // Registrations grouped by event

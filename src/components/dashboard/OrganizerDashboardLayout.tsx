@@ -3,7 +3,6 @@ import { Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { SidebarProvider, SidebarInset, useSidebar } from '@/components/ui/sidebar';
 import { OrganizerSidebar } from './OrganizerSidebar';
-import { SidebarOverlay } from '@/components/sidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -79,9 +78,8 @@ export const OrganizerDashboardLayout: React.FC = () => {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background via-background/98 to-primary/5" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_hsl(var(--primary)/0.08),_transparent_50%)]" />
 
-        {/* Sidebar with click-outside overlay */}
-        <SidebarOverlay />
-        <OrganizerSidebar onLogout={handleLogout} />
+        {/* Sidebar */}
+        <OrganizerSidebar />
 
         {/* Main content */}
         <SidebarInset className="relative flex-1">

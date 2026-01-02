@@ -6,7 +6,6 @@ import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useEventManagementMetrics, DashboardEventRow } from '@/hooks/useEventManagementMetrics';
 import { OrganizerBreadcrumbs } from '@/components/organization/OrganizerBreadcrumbs';
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
-import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 
 /**
  * EventServiceDashboard provides the AWS-style service landing page for Event Management.
@@ -19,14 +18,6 @@ import { useCurrentOrganization } from '@/components/organization/OrganizationCo
 export const EventServiceDashboard: React.FC = () => {
   const { user } = useAuth();
   const { createPath, listPath, eventDetailPath, eventEditPath } = useEventManagementPaths();
-
-  // Get organization context if in org scope
-  let organization: { id: string } | null = null;
-  try {
-    organization = useCurrentOrganization();
-  } catch {
-    // Not in org context - will use user-scoped events
-  }
 
   useEffect(() => {
     document.title = 'Event Management Dashboard | Thittam1Hub';
@@ -51,11 +42,7 @@ export const EventServiceDashboard: React.FC = () => {
     canonical.setAttribute('href', window.location.href);
   }, []);
 
-  // Pass organization ID to scope events, or user ID for personal events
-  const { events, registrationsByEvent, metrics } = useEventManagementMetrics(
-    organization?.id,
-    !organization ? user?.id : undefined
-  );
+  const { events, registrationsByEvent, metrics } = useEventManagementMetrics();
 
   const analyticsPath = listPath.startsWith('/dashboard')
     ? '/dashboard/analytics'
