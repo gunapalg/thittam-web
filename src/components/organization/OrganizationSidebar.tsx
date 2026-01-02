@@ -41,7 +41,7 @@ const orgServices: OrgMenuItem[] = [
   { title: 'Dashboard', icon: LayoutDashboard, path: 'dashboard', description: 'Overview & metrics' },
   { title: 'Event Management', icon: CalendarDays, path: 'eventmanagement', description: 'Manage events' },
   { title: 'Workspace', icon: Briefcase, path: 'workspaces', description: 'Team collaboration' },
-  { title: 'Marketplace', icon: Store, path: 'organizations', description: 'Products & services' },
+  { title: 'Marketplace', icon: Store, path: 'marketplace', description: 'Products & services' },
   { title: 'Analytics', icon: LineChart, path: 'analytics', description: 'Performance insights' },
   { title: 'Team', icon: Users, path: 'team', description: 'Members & roles' },
 ];
