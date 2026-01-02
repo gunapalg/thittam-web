@@ -1,8 +1,17 @@
 import { Link, useLocation } from 'react-router-dom';
 
 interface OrganizerBreadcrumbsProps {
-  current: 'dashboard' | 'event-management';
+  current: 'dashboard' | 'event-management' | 'marketplace' | 'analytics' | 'workspace' | 'team';
 }
+
+const breadcrumbLabels: Record<OrganizerBreadcrumbsProps['current'], string> = {
+  'dashboard': 'Organizer Dashboard',
+  'event-management': 'Event Management',
+  'marketplace': 'Marketplace',
+  'analytics': 'Analytics',
+  'workspace': 'Workspace',
+  'team': 'Team',
+};
 
 /**
  * Shared breadcrumbs for organizer-scoped console views.
@@ -40,7 +49,7 @@ export const OrganizerBreadcrumbs: React.FC<OrganizerBreadcrumbsProps> = ({ curr
             Organizer Dashboard
           </Link>
           <span>/</span>
-          <span className="text-foreground font-medium">Event Management</span>
+          <span className="text-foreground font-medium">{breadcrumbLabels[current]}</span>
         </>
       )}
     </div>

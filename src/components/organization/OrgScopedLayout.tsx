@@ -12,6 +12,7 @@ import { OrganizationSidebar } from './OrganizationSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { OrgSettingsDashboard } from './OrgSettingsDashboard';
 import { OrgStorySettingsPage } from './OrgStorySettingsPage';
+import { OrgMarketplacePage } from '@/components/routing/services/OrgMarketplacePage';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -94,6 +95,7 @@ export const OrgScopedLayout: React.FC = () => {
                   <Route path="settings/story" element={<OrgStorySettingsPage />} />
                   <Route path="eventmanagement/*" element={<EventService />} />
                   <Route path="workspaces/*" element={<WorkspaceService />} />
+                  <Route path="marketplace" element={<OrgMarketplacePage />} />
                   <Route path="organizations/*" element={<OrganizationService />} />
                   <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
                   <Route path="team" element={<OrganizationTeamManagement />} />
