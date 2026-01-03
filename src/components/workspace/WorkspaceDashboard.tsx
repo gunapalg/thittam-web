@@ -445,9 +445,9 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId, orgSlug }: Wo
         />
       )}
 
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-4">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 space-y-3 sm:space-y-4">
         {/* Role-based sub workspace selector */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-3 px-3 sm:mx-0 sm:px-0">
           {roleSpaces.map((roleSpace) => (
             <button
               key={roleSpace}
@@ -466,7 +466,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId, orgSlug }: Wo
                   lastActiveTab: activeTab,
                 });
               }}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${activeRoleSpace === roleSpace
+              className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium border transition-colors whitespace-nowrap shrink-0 ${activeRoleSpace === roleSpace
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'bg-background text-muted-foreground border-border hover:bg-muted'
                 }`}
@@ -491,11 +491,11 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId, orgSlug }: Wo
         onWorkspaceSwitch={handleWorkspaceSwitch}
       />
 
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {activeTab === 'overview' && (
-          <div className="space-y-8">
+          <div className="space-y-4 sm:space-y-8">
             {canPublishEvent && (
-              <div className="flex items-center justify-between rounded-lg border border-border bg-muted p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border bg-muted p-3 sm:p-4">
                 <div>
                   <h3 className="text-sm font-medium text-foreground">Publish event</h3>
                   <p className="text-xs text-muted-foreground mt-1">
@@ -506,7 +506,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId, orgSlug }: Wo
                   type="button"
                   onClick={() => publishEventMutation.mutate()}
                   disabled={publishEventMutation.isPending}
-                  className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-sm font-semibold"
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-sm font-semibold w-full sm:w-auto"
                 >
                   {publishEventMutation.isPending ? 'Publishing…' : 'Publish event'}
                 </button>
@@ -515,11 +515,11 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId, orgSlug }: Wo
 
             <TaskSummaryCards workspace={workspace} onViewTasks={handleViewTasks} />
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
-              <div className="xl:col-span-2 space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 items-start">
+              <div className="lg:col-span-2 space-y-4 sm:space-y-8 order-2 lg:order-1">
                 <WorkspaceCollaborationTimeline workspace={workspace} />
               </div>
-              <div className="space-y-8">
+              <div className="space-y-4 sm:space-y-8 order-1 lg:order-2">
                 {workspace.eventId && (
                   <WorkspaceHierarchyStats eventId={workspace.eventId} />
                 )}
@@ -531,7 +531,7 @@ export function WorkspaceDashboard({ workspaceId: propWorkspaceId, orgSlug }: Wo
         )}
 
         {activeTab === 'tasks' && (
-          <div className="bg-card rounded-lg shadow-sm border border-border p-6">
+          <div className="bg-card rounded-lg shadow-sm border border-border p-3 sm:p-6">
             <TaskManagementInterface
               tasks={tasks || []}
               teamMembers={teamMembers || []}
