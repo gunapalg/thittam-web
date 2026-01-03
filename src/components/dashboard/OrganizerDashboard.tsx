@@ -20,7 +20,7 @@ interface Event {
   endDate: string;
   status: string;
   registrationCount: number;
-  capacity?: number;
+  capacity?: number | null;
 }
 interface WorkspaceSummary {
   id: string;
@@ -47,39 +47,92 @@ export function OrganizerDashboard() {
 
   // Check if profile completion is needed (Requirements 2.4, 2.5)
   const isProfileIncomplete = !user?.profileCompleted || !user?.bio || !user?.organization;
+  // Fetch events directly from Supabase
   const {
     data: events
   } = useQuery<Event[]>({
-    queryKey: ['organizer-events', organization.id],
+    queryKey: ['organizer-events-supabase', organization.id],
     queryFn: async () => {
-      const response = await api.get('/events/my-events', {
-        params: {
-          organizationId: organization.id
-        }
-      });
-      return response.data.events as Event[];
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          id,
+          name,
+          description,
+          start_date,
+          end_date,
+          status,
+          capacity
+        `)
+        .eq('organization_id', organization.id)
+        .order('start_date', { ascending: false });
+      
+      if (error) throw error;
+      
+      // Get registration counts for each event
+      const eventsWithCounts = await Promise.all(
+        (data || []).map(async (event) => {
+          const { count } = await supabase
+            .from('registrations')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', event.id);
+          
+          return {
+            id: event.id,
+            name: event.name,
+            description: event.description || '',
+            startDate: event.start_date,
+            endDate: event.end_date,
+            status: event.status,
+            registrationCount: count || 0,
+            capacity: event.capacity
+          };
+        })
+      );
+      
+      return eventsWithCounts;
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    enabled: isHealthy !== false
+    refetchOnWindowFocus: false
   });
+
+  // Fetch workspaces directly from Supabase
   const {
     data: workspaces
   } = useQuery<WorkspaceSummary[]>({
-    queryKey: ['organizer-workspaces', organization.id],
+    queryKey: ['organizer-workspaces-supabase', organization.id],
     queryFn: async () => {
-      const response = await api.get('/workspaces/my-workspaces', {
-        params: {
-          orgSlug: organization.slug
-        }
-      });
-      return response.data.workspaces as WorkspaceSummary[];
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select(`
+          id,
+          name,
+          status,
+          updated_at,
+          event_id,
+          events (
+            id,
+            name
+          )
+        `)
+        .eq('organizer_id', user!.id)
+        .order('updated_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      return (data || []).map(ws => ({
+        id: ws.id,
+        name: ws.name,
+        status: ws.status,
+        updatedAt: ws.updated_at,
+        event: ws.events ? { id: ws.events.id, name: ws.events.name } : null
+      }));
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
-    enabled: isHealthy !== false
+    enabled: !!user?.id
   });
   const {
     data: analytics
