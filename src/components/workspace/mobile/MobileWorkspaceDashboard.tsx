@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -8,123 +7,51 @@ import {
   MessageSquare,
   BarChart3
 } from 'lucide-react';
-import { Workspace, WorkspaceStatus } from '../../../types';
+
 import { MobileTaskSummary } from './MobileTaskSummary';
 import { MobileTeamOverview } from './MobileTeamOverview';
 import { MobileWorkspaceHeader } from './MobileWorkspaceHeader';
 import { MobileNavigation } from './MobileNavigation';
 import { MobileFeaturesPanel } from './MobileFeaturesPanel';
-import { supabase } from '@/integrations/supabase/client';
+import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface MobileWorkspaceDashboardProps {
   workspaceId?: string;
+  orgSlug?: string;
 }
 
-export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: MobileWorkspaceDashboardProps) {
-  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
-  const workspaceId = propWorkspaceId || paramWorkspaceId;
+export function MobileWorkspaceDashboard({ workspaceId, orgSlug }: MobileWorkspaceDashboardProps) {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics'>('overview');
+  const [mobileActiveTab, setMobileActiveTab] = useState<'overview' | 'tasks' | 'team' | 'communication' | 'analytics'>('overview');
 
-  // Fetch workspace data from Supabase
-  const { data: workspace, isLoading, error } = useQuery({
-    queryKey: ['workspace', workspaceId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('workspaces')
-        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id')
-        .eq('id', workspaceId as string)
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error('Workspace not found');
-
-      return {
-        id: data.id,
-        eventId: data.event_id,
-        name: data.name,
-        status: data.status as WorkspaceStatus,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
-        description: undefined,
-        event: undefined,
-        teamMembers: [],
-        taskSummary: undefined,
-        channels: [],
-        parentWorkspaceId: data.parent_workspace_id,
-      } as unknown as Workspace;
-    },
-    enabled: !!workspaceId,
-  });
-
-  // Fetch user's workspaces for switching
-  const { data: userWorkspaces } = useQuery({
-    queryKey: ['user-workspaces-mobile', workspaceId],
-    queryFn: async () => {
-      if (!workspaceId) return [] as Workspace[];
-
-      const { data: current } = await supabase
-        .from('workspaces')
-        .select('event_id')
-        .eq('id', workspaceId as string)
-        .maybeSingle();
-
-      const eventId = current?.event_id;
-
-      let query = supabase
-        .from('workspaces')
-        .select('id, name, status, created_at, updated_at, event_id, parent_workspace_id')
-        .order('created_at', { ascending: false });
-
-      if (eventId) {
-        query = query.eq('event_id', eventId);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      return (data || []).map((row: any) => ({
-        id: row.id,
-        eventId: row.event_id,
-        name: row.name,
-        status: row.status as WorkspaceStatus,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
-        description: undefined,
-        event: undefined,
-        teamMembers: [],
-        taskSummary: undefined,
-        channels: [],
-        parentWorkspaceId: row.parent_workspace_id,
-      })) as unknown as Workspace[];
-    },
-    enabled: !!workspaceId,
-  });
+  // Use shared shell hook
+  const { state, actions } = useWorkspaceShell({ workspaceId, orgSlug });
+  const { workspace, userWorkspaces, isLoading, error } = state;
 
   const handleQuickAction = (action: string) => {
     setIsMenuOpen(false);
     switch (action) {
       case 'create-task':
-        navigate(`/workspaces/${workspaceId}/tasks/create`);
+        actions.handleCreateTask();
         break;
       case 'invite-member':
-        navigate(`/workspaces/${workspaceId}/team/invite`);
+        actions.handleInviteTeamMember();
         break;
       case 'view-tasks':
-        setActiveTab('tasks');
+        setMobileActiveTab('tasks');
         break;
       case 'view-team':
-        setActiveTab('team');
+        setMobileActiveTab('team');
         break;
       case 'view-communication':
-        setActiveTab('communication');
+        setMobileActiveTab('communication');
         break;
       case 'view-analytics':
-        setActiveTab('analytics');
+        setMobileActiveTab('analytics');
         break;
       case 'settings':
-        navigate(`/workspaces/${workspaceId}/settings`);
+        actions.handleManageSettings();
         break;
     }
   };
@@ -167,14 +94,14 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
       {isMenuOpen && (
         <MobileNavigation
           workspace={workspace}
-          userWorkspaces={userWorkspaces || []}
-          activeTab={activeTab}
+          userWorkspaces={userWorkspaces}
+          activeTab={mobileActiveTab}
           onTabChange={(tab) => {
-            setActiveTab(tab);
+            setMobileActiveTab(tab);
             setIsMenuOpen(false);
           }}
           onWorkspaceSwitch={(newWorkspaceId) => {
-            navigate(`/workspaces/${newWorkspaceId}`);
+            actions.handleWorkspaceSwitch(newWorkspaceId);
             setIsMenuOpen(false);
           }}
           onQuickAction={handleQuickAction}
@@ -184,7 +111,7 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
 
       {/* Main Content */}
       <div className="w-full pt-16 pb-24 px-4 space-y-6">
-        {activeTab === 'overview' && (
+        {mobileActiveTab === 'overview' && (
           <div className="space-y-6">
             {/* Overview Cards */}
             <section aria-label="Workspace overview" className="space-y-4">
@@ -284,28 +211,28 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
           </div>
         )}
 
-        {activeTab === 'tasks' && (
+        {mobileActiveTab === 'tasks' && (
           <div className="bg-card rounded-xl shadow-sm border border-border p-4">
             <h2 className="text-lg font-semibold text-foreground mb-4">Tasks</h2>
             <p className="text-muted-foreground text-sm">Mobile task management interface will be implemented in the next component.</p>
           </div>
         )}
 
-        {activeTab === 'team' && (
+        {mobileActiveTab === 'team' && (
           <div className="bg-card rounded-xl shadow-sm border border-border p-4">
             <h2 className="text-lg font-semibold text-foreground mb-4">Team</h2>
             <p className="text-muted-foreground text-sm">Mobile team management interface will be implemented in the next component.</p>
           </div>
         )}
 
-        {activeTab === 'communication' && (
+        {mobileActiveTab === 'communication' && (
           <div className="bg-card rounded-xl shadow-sm border border-border p-4">
             <h2 className="text-lg font-semibold text-foreground mb-4">Communication</h2>
             <p className="text-muted-foreground text-sm">Mobile communication interface will be implemented in the next component.</p>
           </div>
         )}
 
-        {activeTab === 'analytics' && (
+        {mobileActiveTab === 'analytics' && (
           <div className="bg-card rounded-xl shadow-sm border border-border p-4">
             <h2 className="text-lg font-semibold text-foreground mb-4">Analytics</h2>
             <p className="text-muted-foreground text-sm">Mobile analytics interface will be implemented in the next component.</p>
@@ -317,8 +244,8 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-2 pb-safe">
         <div className="flex justify-around">
           <button
-            onClick={() => setActiveTab('overview')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${activeTab === 'overview'
+            onClick={() => setMobileActiveTab('overview')}
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${mobileActiveTab === 'overview'
                 ? 'text-primary bg-primary/10'
                 : 'text-muted-foreground hover:text-foreground'
               }`}
@@ -327,8 +254,8 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
             <span className="text-xs mt-1">Overview</span>
           </button>
           <button
-            onClick={() => setActiveTab('tasks')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${activeTab === 'tasks'
+            onClick={() => setMobileActiveTab('tasks')}
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${mobileActiveTab === 'tasks'
                 ? 'text-primary bg-primary/10'
                 : 'text-muted-foreground hover:text-foreground'
               }`}
@@ -337,8 +264,8 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
             <span className="text-xs mt-1">Tasks</span>
           </button>
           <button
-            onClick={() => setActiveTab('team')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${activeTab === 'team'
+            onClick={() => setMobileActiveTab('team')}
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${mobileActiveTab === 'team'
                 ? 'text-primary bg-primary/10'
                 : 'text-muted-foreground hover:text-foreground'
               }`}
@@ -347,8 +274,8 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
             <span className="text-xs mt-1">Team</span>
           </button>
           <button
-            onClick={() => setActiveTab('communication')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${activeTab === 'communication'
+            onClick={() => setMobileActiveTab('communication')}
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${mobileActiveTab === 'communication'
                 ? 'text-primary bg-primary/10'
                 : 'text-muted-foreground hover:text-foreground'
               }`}
@@ -357,8 +284,8 @@ export function MobileWorkspaceDashboard({ workspaceId: propWorkspaceId }: Mobil
             <span className="text-xs mt-1">Chat</span>
           </button>
           <button
-            onClick={() => setActiveTab('analytics')}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${activeTab === 'analytics'
+            onClick={() => setMobileActiveTab('analytics')}
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${mobileActiveTab === 'analytics'
                 ? 'text-primary bg-primary/10'
                 : 'text-muted-foreground hover:text-foreground'
               }`}

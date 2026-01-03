@@ -1,0 +1,51 @@
+import { useMemo } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { TeamMember, UserRole, WorkspaceRole } from '@/types';
+
+interface UseWorkspacePermissionsProps {
+  teamMembers: TeamMember[];
+  eventId?: string;
+}
+
+/**
+ * Shared hook for workspace permission calculations
+ * Used by both desktop and mobile workspace dashboards
+ */
+export function useWorkspacePermissions({ teamMembers, eventId }: UseWorkspacePermissionsProps) {
+  const { user } = useAuth();
+
+  return useMemo(() => {
+    const isGlobalWorkspaceManager =
+      !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
+
+    const currentMember = teamMembers?.find((member) => member.userId === user?.id);
+
+    const managerWorkspaceRoles: WorkspaceRole[] = [
+      WorkspaceRole.WORKSPACE_OWNER,
+      WorkspaceRole.DEPARTMENT_MANAGER,
+      WorkspaceRole.EVENT_COORDINATOR,
+    ];
+
+    const isWorkspaceRoleManager = currentMember
+      ? managerWorkspaceRoles.includes(currentMember.role as WorkspaceRole)
+      : false;
+
+    const canManageTasks = isGlobalWorkspaceManager || isWorkspaceRoleManager;
+    const canPublishEvent = isGlobalWorkspaceManager && !!eventId;
+    const canManageSettings = isGlobalWorkspaceManager;
+    const canInviteMembers = isGlobalWorkspaceManager;
+    const canCreateSubWorkspace = isGlobalWorkspaceManager;
+
+    return {
+      user,
+      currentMember,
+      isGlobalWorkspaceManager,
+      isWorkspaceRoleManager,
+      canManageTasks,
+      canPublishEvent,
+      canManageSettings,
+      canInviteMembers,
+      canCreateSubWorkspace,
+    };
+  }, [user, teamMembers, eventId]);
+}
