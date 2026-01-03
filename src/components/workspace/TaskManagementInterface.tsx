@@ -4,8 +4,9 @@ import { TaskList } from './TaskList';
 import { TaskKanbanBoard } from './TaskKanbanBoard';
 import { TaskDetailView } from './TaskDetailView';
 import { TaskFilterBar, TaskFilters } from './TaskFilterBar';
-import { LayoutList, LayoutGrid } from 'lucide-react';
+import { LayoutList, Columns3, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface TaskManagementInterfaceProps {
   tasks: WorkspaceTask[];
@@ -110,7 +111,7 @@ export function TaskManagementInterface({
   }, [tasks, filters, roleScope]);
 
   const commonProps = {
-    tasks,
+    tasks: filteredTasks,
     teamMembers,
     onTaskClick: handleTaskClick,
     onTaskEdit,
@@ -125,53 +126,68 @@ export function TaskManagementInterface({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg sm:text-xl font-semibold text-foreground">Task Management</h2>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            Organize and track your event tasks
+            {filteredTasks.length} of {tasks.length} tasks
           </p>
         </div>
 
-        {/* View Mode Toggle */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50 border border-border self-start sm:self-auto">
-          <button
-            onClick={() => setViewMode('list')}
-            className={cn(
-              'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
-              viewMode === 'list'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-            )}
-          >
-            <LayoutList className="h-4 w-4" />
-            <span className="hidden xs:inline">List</span>
-          </button>
-          <button
-            onClick={() => setViewMode('kanban')}
-            className={cn(
-              'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
-              viewMode === 'kanban'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
-            )}
-          >
-            <LayoutGrid className="h-4 w-4" />
-            <span className="hidden xs:inline">Kanban</span>
-          </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          {/* View Mode Toggle */}
+          <div className="flex items-center p-1 rounded-lg bg-muted/60 border border-border">
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
+                viewMode === 'list'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <LayoutList className="h-4 w-4" />
+              <span className="hidden sm:inline">List</span>
+            </button>
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
+                viewMode === 'kanban'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Columns3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Kanban</span>
+            </button>
+          </div>
+
+          {/* Create Task Button */}
+          {onCreateTask && (
+            <Button onClick={onCreateTask} size="sm" className="hidden sm:flex">
+              <Plus className="h-4 w-4 mr-1.5" />
+              New Task
+            </Button>
+          )}
+          {onCreateTask && (
+            <Button onClick={onCreateTask} size="icon" className="sm:hidden h-9 w-9">
+              <Plus className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Shared filters for workspace tasks */}
+      {/* Filters */}
       <TaskFilterBar filters={filters} onChange={handleFilterChange} teamMembers={teamMembers} />
 
       {/* Task Views */}
       {viewMode === 'list' ? (
         <TaskList {...commonProps} />
       ) : (
-        <TaskKanbanBoard {...commonProps} tasks={filteredTasks} />
+        <TaskKanbanBoard {...commonProps} />
       )}
 
       {/* Task Detail Modal */}
