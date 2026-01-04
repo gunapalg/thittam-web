@@ -10,7 +10,7 @@ type SelectContextValue = {
   setOpen: (open: boolean) => void;
   value: string | undefined;
   setValue: (value: string) => void;
-  triggerRef: React.RefObject<HTMLElement>;
+  triggerRef: React.MutableRefObject<HTMLElement | null>;
   items: React.MutableRefObject<Map<string, string>>;
 };
 

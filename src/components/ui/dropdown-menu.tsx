@@ -8,7 +8,7 @@ type Align = "start" | "center" | "end";
 type DropdownMenuContextValue = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  triggerRef: React.RefObject<HTMLElement>;
+  triggerRef: React.MutableRefObject<HTMLElement | null>;
 };
 
 const DropdownMenuContext = React.createContext<DropdownMenuContextValue | null>(null);
