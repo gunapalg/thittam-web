@@ -5,7 +5,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, MapPin } from 'lucide-react';
-import { ServiceCategory, SearchFilters, formatCategory } from './types';
+import { SearchFilters } from './ServiceDiscoveryUI';
+
+const SERVICE_CATEGORIES = [
+  'VENUE',
+  'CATERING',
+  'PHOTOGRAPHY',
+  'VIDEOGRAPHY',
+  'ENTERTAINMENT',
+  'DECORATION',
+  'AUDIO_VISUAL',
+  'TRANSPORTATION',
+  'SECURITY',
+  'CLEANING',
+  'EQUIPMENT_RENTAL',
+  'PRINTING',
+  'MARKETING',
+  'OTHER'
+];
+
+const formatCategory = (category: string) => {
+  return category.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+};
 
 interface ServiceFiltersProps {
   filters: SearchFilters;
@@ -40,14 +61,14 @@ export const ServiceFilters: React.FC<ServiceFiltersProps> = ({ filters, onFilte
             <Label className="text-sm font-medium text-foreground">Category</Label>
             <Select
               value={filters.category || 'all'}
-              onValueChange={(value) => onFilterChange({ category: value === 'all' ? undefined : value as ServiceCategory })}
+              onValueChange={(value) => onFilterChange({ category: value === 'all' ? undefined : value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {Object.values(ServiceCategory).map((category) => (
+                {SERVICE_CATEGORIES.map((category) => (
                   <SelectItem key={category} value={category}>
                     {formatCategory(category)}
                   </SelectItem>
@@ -85,10 +106,8 @@ export const ServiceFilters: React.FC<ServiceFiltersProps> = ({ filters, onFilte
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="relevance">Relevance</SelectItem>
-                <SelectItem value="price">Price</SelectItem>
-                <SelectItem value="rating">Rating</SelectItem>
-                <SelectItem value="distance">Distance</SelectItem>
+                <SelectItem value="relevance">Newest First</SelectItem>
+                <SelectItem value="price">Price: Low to High</SelectItem>
               </SelectContent>
             </Select>
           </div>
