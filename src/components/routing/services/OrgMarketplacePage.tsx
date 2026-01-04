@@ -24,7 +24,7 @@ import ReviewRatingUI from '@/components/marketplace/ReviewRatingUI';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-const VALID_TABS = ['overview', 'discover', 'bookings', 'reviews'] as const;
+const VALID_TABS = ['overview', 'discover', 'bookings', 'reviews', 'analytics'] as const;
 type TabValue = typeof VALID_TABS[number];
 
 /**
@@ -118,33 +118,14 @@ export const OrgMarketplacePage: React.FC = () => {
           ]}
         />
 
-        {/* Metrics Grid */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {metrics.map((metric) => (
-            <Card key={metric.label} className="border-border/60">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${metric.bgColor}`}>
-                    <metric.icon className={`h-5 w-5 ${metric.color}`} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">{metric.value}</p>
-                    <p className="text-xs text-muted-foreground">{metric.label}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </section>
-
-
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="discover">Discover</TabsTrigger>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -240,6 +221,35 @@ export const OrgMarketplacePage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <BookingManagementUI />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {metrics.map((metric) => (
+                <Card key={metric.label} className="border-border/60">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${metric.bgColor}`}>
+                        <metric.icon className={`h-5 w-5 ${metric.color}`} />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-foreground">{metric.value}</p>
+                        <p className="text-xs text-muted-foreground">{metric.label}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </section>
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Performance</CardTitle>
+                <CardDescription>Detailed analytics for your marketplace products</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">More detailed analytics coming soon.</p>
               </CardContent>
             </Card>
           </TabsContent>
