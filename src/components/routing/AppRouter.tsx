@@ -27,6 +27,7 @@ import { OrganizerOnboardingPage } from '../organization/OrganizerOnboardingPage
 import { AdminUserRolesPage } from '../admin/AdminUserRolesPage';
 import { PendingOrganizersAdminPage } from '../admin/PendingOrganizersAdminPage';
 import { RolesDiagramPage } from '../admin/RolesDiagramPage';
+import { AdminActivityDashboard } from '../admin/AdminActivityDashboard';
 import { AdminLayout } from '../admin/AdminLayout';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
@@ -728,6 +729,7 @@ export const AppRouter: React.FC = () => {
                 <Route path="users" element={<AdminUserRolesPage />} />
                 <Route path="roles-diagram" element={<RolesDiagramPage />} />
                 <Route path="organizers" element={<PendingOrganizersAdminPage />} />
+                <Route path="activity" element={<AdminActivityDashboard />} />
               </Route>
               <Route
                 path="profile/*"

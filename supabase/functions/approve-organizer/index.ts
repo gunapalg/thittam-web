@@ -208,6 +208,19 @@ serve(async (req) => {
       });
     }
 
+    // Audit log the organizer approval
+    const userAgent = req.headers.get('user-agent') || 'unknown';
+    await serviceClient.from("admin_audit_logs").insert({
+      admin_id: user.id,
+      admin_email: user.email,
+      action: "ORGANIZER_APPROVED",
+      target_type: "user",
+      target_id: userId,
+      details: { organizationId: organizationId ?? null },
+      ip_address: clientIP,
+      user_agent: userAgent,
+    });
+
     console.log("approve-organizer: organizer approved", {
       actorUserId: user.id,
       targetUserId: userId,
