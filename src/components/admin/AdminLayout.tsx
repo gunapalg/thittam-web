@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMyOrganizations } from '@/hooks/useOrganization';
 import { UserRole } from '@/types';
 import { supabase } from '@/integrations/supabase/looseClient';
+import { useAdminSessionTimeout } from '@/hooks/useAdminSessionTimeout';
 
 /**
  * AdminLayout
@@ -13,6 +14,7 @@ import { supabase } from '@/integrations/supabase/looseClient';
  * 2. User must have SUPER_ADMIN role (verified client-side)
  * 3. User must be admin in the thittam1hub organization
  * 4. Server-side verification via has_role RPC call
+ * 5. Session timeout after 15 minutes of inactivity
  * 
  * This provides defense-in-depth by checking both client-side state
  * and making a server-side verification call to the database.
@@ -24,6 +26,9 @@ export const AdminLayout: React.FC = () => {
   
   const [serverVerified, setServerVerified] = useState<boolean | null>(null);
   const [verifying, setVerifying] = useState(true);
+
+  // Session timeout for admin users - 15 minutes of inactivity
+  useAdminSessionTimeout({ enabled: isAuthenticated && serverVerified === true });
 
   // Server-side admin verification via has_role RPC
   useEffect(() => {

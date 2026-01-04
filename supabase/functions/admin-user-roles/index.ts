@@ -369,6 +369,20 @@ serve(async (req) => {
         });
       }
 
+      // Audit log the role update
+      const clientIP = getClientIP(req);
+      const userAgent = req.headers.get('user-agent') || 'unknown';
+      await serviceClient.from("admin_audit_logs").insert({
+        admin_id: user.id,
+        admin_email: user.email,
+        action: "ROLE_UPDATE",
+        target_type: "user",
+        target_id: userId,
+        details: { roles: rolesToAssign, note: note ?? null },
+        ip_address: clientIP,
+        user_agent: userAgent,
+      });
+
       console.log("admin-user-roles: roles updated", {
         actorUserId: user.id,
         targetUserId: userId,
