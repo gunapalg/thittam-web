@@ -67,18 +67,57 @@ export const MarketplacePage: React.FC = () => {
       case 'discover':
         return (
           <div className="space-y-6">
-            {/* Hero Banner */}
-            <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-8 border">
-              <h2 className="text-2xl font-bold mb-2">Are you a vendor?</h2>
-              <p className="text-muted-foreground mb-4">
-                Join our marketplace and connect with event organizers looking for quality services.
-              </p>
-              <Button onClick={() => navigate('/marketplace/vendor/register')}>
-                Become a Vendor
-              </Button>
+            {/* Hero CTA Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Organizer CTA */}
+              <div className="bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 rounded-xl p-6 border border-primary/20 hover:shadow-lg transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-primary/10 rounded-lg">
+                    <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-foreground mb-2">Find Services for Your Event</h2>
+                    <p className="text-muted-foreground mb-4 text-sm">
+                      Discover verified vendors offering venues, catering, photography, and more for your next event.
+                    </p>
+                    <Button 
+                      onClick={() => setActiveView('discover')}
+                      className="w-full sm:w-auto"
+                    >
+                      Browse Services
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vendor CTA */}
+              <div className="bg-gradient-to-br from-secondary/15 via-secondary/10 to-secondary/5 rounded-xl p-6 border border-secondary/20 hover:shadow-lg transition-shadow">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-secondary/10 rounded-lg">
+                    <svg className="w-6 h-6 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-foreground mb-2">List Your Services & Products</h2>
+                    <p className="text-muted-foreground mb-4 text-sm">
+                      Join our marketplace as a vendor and connect with event organizers looking for quality services.
+                    </p>
+                    <Button 
+                      variant="secondary"
+                      onClick={() => navigate('/marketplace/vendor/register')}
+                      className="w-full sm:w-auto"
+                    >
+                      Vendor Dashboard
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-card rounded-lg border p-6">
               <ServiceDiscoveryUI eventId={eventId || undefined} />
             </div>
           </div>
