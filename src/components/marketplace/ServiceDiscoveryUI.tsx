@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import api from '@/lib/api';
+import { supabase } from '@/integrations/supabase/client';
 import { Search, LayoutGrid, List } from 'lucide-react';
-import { ServiceListing, SearchFilters } from './types';
 import { ServiceFilters } from './ServiceFilters';
 import { ServiceCard } from './ServiceCard';
 import { ServiceCardSkeleton } from './ServiceCardSkeleton';
@@ -20,6 +19,39 @@ import {
 
 const ITEMS_PER_PAGE = 10;
 
+export interface SearchFilters {
+  query?: string;
+  category?: string;
+  location?: string;
+  budgetRange?: {
+    min: number;
+    max: number;
+  };
+  verifiedOnly: boolean;
+  sortBy: 'relevance' | 'price' | 'rating' | 'distance';
+}
+
+export interface ServiceListingData {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  base_price: number | null;
+  pricing_type: string;
+  price_unit: string | null;
+  service_areas: string[] | null;
+  inclusions: string[] | null;
+  media_urls: string[] | null;
+  tags: string[] | null;
+  vendor: {
+    id: string;
+    business_name: string;
+    verification_status: string | null;
+    city: string | null;
+    state: string | null;
+  };
+}
+
 interface ServiceDiscoveryUIProps {
   eventId?: string;
 }
@@ -29,39 +61,111 @@ const ServiceDiscoveryUI: React.FC<ServiceDiscoveryUIProps> = ({ eventId }) => {
     verifiedOnly: true,
     sortBy: 'relevance'
   });
-  const [selectedService, setSelectedService] = useState<ServiceListing | null>(null);
+  const [selectedService, setSelectedService] = useState<ServiceListingData | null>(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [useInfiniteScroll, setUseInfiniteScroll] = useState(false);
   
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Build query params helper
-  const buildParams = (page: number) => {
-    const params = new URLSearchParams();
-    if (filters.query) params.append('query', filters.query);
-    if (filters.category) params.append('category', filters.category);
-    if (filters.location) params.append('location', filters.location);
-    if (filters.budgetRange?.min) params.append('minBudget', filters.budgetRange.min.toString());
-    if (filters.budgetRange?.max) params.append('maxBudget', filters.budgetRange.max.toString());
-    if (filters.verifiedOnly) params.append('verifiedOnly', 'true');
-    params.append('sortBy', filters.sortBy);
-    params.append('page', page.toString());
-    params.append('limit', ITEMS_PER_PAGE.toString());
-    return params;
+  // Fetch services from Supabase
+  const fetchServices = async (page: number) => {
+    let query = supabase
+      .from('vendor_services')
+      .select(`
+        id,
+        name,
+        description,
+        category,
+        base_price,
+        pricing_type,
+        price_unit,
+        service_areas,
+        inclusions,
+        media_urls,
+        tags,
+        vendor:vendors!vendor_services_vendor_fk (
+          id,
+          business_name,
+          verification_status,
+          city,
+          state
+        )
+      `, { count: 'exact' })
+      .eq('status', 'ACTIVE');
+
+    // Apply filters
+    if (filters.category) {
+      query = query.eq('category', filters.category);
+    }
+
+    if (filters.query) {
+      query = query.or(`name.ilike.%${filters.query}%,description.ilike.%${filters.query}%`);
+    }
+
+    if (filters.budgetRange?.min) {
+      query = query.gte('base_price', filters.budgetRange.min);
+    }
+
+    if (filters.budgetRange?.max) {
+      query = query.lte('base_price', filters.budgetRange.max);
+    }
+
+    // Apply sorting
+    switch (filters.sortBy) {
+      case 'price':
+        query = query.order('base_price', { ascending: true, nullsFirst: false });
+        break;
+      case 'relevance':
+      default:
+        query = query.order('created_at', { ascending: false });
+        break;
+    }
+
+    // Pagination
+    const from = (page - 1) * ITEMS_PER_PAGE;
+    const to = from + ITEMS_PER_PAGE - 1;
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      throw error;
+    }
+
+    // Filter by verified vendors if required (post-query since we can't filter nested)
+    let filteredData = data || [];
+    if (filters.verifiedOnly) {
+      filteredData = filteredData.filter(
+        (service: any) => service.vendor?.verification_status === 'VERIFIED'
+      );
+    }
+
+    // Filter by location if specified
+    if (filters.location) {
+      const locationLower = filters.location.toLowerCase();
+      filteredData = filteredData.filter((service: any) => {
+        const city = service.vendor?.city?.toLowerCase() || '';
+        const state = service.vendor?.state?.toLowerCase() || '';
+        const serviceAreas = service.service_areas || [];
+        return (
+          city.includes(locationLower) ||
+          state.includes(locationLower) ||
+          serviceAreas.some((area: string) => area.toLowerCase().includes(locationLower))
+        );
+      });
+    }
+
+    return {
+      services: filteredData as ServiceListingData[],
+      totalCount: count || 0,
+    };
   };
 
   // Paginated query
   const paginatedQuery = useQuery({
     queryKey: ['marketplace-services', filters, currentPage],
-    queryFn: async () => {
-      const params = buildParams(currentPage);
-      const response = await api.get(`/marketplace/services/search?${params.toString()}`);
-      return {
-        services: response.data.services as ServiceListing[],
-        totalCount: response.data.totalCount as number || 0,
-      };
-    },
+    queryFn: () => fetchServices(currentPage),
     enabled: !useInfiniteScroll,
   });
 
@@ -69,11 +173,9 @@ const ServiceDiscoveryUI: React.FC<ServiceDiscoveryUIProps> = ({ eventId }) => {
   const infiniteQuery = useInfiniteQuery({
     queryKey: ['marketplace-services-infinite', filters],
     queryFn: async ({ pageParam = 1 }) => {
-      const params = buildParams(pageParam);
-      const response = await api.get(`/marketplace/services/search?${params.toString()}`);
+      const result = await fetchServices(pageParam);
       return {
-        services: response.data.services as ServiceListing[],
-        totalCount: response.data.totalCount as number || 0,
+        ...result,
         nextPage: pageParam + 1,
       };
     },
@@ -120,7 +222,7 @@ const ServiceDiscoveryUI: React.FC<ServiceDiscoveryUIProps> = ({ eventId }) => {
     setCurrentPage(1);
   }, []);
 
-  const handleBookService = (service: ServiceListing) => {
+  const handleBookService = (service: ServiceListingData) => {
     setSelectedService(service);
     setShowBookingModal(true);
   };

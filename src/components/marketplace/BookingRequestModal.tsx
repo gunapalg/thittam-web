@@ -1,28 +1,52 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useNavigate } from 'react-router-dom';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
-import api from '@/lib/api';
-import { ServiceListing, formatPrice } from './types';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { ServiceListingData } from './ServiceDiscoveryUI';
 
 interface BookingRequestModalProps {
-  service: ServiceListing;
+  service: ServiceListingData;
   eventId?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+const formatPrice = (basePrice: number | null, pricingType: string, priceUnit: string | null) => {
+  if (!basePrice) {
+    return 'Contact for pricing';
+  }
+  
+  const formattedPrice = basePrice.toLocaleString();
+  
+  switch (pricingType) {
+    case 'FIXED':
+      return `$${formattedPrice}`;
+    case 'HOURLY':
+      return `$${formattedPrice}/hour`;
+    case 'PER_PERSON':
+      return `$${formattedPrice}/person`;
+    case 'CUSTOM_QUOTE':
+      return 'Custom Quote';
+    default:
+      return priceUnit ? `$${formattedPrice}/${priceUnit}` : `$${formattedPrice}`;
+  }
+};
+
 export const BookingRequestModal: React.FC<BookingRequestModalProps> = ({ 
   service, 
-  eventId, 
+  eventId: _eventId, 
   open, 
-  onOpenChange 
+  onOpenChange
 }) => {
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [bookingData, setBookingData] = useState({
     serviceDate: '',
     requirements: '',
@@ -34,32 +58,36 @@ export const BookingRequestModal: React.FC<BookingRequestModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!eventId) return;
+    
+    if (!user) {
+      toast({
+        title: 'Login Required',
+        description: 'Please log in to request a quote.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      await api.post('/marketplace/bookings', {
-        eventId,
-        serviceListingId: service.id,
-        serviceDate: bookingData.serviceDate,
-        requirements: bookingData.requirements,
-        budgetRange: bookingData.budgetMin && bookingData.budgetMax ? {
-          min: parseFloat(bookingData.budgetMin),
-          max: parseFloat(bookingData.budgetMax)
-        } : undefined,
-        additionalNotes: bookingData.additionalNotes
+      // Navigate to the vendor's profile with the quote request form
+      const params = new URLSearchParams({
+        requestQuote: 'true',
+        serviceId: service.id,
+        ...(bookingData.serviceDate && { eventDate: bookingData.serviceDate }),
       });
-
-      toast({
-        title: 'Request sent',
-        description: 'Your booking request has been sent successfully.',
-      });
+      
+      navigate(`/vendor/${service.vendor?.id}?${params.toString()}`);
       onOpenChange(false);
+      toast({
+        title: 'Redirecting',
+        description: 'You can complete your quote request on the vendor page.',
+      });
     } catch (error) {
-      console.error('Failed to create booking request:', error);
+      console.error('Failed to process request:', error);
       toast({
         title: 'Error',
-        description: 'Failed to send booking request. Please try again.',
+        description: 'Failed to process your request. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -72,13 +100,18 @@ export const BookingRequestModal: React.FC<BookingRequestModalProps> = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Request Quote</DialogTitle>
+          <DialogDescription>
+            Get a custom quote for this service from {service.vendor?.business_name}
+          </DialogDescription>
         </DialogHeader>
 
         {/* Service Summary */}
         <div className="bg-muted rounded-lg p-4 mb-4">
-          <h3 className="font-medium text-foreground mb-1">{service.title}</h3>
-          <p className="text-sm text-muted-foreground mb-1">{service.vendor.businessName}</p>
-          <p className="text-sm text-muted-foreground">{formatPrice(service.pricing)}</p>
+          <h3 className="font-medium text-foreground mb-1">{service.name}</h3>
+          <p className="text-sm text-muted-foreground mb-1">{service.vendor?.business_name}</p>
+          <p className="text-sm text-muted-foreground">
+            {formatPrice(service.base_price, service.pricing_type, service.price_unit)}
+          </p>
         </div>
 
         {/* Booking Form */}
@@ -146,7 +179,7 @@ export const BookingRequestModal: React.FC<BookingRequestModalProps> = ({
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {isSubmitting ? 'Sending...' : 'Send Request'}
+              {isSubmitting ? 'Processing...' : 'Continue to Vendor'}
             </Button>
           </div>
         </form>
