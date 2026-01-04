@@ -15,7 +15,7 @@ type TooltipContextValue = {
 
 const TooltipContext = React.createContext<TooltipContextValue | null>(null);
 
-export const TooltipProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>;
+export const TooltipProvider: React.FC<{ children: React.ReactNode; delayDuration?: number }> = ({ children }) => <>{children}</>;
 
 export const Tooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [label, setLabel] = React.useState<React.ReactNode | null>(null);

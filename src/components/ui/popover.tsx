@@ -8,7 +8,7 @@ type Align = "start" | "center" | "end";
 type PopoverContextValue = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  triggerRef: React.RefObject<HTMLElement>;
+  triggerRef: React.MutableRefObject<HTMLElement | null>;
 };
 
 const PopoverContext = React.createContext<PopoverContextValue | null>(null);
