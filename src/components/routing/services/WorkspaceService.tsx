@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { WorkspaceServiceDashboard } from './WorkspaceServiceDashboard';
 import { WorkspaceListPage } from './WorkspaceListPage';
 import { WorkspaceDetailPage } from './WorkspaceDetailPage';
@@ -23,17 +23,22 @@ import { WorkspaceSettingsPage } from '@/components/workspace/WorkspaceSettingsP
  */
 
 const WorkspaceIndexRoute: React.FC = () => {
-  const { orgSlug, eventId } = useParams<{ orgSlug?: string; eventId?: string }>();
+  const { eventId } = useParams<{ eventId?: string }>();
+  const location = useLocation();
+  
+  // Check if we're in an org context by looking at the URL path
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  const isOrgContext = pathParts.length >= 1 && pathParts[0] !== 'dashboard' && pathParts[0] !== 'console';
 
   // When under an organization route with eventId (/:orgSlug/workspaces/:eventId), 
   // render the organization-scoped workspace portal for that event.
-  if (orgSlug && eventId) {
+  if (isOrgContext && eventId) {
     return <OrgWorkspacePage />;
   }
 
   // When under an organization route without eventId (/:orgSlug/workspaces),
   // show the organization workspace list grouped by ownership.
-  if (orgSlug) {
+  if (isOrgContext) {
     return <OrgWorkspaceListPage />;
   }
 
@@ -44,8 +49,8 @@ const WorkspaceIndexRoute: React.FC = () => {
 export const WorkspaceService: React.FC = () => {
   return (
     <Routes>
-      {/* Global dashboard route - /dashboard/workspaces */}
-      <Route index element={<WorkspaceServiceDashboard />} />
+      {/* Index route - determines which view to show based on context */}
+      <Route index element={<WorkspaceIndexRoute />} />
 
       {/* Workspace List Page - for dashboard */}
       <Route path="list" element={<WorkspaceListPage />} />
