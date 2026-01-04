@@ -13,7 +13,6 @@ import {
   Star, 
   MessageSquare, 
   Send, 
-  
   CheckCircle,
   Filter
 } from 'lucide-react';
