@@ -104,34 +104,6 @@ export function WorkspaceHeader({
                 />
               </div>
             </div>
-            
-            {/* Hierarchy Tree Popover */}
-            {workspace.eventId && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted rounded-lg transition-colors shrink-0"
-                    title="View workspace hierarchy"
-                  >
-                    <GitBranch className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Hierarchy</span>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent 
-                  className="w-72 sm:w-80 max-h-[400px] overflow-auto p-0" 
-                  align="end"
-                >
-                  <div className="px-3 py-2 border-b border-border">
-                    <h4 className="text-sm font-medium">Workspace Hierarchy</h4>
-                    <p className="text-xs text-muted-foreground">Click to navigate</p>
-                  </div>
-                  <WorkspaceHierarchyTree
-                    eventId={workspace.eventId}
-                    currentWorkspaceId={workspace.id}
-                  />
-                </PopoverContent>
-              </Popover>
-            )}
           </div>
 
           {/* Workspace Title and Status - Mobile Optimized */}
@@ -152,6 +124,34 @@ export function WorkspaceHeader({
 
             {/* Action Buttons - Desktop */}
             <div className="hidden md:flex items-center gap-2">
+              {/* Hierarchy Tree Popover */}
+              {workspace.eventId && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      className="inline-flex items-center px-3 py-2 border border-border text-sm leading-4 font-medium rounded-md text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                      title="View workspace hierarchy"
+                    >
+                      <GitBranch className="w-4 h-4 mr-2" />
+                      Hierarchy
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent 
+                    className="w-72 sm:w-80 max-h-[400px] overflow-auto p-0" 
+                    align="end"
+                  >
+                    <div className="px-3 py-2 border-b border-border">
+                      <h4 className="text-sm font-medium">Workspace Hierarchy</h4>
+                      <p className="text-xs text-muted-foreground">Click to navigate</p>
+                    </div>
+                    <WorkspaceHierarchyTree
+                      eventId={workspace.eventId}
+                      currentWorkspaceId={workspace.id}
+                    />
+                  </PopoverContent>
+                </Popover>
+              )}
+
               {onCreateSubWorkspace && (
                 <button
                   onClick={onCreateSubWorkspace}
