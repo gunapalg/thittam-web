@@ -3,11 +3,13 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { PageHeader } from '../PageHeader';
 import { useAuth } from '@/hooks/useAuth';
-import { UserRole } from '@/types';
+import { UserRole, WorkspaceRole, WorkspaceType } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 import { useOrganizationEvents } from '@/hooks/useOrganization';
+import { getWorkspaceRoleLabel } from '@/lib/workspaceHierarchy';
+import { Shield } from 'lucide-react';
 
 const workspaceCreateSchema = z.object({
   name: z
@@ -106,12 +108,14 @@ export const WorkspaceCreatePage: React.FC = () => {
         return;
       }
 
+      // Create the root workspace with workspace_type set to ROOT
       const { data, error } = await supabase
         .from('workspaces')
         .insert({
           event_id: parseResult.data.eventId,
           name: parseResult.data.name,
           organizer_id: user.id,
+          workspace_type: WorkspaceType.ROOT,
         })
         .select('id')
         .maybeSingle();
@@ -120,9 +124,25 @@ export const WorkspaceCreatePage: React.FC = () => {
 
       const createdId = data?.id as string | undefined;
 
+      // Auto-assign the creator as WORKSPACE_OWNER
+      if (createdId) {
+        const { error: memberError } = await supabase
+          .from('workspace_team_members')
+          .insert({
+            workspace_id: createdId,
+            user_id: user.id,
+            role: WorkspaceRole.WORKSPACE_OWNER,
+            status: 'ACTIVE',
+          });
+
+        if (memberError) {
+          console.error('Failed to add creator as workspace owner', memberError);
+        }
+      }
+
       toast({
         title: 'Workspace created',
-        description: 'Your workspace has been created successfully.',
+        description: 'Your workspace has been created successfully. You are now the Workspace Owner.',
       });
 
       const baseWorkspacePath = isOrgContext && orgSlugCandidate
@@ -277,6 +297,19 @@ export const WorkspaceCreatePage: React.FC = () => {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Role Assignment Preview */}
+          <div className="rounded-md border border-border bg-muted/50 px-4 py-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">Your Role Assignment</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              As the creator of this root workspace, you will be assigned the{' '}
+              <span className="font-semibold text-foreground">{getWorkspaceRoleLabel(WorkspaceRole.WORKSPACE_OWNER)}</span>{' '}
+              role with full control over the workspace hierarchy.
+            </p>
           </div>
 
           {/* Info Card */}
