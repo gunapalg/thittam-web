@@ -15,6 +15,7 @@ import { RoleBasedActions } from '../RoleBasedActions';
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
 import { BudgetTrackerConnected } from '../department/BudgetTrackerConnected';
 import { VolunteersDashboard } from '../volunteers';
+import { FinanceDashboard } from '../finance';
 
 interface CommitteeDashboardProps {
   workspace: Workspace;
@@ -49,9 +50,28 @@ export function CommitteeDashboard({
   const isVolunteersCommittee = committeeType === 'volunteers' || 
     workspace.name.toLowerCase().includes('volunteer');
 
+  // Check if this is a finance committee - render specialized dashboard
+  const isFinanceCommittee = committeeType === 'finance' || 
+    workspace.name.toLowerCase().includes('finance');
+
   if (isVolunteersCommittee) {
     return (
       <VolunteersDashboard
+        workspace={workspace}
+        orgSlug={orgSlug}
+        userRole={userRole}
+        onViewTasks={onViewTasks}
+        onDelegateRole={onDelegateRole}
+        onInviteMember={onInviteMember}
+        onRequestBudget={onRequestBudget}
+        onRequestResource={onRequestResource}
+      />
+    );
+  }
+
+  if (isFinanceCommittee) {
+    return (
+      <FinanceDashboard
         workspace={workspace}
         orgSlug={orgSlug}
         userRole={userRole}
