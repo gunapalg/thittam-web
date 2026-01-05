@@ -55,8 +55,11 @@ export const WorkspaceService: React.FC = () => {
       {/* Workspace List Page - for dashboard */}
       <Route path="list" element={<WorkspaceListPage />} />
 
-      {/* Workspace Create Page - for dashboard */}
+      {/* Workspace Create Page - works for both /:orgSlug/workspaces/create and /dashboard/workspaces/create */}
       <Route path="create" element={<WorkspaceCreatePage />} />
+      
+      {/* Workspace Create with event pre-selected - /:orgSlug/workspaces/create/:eventId */}
+      <Route path="create/:eventId" element={<WorkspaceCreatePage />} />
 
       {/* Event-specific workspace portal - /:orgSlug/workspaces/:eventId */}
       <Route path=":eventId" element={<WorkspaceIndexRoute />} />
