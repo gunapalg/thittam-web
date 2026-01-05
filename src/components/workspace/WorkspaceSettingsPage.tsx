@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Trash2, Bell, Shield, Palette, Users } from 'lucide-react';
+import { ArrowLeft, Save, Trash2, Bell, Shield, Palette, Users, Archive, Settings2 } from 'lucide-react';
 import { MemberRoleManagement } from './settings/MemberRoleManagement';
 import { WorkspaceRole } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,24 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useWorkspaceData } from '@/hooks/useWorkspaceData';
 import { useWorkspacePermissions } from '@/hooks/useWorkspacePermissions';
 import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 type SettingsTab = 'general' | 'notifications' | 'permissions' | 'danger';
 
@@ -67,14 +79,29 @@ export function WorkspaceSettingsPage() {
     }
   };
 
+  const handleArchiveWorkspace = async () => {
+    if (!workspaceId) return;
+
+    try {
+      const { error } = await supabase
+        .from('workspaces')
+        .update({
+          status: 'archived',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', workspaceId);
+
+      if (error) throw error;
+      toast.success('Workspace archived');
+      navigate(-1);
+    } catch (error) {
+      console.error('Failed to archive workspace:', error);
+      toast.error('Failed to archive workspace');
+    }
+  };
+
   const handleDeleteWorkspace = async () => {
     if (!workspaceId) return;
-    
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this workspace? This action cannot be undone.'
-    );
-    
-    if (!confirmed) return;
 
     try {
       const { error } = await supabase
@@ -211,6 +238,82 @@ export function WorkspaceSettingsPage() {
                         {isSaving ? 'Saving...' : 'Save Changes'}
                       </Button>
                     </div>
+                  </div>
+                </div>
+
+                {/* Task Defaults */}
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Settings2 className="h-5 w-5 text-muted-foreground" />
+                    <h2 className="text-lg font-semibold text-foreground">Task Defaults</h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-border">
+                      <div>
+                        <p className="font-medium text-foreground">Default Task Priority</p>
+                        <p className="text-sm text-muted-foreground">Set the default priority for new tasks</p>
+                      </div>
+                      <Select 
+                        value={settings?.default_task_priority ?? 'medium'}
+                        onValueChange={(value) => updateSetting('default_task_priority', value as 'low' | 'medium' | 'high' | 'urgent')}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Auto-Archive Settings */}
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Archive className="h-5 w-5 text-muted-foreground" />
+                    <h2 className="text-lg font-semibold text-foreground">Auto-Archive</h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-3 border-b border-border">
+                      <div>
+                        <p className="font-medium text-foreground">Auto-archive after event</p>
+                        <p className="text-sm text-muted-foreground">Automatically archive workspace when linked event ends</p>
+                      </div>
+                      <Switch 
+                        checked={settings?.auto_archive_after_event ?? false}
+                        onCheckedChange={(checked) => updateSetting('auto_archive_after_event', checked)}
+                      />
+                    </div>
+                    
+                    {settings?.auto_archive_after_event && (
+                      <div className="flex items-center justify-between py-3">
+                        <div>
+                          <p className="font-medium text-foreground">Days after event completion</p>
+                          <p className="text-sm text-muted-foreground">Number of days to wait before archiving</p>
+                        </div>
+                        <Select 
+                          value={String(settings?.auto_archive_days_after ?? 7)}
+                          onValueChange={(value) => updateSetting('auto_archive_days_after', parseInt(value))}
+                        >
+                          <SelectTrigger className="w-24">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">1 day</SelectItem>
+                            <SelectItem value="3">3 days</SelectItem>
+                            <SelectItem value="7">7 days</SelectItem>
+                            <SelectItem value="14">14 days</SelectItem>
+                            <SelectItem value="30">30 days</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -373,7 +476,12 @@ export function WorkspaceSettingsPage() {
                         Archive this workspace and hide it from the list
                       </p>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleArchiveWorkspace}
+                    >
+                      <Archive className="h-4 w-4 mr-1.5" />
                       Archive
                     </Button>
                   </div>
@@ -385,14 +493,32 @@ export function WorkspaceSettingsPage() {
                         Permanently delete this workspace and all its data
                       </p>
                     </div>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={handleDeleteWorkspace}
-                    >
-                      <Trash2 className="h-4 w-4 mr-1.5" />
-                      Delete
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm">
+                          <Trash2 className="h-4 w-4 mr-1.5" />
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Workspace</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{workspace.name}"? This action cannot be undone. 
+                            All tasks, team members, settings, and associated data will be permanently removed.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDeleteWorkspace}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete Workspace
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>

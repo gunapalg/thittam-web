@@ -12,6 +12,9 @@ export interface WorkspaceSettings {
   allow_member_invites: boolean;
   allow_task_creation: boolean;
   public_visibility: boolean;
+  default_task_priority: 'low' | 'medium' | 'high' | 'urgent';
+  auto_archive_after_event: boolean;
+  auto_archive_days_after: number;
 }
 
 const DEFAULT_SETTINGS: Omit<WorkspaceSettings, 'workspace_id'> = {
@@ -22,6 +25,9 @@ const DEFAULT_SETTINGS: Omit<WorkspaceSettings, 'workspace_id'> = {
   allow_member_invites: true,
   allow_task_creation: true,
   public_visibility: false,
+  default_task_priority: 'medium',
+  auto_archive_after_event: false,
+  auto_archive_days_after: 7,
 };
 
 export function useWorkspaceSettings(workspaceId: string | undefined) {

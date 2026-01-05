@@ -1740,7 +1740,10 @@ export type Database = {
         Row: {
           allow_member_invites: boolean
           allow_task_creation: boolean
+          auto_archive_after_event: boolean | null
+          auto_archive_days_after: number | null
           created_at: string
+          default_task_priority: string | null
           id: string
           notify_messages: boolean
           notify_new_members: boolean
@@ -1753,7 +1756,10 @@ export type Database = {
         Insert: {
           allow_member_invites?: boolean
           allow_task_creation?: boolean
+          auto_archive_after_event?: boolean | null
+          auto_archive_days_after?: number | null
           created_at?: string
+          default_task_priority?: string | null
           id?: string
           notify_messages?: boolean
           notify_new_members?: boolean
@@ -1766,7 +1772,10 @@ export type Database = {
         Update: {
           allow_member_invites?: boolean
           allow_task_creation?: boolean
+          auto_archive_after_event?: boolean | null
+          auto_archive_days_after?: number | null
           created_at?: string
+          default_task_priority?: string | null
           id?: string
           notify_messages?: boolean
           notify_new_members?: boolean
