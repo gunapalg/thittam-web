@@ -61,11 +61,10 @@ export const WorkspaceService: React.FC = () => {
       {/* Event-specific workspace portal - /:orgSlug/workspaces/:eventId */}
       <Route path=":eventId" element={<WorkspaceIndexRoute />} />
 
-      {/* Workspace Settings Page under event context */}
+      {/* Workspace Settings Page under event context - MUST come before general :workspaceId route */}
       <Route path=":eventId/:workspaceId/settings" element={<WorkspaceSettingsPage />} />
 
       {/* Workspace Detail with tabs under event context */}
-      <Route path=":eventId/:workspaceId" element={<WorkspaceDetailPage />} />
       <Route path=":eventId/:workspaceId/tasks" element={<WorkspaceDetailPage defaultTab="tasks" />} />
       <Route path=":eventId/:workspaceId/team" element={<WorkspaceDetailPage defaultTab="team" />} />
       <Route path=":eventId/:workspaceId/team/invite" element={<WorkspaceDetailPage defaultTab="team" />} />
@@ -74,6 +73,9 @@ export const WorkspaceService: React.FC = () => {
       <Route path=":eventId/:workspaceId/reports" element={<WorkspaceDetailPage defaultTab="reports" />} />
       <Route path=":eventId/:workspaceId/marketplace" element={<WorkspaceDetailPage defaultTab="marketplace" />} />
       <Route path=":eventId/:workspaceId/templates" element={<WorkspaceDetailPage defaultTab="templates" />} />
+      
+      {/* General workspace detail - MUST come after more specific routes */}
+      <Route path=":eventId/:workspaceId" element={<WorkspaceDetailPage />} />
 
       {/* Legacy routes without eventId - redirect to dashboard */}
       <Route path=":workspaceId/settings" element={<WorkspaceSettingsPage />} />
