@@ -152,7 +152,7 @@ export const OrgScopedLayout: React.FC = () => {
 
   return (
     <OrganizationProvider value={{ organization }}>
-      <SidebarProvider defaultOpen={false} className="flex-col">
+      <SidebarProvider open={false} onOpenChange={() => {}} className="flex-col">
         {/* Global console header fixed at the top */}
         <OrgConsoleHeader user={user} onLogout={handleLogout} />
 
