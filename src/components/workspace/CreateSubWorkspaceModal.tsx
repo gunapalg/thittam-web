@@ -6,18 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,7 +21,16 @@ import {
   getResponsibleRoleForWorkspace,
   getWorkspaceRoleLabel,
 } from '@/lib/workspaceHierarchy';
-import { AlertTriangle, Building2, Users, Layers, Shield } from 'lucide-react';
+import { 
+  AlertTriangle, 
+  Building2, 
+  Users, 
+  Layers, 
+  Sparkles,
+  ArrowRight,
+  Check
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface CreateSubWorkspaceModalProps {
   open: boolean;
@@ -74,7 +74,6 @@ export function CreateSubWorkspaceModal({
     if (parentWorkspace.workspace_type) {
       return parentWorkspace.workspace_type as WorkspaceType;
     }
-    // Fallback: if no parent_workspace_id, it's ROOT
     return parentWorkspace.parent_workspace_id ? undefined : WorkspaceType.ROOT;
   }, [parentWorkspace]);
 
@@ -104,11 +103,9 @@ export function CreateSubWorkspaceModal({
 
   // Get department_id for the new workspace
   const getDepartmentId = (): string | null => {
-    // If creating a DEPARTMENT, the department_id is the selected option
     if (nextType === WorkspaceType.DEPARTMENT) {
       return selectedOption || null;
     }
-    // If creating COMMITTEE or TEAM, inherit from parent
     return parentWorkspace?.department_id || null;
   };
 
@@ -135,7 +132,6 @@ export function CreateSubWorkspaceModal({
       const name = getFinalName();
       if (!name.trim()) throw new Error('Name is required');
 
-      // Step 1: Create the workspace
       const { data: workspace, error: wsError } = await supabase
         .from('workspaces')
         .insert({
@@ -152,7 +148,6 @@ export function CreateSubWorkspaceModal({
 
       if (wsError) throw wsError;
 
-      // Step 2: Auto-assign the creator with the responsible role
       if (responsibleRole) {
         const { error: memberError } = await supabase
           .from('workspace_team_members')
@@ -165,7 +160,6 @@ export function CreateSubWorkspaceModal({
 
         if (memberError) {
           console.error('Failed to auto-assign role:', memberError);
-          // Don't fail the whole operation if role assignment fails
         }
       }
 
@@ -202,7 +196,6 @@ export function CreateSubWorkspaceModal({
     setCustomName('');
   };
 
-  // Reset form when modal opens/closes or parent changes
   useEffect(() => {
     if (open) {
       resetForm();
@@ -216,156 +209,236 @@ export function CreateSubWorkspaceModal({
 
   const isValid = allowCustomName ? customName.trim().length > 0 : selectedOption.length > 0;
 
-  // Get the icon for the workspace type
-  const getTypeIcon = () => {
+  // Get styling for workspace type
+  const getTypeStyles = () => {
     switch (nextType) {
       case WorkspaceType.DEPARTMENT:
-        return <Building2 className="h-5 w-5 text-blue-500" />;
+        return { 
+          icon: Building2, 
+          gradient: 'from-blue-500/20 via-blue-500/10 to-transparent',
+          border: 'border-blue-500/30',
+          iconColor: 'text-blue-500',
+          ring: 'ring-blue-500/20'
+        };
       case WorkspaceType.COMMITTEE:
-        return <Users className="h-5 w-5 text-amber-500" />;
+        return { 
+          icon: Users, 
+          gradient: 'from-amber-500/20 via-amber-500/10 to-transparent',
+          border: 'border-amber-500/30',
+          iconColor: 'text-amber-500',
+          ring: 'ring-amber-500/20'
+        };
       case WorkspaceType.TEAM:
-        return <Layers className="h-5 w-5 text-emerald-500" />;
+        return { 
+          icon: Layers, 
+          gradient: 'from-emerald-500/20 via-emerald-500/10 to-transparent',
+          border: 'border-emerald-500/30',
+          iconColor: 'text-emerald-500',
+          ring: 'ring-emerald-500/20'
+        };
       default:
-        return <Layers className="h-5 w-5 text-primary" />;
+        return { 
+          icon: Sparkles, 
+          gradient: 'from-primary/20 via-primary/10 to-transparent',
+          border: 'border-primary/30',
+          iconColor: 'text-primary',
+          ring: 'ring-primary/20'
+        };
     }
   };
 
-  // Get description based on next type
-  const getTypeDescription = (): string => {
-    switch (nextType) {
-      case WorkspaceType.DEPARTMENT:
-        return 'Departments organize your workspace into functional areas like Operations, Growth, and Content.';
-      case WorkspaceType.COMMITTEE:
-        return `Committees are specialized teams within the ${parentWorkspace?.name || 'department'} that handle specific functions.`;
-      case WorkspaceType.TEAM:
-        return `Teams are small groups that execute specific tasks within the ${parentWorkspace?.name || 'committee'}.`;
-      default:
-        return '';
-    }
-  };
+  const styles = getTypeStyles();
+  const TypeIcon = styles.icon;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {getTypeIcon()}
-            {nextType ? `Create ${getWorkspaceTypeLabel(nextType)}` : 'Create Sub-Workspace'}
-          </DialogTitle>
-          <DialogDescription>
-            {canCreate ? getTypeDescription() : 'This workspace cannot have sub-workspaces.'}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[520px] p-0 overflow-hidden border-border/50 bg-card">
+        {/* Header with gradient */}
+        <div className={cn(
+          "relative px-6 pt-8 pb-6 bg-gradient-to-b",
+          styles.gradient
+        )}>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-background/0 to-background pointer-events-none" />
+          
+          <DialogHeader className="relative space-y-3">
+            <div className={cn(
+              "w-14 h-14 rounded-2xl flex items-center justify-center",
+              "bg-background border shadow-lg",
+              styles.border
+            )}>
+              <TypeIcon className={cn("h-7 w-7", styles.iconColor)} />
+            </div>
+            
+            <div className="space-y-1.5">
+              <DialogTitle className="text-xl font-semibold tracking-tight text-foreground">
+                Create Sub-Workspace
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground text-sm leading-relaxed">
+                {canCreate 
+                  ? `Add a new ${getWorkspaceTypeLabel(nextType || undefined).toLowerCase()} under "${parentWorkspace?.name || 'Workspace'}"`
+                  : 'This workspace has reached its maximum depth.'}
+              </DialogDescription>
+            </div>
+          </DialogHeader>
+        </div>
 
         {!canCreate ? (
-          <div className="flex flex-col items-center gap-4 py-6">
-            <div className="rounded-full bg-destructive/10 p-3">
-              <AlertTriangle className="h-6 w-6 text-destructive" />
+          <div className="flex flex-col items-center gap-4 p-8">
+            <div className="rounded-full bg-destructive/10 p-4">
+              <AlertTriangle className="h-8 w-8 text-destructive" />
             </div>
-            <div className="text-center">
-              <p className="font-medium text-foreground">Maximum Depth Reached</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Teams are the final level in the hierarchy. You cannot create
-                sub-workspaces below level {MAX_WORKSPACE_DEPTH}.
+            <div className="text-center space-y-2">
+              <p className="font-semibold text-foreground">Maximum Depth Reached</p>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Teams are the final level. You cannot create sub-workspaces beyond level {MAX_WORKSPACE_DEPTH}.
               </p>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Hierarchy indicator */}
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 border border-border">
-              <div className="flex items-center gap-1">
-                {/* Level indicators */}
-                <div className={`w-3 h-3 rounded-full ${parentType === WorkspaceType.ROOT || !parentType ? 'bg-primary' : 'bg-muted-foreground/30'}`} />
-                <div className={`w-3 h-3 rounded-full ${parentType === WorkspaceType.DEPARTMENT ? 'bg-blue-500' : nextType === WorkspaceType.DEPARTMENT ? 'ring-2 ring-blue-500 ring-offset-2' : 'bg-muted-foreground/30'}`} />
-                <div className={`w-3 h-3 rounded-full ${parentType === WorkspaceType.COMMITTEE ? 'bg-amber-500' : nextType === WorkspaceType.COMMITTEE ? 'ring-2 ring-amber-500 ring-offset-2' : 'bg-muted-foreground/30'}`} />
-                <div className={`w-3 h-3 rounded-full ${nextType === WorkspaceType.TEAM ? 'ring-2 ring-emerald-500 ring-offset-2' : 'bg-muted-foreground/30'}`} />
-              </div>
-              <span className="text-xs text-muted-foreground ml-2">
-                Creating under "{parentWorkspace?.name || 'Workspace'}"
+          <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-5">
+            {/* Hierarchy breadcrumb */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="px-2 py-1 rounded-md bg-muted/50">
+                {parentWorkspace?.name || 'Parent'}
+              </span>
+              <ArrowRight className="h-3 w-3" />
+              <span className={cn(
+                "px-2 py-1 rounded-md border-2 border-dashed",
+                styles.border,
+                styles.iconColor
+              )}>
+                New {getWorkspaceTypeLabel(nextType || undefined)}
               </span>
             </div>
 
-            {/* Selection or Input based on type */}
+            {/* Input Section */}
             {allowCustomName ? (
-              // Free-form team name input
-              <div className="space-y-2">
-                <Label htmlFor="team-name">Team Name</Label>
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-foreground">
+                  Workspace Name
+                </label>
                 <Input
-                  id="team-name"
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  placeholder="Enter team name..."
+                  placeholder="Enter a name for your workspace..."
                   maxLength={100}
                   autoFocus
+                  className={cn(
+                    "h-12 text-base transition-all duration-200",
+                    "focus-visible:ring-2",
+                    styles.ring
+                  )}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Choose a descriptive name for your team (e.g., "Stage Setup", "Vendor Management")
+                  Choose a descriptive name (e.g., "Stage Setup", "Vendor Coordination")
                 </p>
               </div>
             ) : options && options.length > 0 ? (
-              // Predefined options dropdown
-              <div className="space-y-2">
-                <Label htmlFor="option-select">
-                  Select {getWorkspaceTypeLabel(nextType || undefined)}
-                </Label>
-                <Select value={selectedOption} onValueChange={setSelectedOption}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={`Choose a ${getWorkspaceTypeLabel(nextType || undefined).toLowerCase()}...`} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {options.map((option) => (
-                      <SelectItem key={option.id} value={option.id}>
-                        <div className="flex flex-col">
-                          <span>{option.name}</span>
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-foreground">
+                  Select Type
+                </label>
+                <div className="grid gap-2">
+                  {options.map((option) => {
+                    const isSelected = selectedOption === option.id;
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => setSelectedOption(option.id)}
+                        className={cn(
+                          "relative flex items-start gap-3 p-4 rounded-xl text-left transition-all duration-200",
+                          "border-2 hover:border-primary/50 hover:bg-accent/50",
+                          isSelected 
+                            ? "border-primary bg-primary/5 shadow-sm" 
+                            : "border-border bg-background"
+                        )}
+                      >
+                        <div className={cn(
+                          "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                          isSelected 
+                            ? "border-primary bg-primary text-primary-foreground" 
+                            : "border-muted-foreground/30"
+                        )}>
+                          {isSelected && <Check className="h-3 w-3" />}
+                        </div>
+                        <div className="flex-1 space-y-0.5">
+                          <span className={cn(
+                            "font-medium",
+                            isSelected ? "text-foreground" : "text-foreground/80"
+                          )}>
+                            {option.name}
+                          </span>
                           {option.description && (
-                            <span className="text-xs text-muted-foreground">{option.description}</span>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {option.description}
+                            </p>
                           )}
                         </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             ) : (
-              <div className="text-center py-4 text-muted-foreground">
+              <div className="text-center py-6 text-muted-foreground">
                 No options available for this level.
               </div>
             )}
 
             {/* Role assignment preview */}
-            {responsibleRole && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
-                <Shield className="h-4 w-4 text-primary" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">
-                    You'll be assigned as: {getWorkspaceRoleLabel(responsibleRole)}
+            {responsibleRole && isValid && (
+              <div className={cn(
+                "flex items-center gap-3 p-4 rounded-xl",
+                "bg-gradient-to-r from-primary/5 to-transparent",
+                "border border-primary/20"
+              )}>
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    You'll be the {getWorkspaceRoleLabel(responsibleRole)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    As the creator, you'll automatically receive the responsible role for this {getWorkspaceTypeLabel(nextType || undefined).toLowerCase()}.
+                    Automatically assigned as the creator
                   </p>
                 </div>
               </div>
             )}
 
-            <DialogFooter className="gap-2 sm:gap-0">
+            {/* Action buttons */}
+            <div className="flex items-center gap-3 pt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={createSubWorkspaceMutation.isPending}
+                className="flex-1 h-11"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={!isValid || createSubWorkspaceMutation.isPending}
+                className={cn(
+                  "flex-1 h-11 gap-2",
+                  "bg-primary hover:bg-primary/90"
+                )}
               >
-                {createSubWorkspaceMutation.isPending 
-                  ? 'Creating...' 
-                  : `Create ${getWorkspaceTypeLabel(nextType || undefined)}`}
+                {createSubWorkspaceMutation.isPending ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    Create
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </Button>
-            </DialogFooter>
+            </div>
           </form>
         )}
       </DialogContent>
