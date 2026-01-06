@@ -39,27 +39,42 @@ const VendorPortfolioGallery: React.FC<VendorPortfolioGalleryProps> = ({ vendorI
   const { data: images, isLoading } = useQuery({
     queryKey: ['vendor-portfolio', vendorId],
     queryFn: async () => {
-      const { data: files, error } = await supabase.storage
-        .from('vendor-portfolios')
-        .list(`${vendorId}/gallery`, {
-          limit: 50,
-          sortBy: { column: 'created_at', order: 'desc' }
-        });
-
-      if (error) throw error;
-
-      const imageFiles = files?.filter(f => 
-        f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-      ) || [];
-
-      return imageFiles.map(file => ({
-        url: supabase.storage
+      try {
+        const { data: files, error } = await supabase.storage
           .from('vendor-portfolios')
-          .getPublicUrl(`${vendorId}/gallery/${file.name}`).data.publicUrl,
-        name: file.name
-      })) as PortfolioImage[];
+          .list(`${vendorId}/gallery`, {
+            limit: 50,
+            sortBy: { column: 'created_at', order: 'desc' }
+          });
+
+        // If the folder doesn't exist or is empty, return empty array
+        if (error) {
+          console.error('Storage list error:', error);
+          // Return empty array instead of throwing for common errors
+          if (error.message?.includes('not found') || error.message?.includes('empty')) {
+            return [];
+          }
+          throw error;
+        }
+
+        const imageFiles = files?.filter(f => 
+          f.name && f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+        ) || [];
+
+        return imageFiles.map(file => ({
+          url: supabase.storage
+            .from('vendor-portfolios')
+            .getPublicUrl(`${vendorId}/gallery/${file.name}`).data.publicUrl,
+          name: file.name
+        })) as PortfolioImage[];
+      } catch (err) {
+        console.error('Portfolio fetch error:', err);
+        // Return empty array for any error - don't block the UI
+        return [];
+      }
     },
     enabled: !!vendorId,
+    retry: false, // Don't retry on error
   });
 
   const deleteMutation = useMutation({
