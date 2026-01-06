@@ -8,26 +8,21 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { WorkspaceType, WorkspaceRole } from '@/types';
+import { WorkspaceType } from '@/types';
 import {
-  getWorkspaceTypeLabel,
   getResponsibleRoleForWorkspace,
-  getWorkspaceRoleLabel,
   WORKSPACE_DEPARTMENTS,
   DEPARTMENT_COMMITTEES,
 } from '@/lib/workspaceHierarchy';
 import { 
   Building2, 
   Users, 
-  Layers, 
   Sparkles,
   ArrowRight,
   Check,
-  ChevronLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -38,13 +33,14 @@ interface CreateSubWorkspaceModalProps {
   eventId: string;
 }
 
-type CreationType = 'department' | 'committee' | 'team' | null;
-
 interface OptionItem {
   id: string;
   name: string;
   description?: string;
+  type: 'department' | 'committee';
 }
+
+type TabType = 'department' | 'committee';
 
 export function CreateSubWorkspaceModal({
   open,
@@ -56,9 +52,8 @@ export function CreateSubWorkspaceModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [selectedType, setSelectedType] = useState<CreationType>(null);
-  const [selectedOption, setSelectedOption] = useState<string>('');
-  const [customName, setCustomName] = useState('');
+  const [activeTab, setActiveTab] = useState<TabType>('department');
+  const [selectedItems, setSelectedItems] = useState<OptionItem[]>([]);
 
   // Fetch parent workspace
   const { data: parentWorkspace } = useQuery({
@@ -76,134 +71,113 @@ export function CreateSubWorkspaceModal({
     enabled: open && !!parentWorkspaceId,
   });
 
-  const parentType = useMemo(() => {
-    if (!parentWorkspace) return undefined;
-    if (parentWorkspace.workspace_type) {
-      return parentWorkspace.workspace_type as WorkspaceType;
-    }
-    return parentWorkspace.parent_workspace_id ? undefined : WorkspaceType.ROOT;
-  }, [parentWorkspace]);
+  // Get all departments
+  const departmentOptions: OptionItem[] = useMemo(() => {
+    return WORKSPACE_DEPARTMENTS.map(d => ({
+      id: d.id,
+      name: d.name,
+      description: d.description,
+      type: 'department' as const,
+    }));
+  }, []);
 
-  // Get available creation types based on parent
-  const availableTypes = useMemo((): CreationType[] => {
-    if (!parentType) return ['department', 'committee'];
-    
-    switch (parentType) {
-      case WorkspaceType.ROOT:
-        return ['department', 'committee'];
-      case WorkspaceType.DEPARTMENT:
-        return ['committee', 'team'];
-      case WorkspaceType.COMMITTEE:
-        return ['team'];
-      default:
-        return [];
-    }
-  }, [parentType]);
-
-  // Get options based on selected type
-  const currentOptions = useMemo((): OptionItem[] => {
-    if (selectedType === 'department') {
-      return WORKSPACE_DEPARTMENTS.map(d => ({
-        id: d.id,
-        name: d.name,
-        description: d.description,
+  // Get all committees
+  const committeeOptions: OptionItem[] = useMemo(() => {
+    const deptId = parentWorkspace?.department_id;
+    if (deptId && DEPARTMENT_COMMITTEES[deptId]) {
+      return DEPARTMENT_COMMITTEES[deptId].map(c => ({ 
+        id: c.id, 
+        name: c.name,
+        type: 'committee' as const,
       }));
     }
-    if (selectedType === 'committee') {
-      const deptId = parentWorkspace?.department_id;
-      if (deptId && DEPARTMENT_COMMITTEES[deptId]) {
-        return DEPARTMENT_COMMITTEES[deptId].map(c => ({ id: c.id, name: c.name }));
+    return Object.values(DEPARTMENT_COMMITTEES).flat().map(c => ({ 
+      id: c.id, 
+      name: c.name,
+      type: 'committee' as const,
+    }));
+  }, [parentWorkspace?.department_id]);
+
+  const currentOptions = activeTab === 'department' ? departmentOptions : committeeOptions;
+
+  const toggleSelection = (item: OptionItem) => {
+    setSelectedItems(prev => {
+      const exists = prev.find(i => i.id === item.id && i.type === item.type);
+      if (exists) {
+        return prev.filter(i => !(i.id === item.id && i.type === item.type));
       }
-      // Return all committees if no specific department
-      return Object.values(DEPARTMENT_COMMITTEES).flat().map(c => ({ id: c.id, name: c.name }));
-    }
-    return [];
-  }, [selectedType, parentWorkspace?.department_id]);
-
-  const allowCustomName = selectedType === 'team';
-
-  // Map to WorkspaceType
-  const getWorkspaceType = (): WorkspaceType | null => {
-    switch (selectedType) {
-      case 'department': return WorkspaceType.DEPARTMENT;
-      case 'committee': return WorkspaceType.COMMITTEE;
-      case 'team': return WorkspaceType.TEAM;
-      default: return null;
-    }
+      return [...prev, item];
+    });
   };
 
-  const workspaceType = getWorkspaceType();
-
-  // Get department_id for the new workspace
-  const getDepartmentId = (): string | null => {
-    if (selectedType === 'department') {
-      return selectedOption || null;
-    }
-    return parentWorkspace?.department_id || null;
+  const isSelected = (item: OptionItem) => {
+    return selectedItems.some(i => i.id === item.id && i.type === item.type);
   };
 
-  // Get responsible role
-  const responsibleRole = useMemo((): WorkspaceRole | null => {
-    if (!workspaceType) return null;
-    
-    const departmentId = selectedType === 'department' 
-      ? selectedOption 
-      : parentWorkspace?.department_id || undefined;
-    
-    const committeeId = selectedType === 'committee' 
-      ? selectedOption 
-      : undefined;
-    
-    return getResponsibleRoleForWorkspace(workspaceType, departmentId, committeeId);
-  }, [workspaceType, selectedType, selectedOption, parentWorkspace?.department_id]);
+  const selectedDepartments = selectedItems.filter(i => i.type === 'department');
+  const selectedCommittees = selectedItems.filter(i => i.type === 'committee');
 
-  const getFinalName = (): string => {
-    if (allowCustomName) return customName;
-    const option = currentOptions.find((o: OptionItem) => o.id === selectedOption);
-    return option?.name || '';
-  };
-
-  const createSubWorkspaceMutation = useMutation({
+  const createSubWorkspacesMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('Must be authenticated');
-      if (!workspaceType) throw new Error('Select a workspace type');
+      if (selectedItems.length === 0) throw new Error('Select at least one item');
 
-      const name = getFinalName();
-      if (!name.trim()) throw new Error('Name is required');
+      const createdWorkspaces: { id: string; name: string }[] = [];
 
-      const { data: workspace, error: wsError } = await supabase
-        .from('workspaces')
-        .insert({
-          name: name.trim(),
-          event_id: eventId,
-          parent_workspace_id: parentWorkspaceId,
-          organizer_id: user.id,
-          status: 'ACTIVE',
-          workspace_type: workspaceType,
-          department_id: getDepartmentId(),
-        })
-        .select('id, name')
-        .single();
+      for (const item of selectedItems) {
+        const workspaceType = item.type === 'department' 
+          ? WorkspaceType.DEPARTMENT 
+          : WorkspaceType.COMMITTEE;
 
-      if (wsError) throw wsError;
+        const departmentId = item.type === 'department' 
+          ? item.id 
+          : parentWorkspace?.department_id || null;
 
-      if (responsibleRole) {
-        await supabase
-          .from('workspace_team_members')
+        const { data: workspace, error: wsError } = await supabase
+          .from('workspaces')
           .insert({
-            workspace_id: workspace.id,
-            user_id: user.id,
-            role: responsibleRole,
-            status: 'active',
-          });
+            name: item.name,
+            event_id: eventId,
+            parent_workspace_id: parentWorkspaceId,
+            organizer_id: user.id,
+            status: 'ACTIVE',
+            workspace_type: workspaceType,
+            department_id: departmentId,
+          })
+          .select('id, name')
+          .single();
+
+        if (wsError) throw wsError;
+
+        const responsibleRole = getResponsibleRoleForWorkspace(
+          workspaceType,
+          departmentId || undefined,
+          item.type === 'committee' ? item.id : undefined
+        );
+
+        if (responsibleRole) {
+          await supabase
+            .from('workspace_team_members')
+            .insert({
+              workspace_id: workspace.id,
+              user_id: user.id,
+              role: responsibleRole,
+              status: 'active',
+            });
+        }
+
+        createdWorkspaces.push(workspace);
       }
 
-      return { ...workspace, assignedRole: responsibleRole };
+      return createdWorkspaces;
     },
     onSuccess: (data) => {
+      const count = data.length;
       toast({
-        title: `${getWorkspaceTypeLabel(workspaceType || undefined)} created`,
-        description: `"${data.name}" has been created successfully.`,
+        title: `${count} workspace${count > 1 ? 's' : ''} created`,
+        description: count === 1 
+          ? `"${data[0].name}" has been created.`
+          : `Created: ${data.map(w => w.name).join(', ')}`,
       });
       queryClient.invalidateQueries({ queryKey: ['event-workspaces', eventId] });
       queryClient.invalidateQueries({ queryKey: ['workspace-hierarchy', eventId] });
@@ -223,9 +197,8 @@ export function CreateSubWorkspaceModal({
   });
 
   const resetForm = () => {
-    setSelectedType(null);
-    setSelectedOption('');
-    setCustomName('');
+    setActiveTab('department');
+    setSelectedItems([]);
   };
 
   useEffect(() => {
@@ -234,75 +207,24 @@ export function CreateSubWorkspaceModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createSubWorkspaceMutation.mutate();
+    createSubWorkspacesMutation.mutate();
   };
 
-  const isValid = selectedType && (allowCustomName ? customName.trim().length > 0 : selectedOption.length > 0);
-
-  const typeConfig = {
-    department: { 
-      icon: Building2, 
-      label: 'Department',
-      sublabel: 'L2',
-      color: 'text-blue-500',
-      bg: 'bg-blue-500/10',
-      border: 'border-blue-500/30',
-      gradient: 'from-blue-500/15'
-    },
-    committee: { 
-      icon: Users, 
-      label: 'Committee',
-      sublabel: 'L3',
-      color: 'text-amber-500',
-      bg: 'bg-amber-500/10',
-      border: 'border-amber-500/30',
-      gradient: 'from-amber-500/15'
-    },
-    team: { 
-      icon: Layers, 
-      label: 'Team',
-      sublabel: 'L4',
-      color: 'text-emerald-500',
-      bg: 'bg-emerald-500/10',
-      border: 'border-emerald-500/30',
-      gradient: 'from-emerald-500/15'
-    },
-  };
-
-  const currentConfig = selectedType ? typeConfig[selectedType] : null;
+  const isValid = selectedItems.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[380px] p-0 overflow-hidden border-border/50 bg-card gap-0">
+      <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden border-border/50 bg-card gap-0">
         {/* Header */}
-        <div className={cn(
-          "px-4 pt-4 pb-3 bg-gradient-to-b to-transparent",
-          currentConfig?.gradient || "from-primary/10"
-        )}>
+        <div className="px-4 pt-4 pb-3 bg-gradient-to-b from-primary/10 to-transparent">
           <DialogHeader className="space-y-1">
             <div className="flex items-center gap-2">
-              {selectedType && (
-                <button
-                  type="button"
-                  onClick={() => { setSelectedType(null); setSelectedOption(''); }}
-                  className="p-1 -ml-1 rounded-md hover:bg-accent transition-colors"
-                >
-                  <ChevronLeft className="h-4 w-4 text-muted-foreground" />
-                </button>
-              )}
-              <div className={cn(
-                "w-8 h-8 rounded-lg flex items-center justify-center",
-                currentConfig?.bg || "bg-primary/10"
-              )}>
-                {currentConfig ? (
-                  <currentConfig.icon className={cn("h-4 w-4", currentConfig.color)} />
-                ) : (
-                  <Sparkles className="h-4 w-4 text-primary" />
-                )}
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+                <Sparkles className="h-4 w-4 text-primary" />
               </div>
               <div className="flex-1">
                 <DialogTitle className="text-sm font-semibold text-foreground">
-                  {selectedType ? `New ${typeConfig[selectedType].label}` : 'Create Sub-Workspace'}
+                  Create Sub-Workspaces
                 </DialogTitle>
                 <DialogDescription className="text-[11px] text-muted-foreground">
                   Under "{parentWorkspace?.name || 'Workspace'}"
@@ -312,127 +234,145 @@ export function CreateSubWorkspaceModal({
           </DialogHeader>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-4 pb-4 space-y-3">
-          {/* Step 1: Select Type */}
-          {!selectedType ? (
-            <div className="grid grid-cols-2 gap-2">
-              {availableTypes.map((type) => {
-                if (!type) return null;
-                const config = typeConfig[type];
+        <form onSubmit={handleSubmit} className="space-y-0">
+          {/* Tabs */}
+          <div className="flex border-b border-border/50">
+            <button
+              type="button"
+              onClick={() => setActiveTab('department')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium transition-all",
+                "border-b-2 -mb-px",
+                activeTab === 'department'
+                  ? "border-blue-500 text-blue-600 bg-blue-500/5"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-accent/30"
+              )}
+            >
+              <Building2 className="h-3.5 w-3.5" />
+              Department
+              {selectedDepartments.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-blue-500 text-white">
+                  {selectedDepartments.length}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('committee')}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-medium transition-all",
+                "border-b-2 -mb-px",
+                activeTab === 'committee'
+                  ? "border-amber-500 text-amber-600 bg-amber-500/5"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-accent/30"
+              )}
+            >
+              <Users className="h-3.5 w-3.5" />
+              Committee
+              {selectedCommittees.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-amber-500 text-white">
+                  {selectedCommittees.length}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Options List */}
+          <div className="px-4 py-3">
+            <div className="space-y-1.5 max-h-[220px] overflow-y-auto">
+              {currentOptions.map((option) => {
+                const selected = isSelected(option);
+                const colorClass = option.type === 'department' ? 'blue' : 'amber';
                 return (
                   <button
-                    key={type}
+                    key={`${option.type}-${option.id}`}
                     type="button"
-                    onClick={() => setSelectedType(type)}
+                    onClick={() => toggleSelection(option)}
                     className={cn(
-                      "flex flex-col items-center gap-2 p-4 rounded-xl transition-all",
-                      "border-2 border-border/50 hover:border-primary/50 hover:bg-accent/30",
-                      "bg-background"
+                      "w-full flex items-center gap-2.5 p-2.5 rounded-lg text-left transition-all",
+                      "border hover:bg-accent/20",
+                      selected 
+                        ? `border-${colorClass}-500/50 bg-${colorClass}-500/5` 
+                        : "border-border/40 bg-background"
                     )}
                   >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", config.bg)}>
-                      <config.icon className={cn("h-5 w-5", config.color)} />
+                    <div className={cn(
+                      "flex h-4 w-4 shrink-0 items-center justify-center rounded transition-colors",
+                      "border-[1.5px]",
+                      selected 
+                        ? option.type === 'department' 
+                          ? "border-blue-500 bg-blue-500" 
+                          : "border-amber-500 bg-amber-500"
+                        : "border-muted-foreground/40"
+                    )}>
+                      {selected && <Check className="h-2.5 w-2.5 text-white" />}
                     </div>
-                    <div className="text-center">
-                      <span className="text-sm font-medium text-foreground block">{config.label}</span>
-                      <span className="text-[10px] text-muted-foreground">{config.sublabel}</span>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-medium text-foreground block truncate">
+                        {option.name}
+                      </span>
+                      {option.description && (
+                        <p className="text-[10px] text-muted-foreground truncate">
+                          {option.description}
+                        </p>
+                      )}
                     </div>
                   </button>
                 );
               })}
             </div>
-          ) : (
-            <>
-              {/* Step 2: Select Option or Enter Name */}
-              {allowCustomName ? (
-                <Input
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                  placeholder="Enter team name..."
-                  maxLength={100}
-                  autoFocus
-                  className="h-9 text-sm"
-                />
-              ) : currentOptions.length > 0 ? (
-                <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
-                  {currentOptions.map((option) => {
-                    const isSelected = selectedOption === option.id;
-                    return (
-                      <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => setSelectedOption(option.id)}
-                        className={cn(
-                          "w-full flex items-center gap-2.5 p-2.5 rounded-lg text-left transition-all",
-                          "border hover:border-primary/50",
-                          isSelected 
-                            ? "border-primary bg-primary/5" 
-                            : "border-border/40 bg-background hover:bg-accent/20"
-                        )}
-                      >
-                        <div className={cn(
-                          "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-[1.5px] transition-colors",
-                          isSelected ? "border-primary bg-primary" : "border-muted-foreground/40"
-                        )}>
-                          {isSelected && <Check className="h-2 w-2 text-primary-foreground" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-xs font-medium text-foreground block truncate">
-                            {option.name}
-                          </span>
-                          {option.description && (
-                            <p className="text-[10px] text-muted-foreground truncate">
-                              {option.description}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground text-center py-3">
-                  No options available.
-                </p>
-              )}
+          </div>
 
-              {/* Role preview */}
-              {responsibleRole && isValid && (
-                <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-primary/5 border border-primary/20">
-                  <Sparkles className="h-3 w-3 text-primary shrink-0" />
-                  <span className="text-[11px] text-muted-foreground">
-                    Role: <span className="font-medium text-foreground">{getWorkspaceRoleLabel(responsibleRole)}</span>
+          {/* Selection Summary */}
+          {selectedItems.length > 0 && (
+            <div className="px-4 pb-2">
+              <div className="flex flex-wrap gap-1">
+                {selectedItems.map((item) => (
+                  <span
+                    key={`${item.type}-${item.id}`}
+                    className={cn(
+                      "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+                      item.type === 'department'
+                        ? "bg-blue-500/10 text-blue-600"
+                        : "bg-amber-500/10 text-amber-600"
+                    )}
+                  >
+                    {item.type === 'department' ? <Building2 className="h-2.5 w-2.5" /> : <Users className="h-2.5 w-2.5" />}
+                    {item.name}
                   </span>
-                </div>
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 pt-1">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onOpenChange(false)}
-                  disabled={createSubWorkspaceMutation.isPending}
-                  className="flex-1 h-8 text-xs"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  size="sm"
-                  disabled={!isValid || createSubWorkspaceMutation.isPending}
-                  className="flex-1 h-8 text-xs gap-1"
-                >
-                  {createSubWorkspaceMutation.isPending ? (
-                    <div className="h-3 w-3 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  ) : (
-                    <>Create <ArrowRight className="h-3 w-3" /></>
-                  )}
-                </Button>
+                ))}
               </div>
-            </>
+            </div>
           )}
+
+          {/* Actions */}
+          <div className="flex items-center gap-2 px-4 pb-4 pt-2 border-t border-border/30">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+              disabled={createSubWorkspacesMutation.isPending}
+              className="flex-1 h-8 text-xs"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={!isValid || createSubWorkspacesMutation.isPending}
+              className="flex-1 h-8 text-xs gap-1"
+            >
+              {createSubWorkspacesMutation.isPending ? (
+                <div className="h-3 w-3 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+              ) : (
+                <>
+                  Create {selectedItems.length > 0 && `(${selectedItems.length})`}
+                  <ArrowRight className="h-3 w-3" />
+                </>
+              )}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
