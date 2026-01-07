@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { NavLink } from '@/components/NavLink';
 import { useCurrentOrganization } from './OrganizationContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -15,10 +14,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { SidebarUserFooter } from './SidebarUserFooter';
+import { SidebarHeaderContent } from './sidebar/SidebarHeader';
+import { SidebarServiceItem } from './sidebar/SidebarServiceItem';
+import { SidebarNavLink } from './sidebar/SidebarNavLink';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Home,
@@ -32,7 +33,6 @@ import {
   ChevronRight,
   Folder,
   FolderOpen,
-  Plus,
   PlusCircle,
   LayoutTemplate,
   List,
@@ -57,236 +57,48 @@ import {
 import { cn } from '@/lib/utils';
 import { WorkspaceStatus } from '@/types';
 
-interface OrgMenuItem {
-  title: string;
-  icon: React.ElementType;
-  path: string;
-  description: string;
-}
-
-const orgServices: OrgMenuItem[] = [
-  { title: 'Dashboard', icon: LayoutDashboard, path: 'dashboard', description: 'Overview & metrics' },
-  // Event Management is now a separate expandable section
-  // Workspace is now a separate expandable section
-  // Marketplace is now a separate expandable section
-  // Analytics is now a separate expandable section
-  // Team is now a separate expandable section
+// Quick action definitions
+const getEventQuickActions = (base: string) => [
+  { title: 'Create New Event', path: `${base}/eventmanagement/create`, icon: PlusCircle, primary: true },
+  { title: 'Browse Templates', path: `${base}/eventmanagement/templates`, icon: LayoutTemplate },
+  { title: 'View All Events', path: `${base}/eventmanagement`, icon: List },
+  { title: 'Registrations', path: `${base}/eventmanagement/registrations`, icon: ClipboardList },
+  { title: 'Analytics', path: `${base}/analytics`, icon: BarChart3 },
 ];
 
-interface TeamQuickAction {
-  title: string;
-  description: string;
-  path: string;
-  icon: React.ElementType;
-  primary?: boolean;
-}
-
-const getTeamQuickActions = (base: string): TeamQuickAction[] => [
-  {
-    title: 'Invite Members',
-    description: 'Add new team members',
-    path: `${base}/team?tab=invite`,
-    icon: UserPlus,
-    primary: true,
-  },
-  {
-    title: 'View Roles',
-    description: 'Manage member roles',
-    path: `${base}/team?tab=roles`,
-    icon: UserCog,
-  },
-  {
-    title: 'Pending Approvals',
-    description: 'Review requests',
-    path: `${base}/team?tab=pending`,
-    icon: Clock,
-  },
-  {
-    title: 'Active Members',
-    description: 'All team members',
-    path: `${base}/team?tab=members`,
-    icon: UserCheck,
-  },
+const getWorkspaceQuickActions = (base: string) => [
+  { title: 'Create Workspace', path: `${base}/workspaces`, icon: PlusCircle, primary: true },
+  { title: 'Browse Templates', path: `${base}/templates`, icon: LayoutTemplate },
+  { title: 'View All Workspaces', path: `${base}/workspaces?tab=list`, icon: List },
+  { title: 'Team Analytics', path: `${base}/workspaces?tab=analytics`, icon: BarChart3 },
 ];
 
-interface AnalyticsQuickAction {
-  title: string;
-  description: string;
-  path: string;
-  icon: React.ElementType;
-  primary?: boolean;
-}
-
-const getAnalyticsQuickActions = (base: string): AnalyticsQuickAction[] => [
-  {
-    title: 'View Reports',
-    description: 'Performance dashboards',
-    path: `${base}/analytics?tab=reports`,
-    icon: FileText,
-    primary: true,
-  },
-  {
-    title: 'Export Data',
-    description: 'Download analytics data',
-    path: `${base}/analytics?tab=export`,
-    icon: Download,
-  },
-  {
-    title: 'Date Range',
-    description: 'Filter by time period',
-    path: `${base}/analytics?tab=daterange`,
-    icon: Calendar,
-  },
-  {
-    title: 'Trends',
-    description: 'Growth & engagement',
-    path: `${base}/analytics?tab=trends`,
-    icon: TrendingUp,
-  },
+const getMarketplaceQuickActions = (base: string) => [
+  { title: 'Manage Products', path: `${base}/settings/story`, icon: Package, primary: true },
+  { title: 'Browse Services', path: `${base}/marketplace?tab=discover`, icon: Search },
+  { title: 'My Bookings', path: `${base}/marketplace?tab=bookings`, icon: ShoppingCart },
+  { title: 'Reviews', path: `${base}/marketplace?tab=reviews`, icon: Star },
 ];
 
-interface MarketplaceQuickAction {
-  title: string;
-  description: string;
-  path: string;
-  icon: React.ElementType;
-  primary?: boolean;
-}
-
-const getMarketplaceQuickActions = (base: string): MarketplaceQuickAction[] => [
-  {
-    title: 'Manage Products',
-    description: 'Add or edit your products',
-    path: `${base}/settings/story`,
-    icon: Package,
-    primary: true,
-  },
-  {
-    title: 'Browse Services',
-    description: 'Find vendors for events',
-    path: `${base}/marketplace?tab=discover`,
-    icon: Search,
-  },
-  {
-    title: 'My Bookings',
-    description: 'View service bookings',
-    path: `${base}/marketplace?tab=bookings`,
-    icon: ShoppingCart,
-  },
-  {
-    title: 'Reviews',
-    description: 'Rate your experiences',
-    path: `${base}/marketplace?tab=reviews`,
-    icon: Star,
-  },
+const getAnalyticsQuickActions = (base: string) => [
+  { title: 'View Reports', path: `${base}/analytics?tab=reports`, icon: FileText, primary: true },
+  { title: 'Export Data', path: `${base}/analytics?tab=export`, icon: Download },
+  { title: 'Date Range', path: `${base}/analytics?tab=daterange`, icon: Calendar },
+  { title: 'Trends', path: `${base}/analytics?tab=trends`, icon: TrendingUp },
 ];
 
-interface EventQuickAction {
-  title: string;
-  description: string;
-  path: string;
-  primary?: boolean;
-}
-
-interface WorkspaceQuickAction {
-  title: string;
-  description: string;
-  path: string;
-  icon: React.ElementType;
-  primary?: boolean;
-}
-
-const getWorkspaceQuickActions = (base: string): WorkspaceQuickAction[] => [
-  {
-    title: 'Create Workspace',
-    description: 'Start a new collaborative workspace',
-    path: `${base}/workspaces`,
-    icon: PlusCircle,
-    primary: true,
-  },
-  {
-    title: 'Browse Templates',
-    description: 'Use pre-built workspace templates',
-    path: `${base}/templates`,
-    icon: LayoutTemplate,
-  },
-  {
-    title: 'View All Workspaces',
-    description: 'Manage your existing workspaces',
-    path: `${base}/workspaces?tab=list`,
-    icon: List,
-  },
-  {
-    title: 'Team Analytics',
-    description: 'View team performance metrics',
-    path: `${base}/workspaces?tab=analytics`,
-    icon: BarChart3,
-  },
+const getTeamQuickActions = (base: string) => [
+  { title: 'Invite Members', path: `${base}/team?tab=invite`, icon: UserPlus, primary: true },
+  { title: 'View Roles', path: `${base}/team?tab=roles`, icon: UserCog },
+  { title: 'Pending Approvals', path: `${base}/team?tab=pending`, icon: Clock },
+  { title: 'Active Members', path: `${base}/team?tab=members`, icon: UserCheck },
 ];
 
-const getEventQuickActions = (base: string): EventQuickAction[] => [
-  {
-    title: 'Create New Event',
-    description: 'Start planning your next event',
-    path: `${base}/eventmanagement/create`,
-    primary: true,
-  },
-  {
-    title: 'Browse Templates',
-    description: 'Use pre-built event templates',
-    path: `${base}/eventmanagement/templates`,
-  },
-  {
-    title: 'View All Events',
-    description: 'Manage your existing events',
-    path: `${base}/eventmanagement`,
-  },
-  {
-    title: 'Registrations',
-    description: 'Review registrations',
-    path: `${base}/eventmanagement/registrations`,
-  },
-  {
-    title: 'Analytics',
-    description: 'Event performance metrics',
-    path: `${base}/analytics`,
-  },
-];
-
-interface OrganizationQuickAction {
-  title: string;
-  description: string;
-  path: string;
-  icon: React.ElementType;
-  primary?: boolean;
-}
-
-const getOrganizationQuickActions = (base: string): OrganizationQuickAction[] => [
-  {
-    title: 'All Organizations',
-    description: 'View and manage all organizations',
-    path: `${base}/organizations/list`,
-    icon: Building2,
-    primary: true,
-  },
-  {
-    title: 'Manage Members',
-    description: 'View organization members',
-    path: `${base}/organizations`,
-    icon: Users,
-  },
-  {
-    title: 'Organization Settings',
-    description: 'Configure current organization',
-    path: `${base}/settings`,
-    icon: Settings,
-  },
-  {
-    title: 'Create New Organization',
-    description: 'Set up a new organization',
-    path: `${base}/organizations/list?action=create`,
-    icon: PlusCircle,
-  },
+const getOrganizationQuickActions = (base: string) => [
+  { title: 'All Organizations', path: `${base}/organizations/list`, icon: Building2, primary: true },
+  { title: 'Manage Members', path: `${base}/organizations`, icon: Users },
+  { title: 'Organization Settings', path: `${base}/settings`, icon: Settings },
+  { title: 'Create New', path: `${base}/organizations/list?action=create`, icon: PlusCircle },
 ];
 
 export const OrganizationSidebar: React.FC = () => {
@@ -299,7 +111,8 @@ export const OrganizationSidebar: React.FC = () => {
   const organization = useCurrentOrganization();
   const { user } = useAuth();
 
-  const [eventManagementExpanded, setEventManagementExpanded] = useState(false);
+  // Expansion states - all collapsed by default
+  const [eventExpanded, setEventExpanded] = useState(false);
   const [workspacesExpanded, setWorkspacesExpanded] = useState(false);
   const [marketplaceExpanded, setMarketplaceExpanded] = useState(false);
   const [analyticsExpanded, setAnalyticsExpanded] = useState(false);
@@ -311,20 +124,16 @@ export const OrganizationSidebar: React.FC = () => {
   const base = `/${orgSlug ?? ''}`.replace(/\/$/, '');
   const currentPath = location.pathname;
   const isThittamHubOrg = orgSlug === 'thittam1hub';
-  const isEventManagementActive = currentPath.includes('/eventmanagement');
+  const selectedWorkspaceId = searchParams.get('workspaceId');
+
+  // Check active states
+  const isEventActive = currentPath.includes('/eventmanagement');
   const isWorkspacesActive = currentPath.includes('/workspaces');
   const isMarketplaceActive = currentPath.includes('/marketplace');
   const isAnalyticsActive = currentPath.includes('/analytics');
   const isTeamActive = currentPath.includes('/team');
   const isOrganizationsActive = currentPath.includes('/organizations');
-  const selectedWorkspaceId = searchParams.get('workspaceId');
-  
-  const eventQuickActions = getEventQuickActions(base);
-  const marketplaceQuickActions = getMarketplaceQuickActions(base);
-  const analyticsQuickActions = getAnalyticsQuickActions(base);
-  const teamQuickActions = getTeamQuickActions(base);
-  const workspaceQuickActions = getWorkspaceQuickActions(base);
-  const organizationQuickActions = getOrganizationQuickActions(base);
+  const isDashboardActive = currentPath.endsWith('/dashboard');
 
   // Fetch workspaces for sidebar
   const { data: workspacesData } = useQuery({
@@ -359,7 +168,6 @@ export const OrganizationSidebar: React.FC = () => {
       const myWorkspaces = allWorkspaces.filter((w) => w.isOwner || w.isMember);
       const orgWorkspaces = allWorkspaces.filter((w) => !w.isOwner && !w.isMember);
 
-      // Build hierarchy
       const buildHierarchy = (workspaces: typeof allWorkspaces) => {
         const roots = workspaces.filter((w) => !w.parentWorkspaceId);
         const children = workspaces.filter((w) => w.parentWorkspaceId);
@@ -392,10 +200,10 @@ export const OrganizationSidebar: React.FC = () => {
         <button
           onClick={() => handleWorkspaceClick(workspace)}
           className={cn(
-            "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
-            isSelected ? "bg-primary/10 text-primary" : "text-foreground"
+            "w-full flex items-center gap-2 px-2.5 py-2 text-xs rounded-xl hover:bg-muted/50 transition-all duration-200 text-left group/ws",
+            isSelected ? "bg-primary/10 text-primary" : "text-foreground/80"
           )}
-          style={{ paddingLeft: `${8 + depth * 12}px` }}
+          style={{ paddingLeft: `${10 + depth * 12}px` }}
         >
           {hasChildren ? (
             <button
@@ -403,7 +211,7 @@ export const OrganizationSidebar: React.FC = () => {
                 e.stopPropagation();
                 setExpanded(!expanded);
               }}
-              className="p-0.5 hover:bg-muted-foreground/20 rounded flex-shrink-0"
+              className="p-0.5 hover:bg-muted-foreground/20 rounded-md flex-shrink-0"
             >
               {expanded ? (
                 <ChevronDown className="h-3 w-3 text-muted-foreground" />
@@ -415,13 +223,15 @@ export const OrganizationSidebar: React.FC = () => {
             <span className="w-4 flex-shrink-0" />
           )}
           {expanded && hasChildren ? (
-            <FolderOpen className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+            <FolderOpen className="h-3.5 w-3.5 text-primary/60 flex-shrink-0" />
           ) : (
             <Folder className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
           )}
-          <span className="truncate flex-1">{workspace.name}</span>
+          <span className="truncate flex-1 group-hover/ws:text-foreground">{workspace.name}</span>
           {workspace.isOwner && (
-            <span className="text-[9px] px-1 py-0.5 bg-primary/10 text-primary rounded flex-shrink-0">Owner</span>
+            <span className="text-[9px] px-1.5 py-0.5 bg-primary/10 text-primary rounded-full font-medium flex-shrink-0">
+              Owner
+            </span>
           )}
         </button>
         {hasChildren && expanded && (
@@ -438,311 +248,198 @@ export const OrganizationSidebar: React.FC = () => {
   return (
     <Sidebar
       collapsible="offcanvas"
-      className="border-r border-border/40 bg-sidebar"
+      className="border-r border-border/20 bg-gradient-to-b from-sidebar via-sidebar to-sidebar/95 backdrop-blur-xl"
     >
-      <SidebarHeader className="border-b border-border/40 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              {organization?.logo_url ? (
-                <img
-                  src={organization.logo_url}
-                  alt={organization.name}
-                  className="h-6 w-6 rounded object-cover"
-                />
-              ) : (
-                <span className="text-xs font-bold text-primary uppercase">
-                  {organization?.name?.slice(0, 2) || orgSlug?.slice(0, 2) || 'OR'}
-                </span>
-              )}
-            </div>
-            {!isCollapsed && (
-              <div className="flex flex-col min-w-0 animate-fade-in">
-                <span className="text-sm font-semibold text-foreground truncate max-w-[140px]">
-                  {organization?.name || orgSlug}
-                </span>
-                <span className="text-[10px] text-muted-foreground truncate">
-                  Organization Console
-                </span>
-              </div>
-            )}
-          </div>
-          <SidebarTrigger className="h-7 w-7 shrink-0" />
-        </div>
+      <SidebarHeader className="p-0">
+        <SidebarHeaderContent 
+          organization={organization} 
+          orgSlug={orgSlug} 
+          isCollapsed={isCollapsed} 
+        />
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-3 space-y-2 overflow-y-auto">
+      <SidebarContent className="px-2 py-4 space-y-1 overflow-y-auto">
         {/* Back to Organizer Home */}
+        <SidebarGroup className="mb-2">
+          <SidebarGroupContent>
+            <SidebarNavLink
+              to="/organizer/dashboard"
+              icon={Home}
+              title="Organizer Home"
+              description="All organizations"
+              isCollapsed={isCollapsed}
+            />
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent mx-3 my-3" />
+
+        {/* Dashboard */}
         <SidebarGroup>
+          <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
+            Overview
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  tooltip="Back to Organizer Home"
+                  isActive={isDashboardActive}
+                  tooltip="Dashboard"
                   className={cn(
-                    'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
-                    'hover:bg-muted/70 text-muted-foreground hover:text-foreground'
+                    'group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition-all duration-300',
+                    'hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5',
+                    isDashboardActive && 'bg-gradient-to-r from-primary/15 to-primary/8 shadow-sm'
                   )}
                 >
-                  <NavLink
-                    to="/organizer/dashboard"
+                  <a
+                    href={`${base}/dashboard`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(`${base}/dashboard`);
+                    }}
                     className="flex w-full items-center gap-3"
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors duration-200">
-                      <Home className="h-4 w-4" />
-                    </span>
+                    <div
+                      className={cn(
+                        'flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300',
+                        isDashboardActive
+                          ? 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25'
+                          : 'bg-muted/50 text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary'
+                      )}
+                    >
+                      <LayoutDashboard className="h-[18px] w-[18px]" />
+                    </div>
                     {!isCollapsed && (
-                      <span className="flex flex-col items-start animate-fade-in">
-                        <span className="text-sm">Organizer Home</span>
-                        <span className="text-[10px] font-normal text-muted-foreground">
-                          All organizations
+                      <div className="flex flex-col items-start animate-fade-in">
+                        <span className={cn("text-sm font-semibold tracking-tight", isDashboardActive && "text-primary")}>
+                          Dashboard
                         </span>
-                      </span>
+                        <span className="text-[10px] text-muted-foreground/80 font-medium">
+                          Overview & metrics
+                        </span>
+                      </div>
                     )}
-                  </NavLink>
+                    {isDashboardActive && !isCollapsed && (
+                      <div className="ml-auto h-2 w-2 rounded-full bg-primary animate-pulse" />
+                    )}
+                  </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Organization Services */}
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent mx-3 my-3" />
+
+        {/* Services */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
+          <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
             Services
           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {orgServices.map((item) => {
-                const to = `${base}/${item.path}`;
-                const isActive = currentPath === to || currentPath.startsWith(`${to}/`);
+          <SidebarGroupContent className="space-y-1">
+            {/* Event Management */}
+            <SidebarServiceItem
+              title="Event Management"
+              description="Plan & organize"
+              icon={CalendarDays}
+              isActive={isEventActive}
+              isExpanded={eventExpanded}
+              onToggle={() => setEventExpanded(!eventExpanded)}
+              quickActions={getEventQuickActions(base)}
+              quickCreatePath={`${base}/eventmanagement/create`}
+              quickCreateTitle="Create event"
+              isCollapsed={isCollapsed}
+            />
 
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.title}
-                      className={cn(
-                        'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
-                        'hover:bg-primary/10 hover:text-primary',
-                        isActive && 'bg-primary/15 text-primary shadow-sm'
-                      )}
-                    >
-                      <NavLink
-                        to={to}
-                        end={item.path === 'dashboard'}
-                        className="flex w-full items-center gap-3"
-                      >
-                        <span
-                          className={cn(
-                            'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
-                            isActive
-                              ? 'bg-primary text-primary-foreground shadow-md'
-                              : 'bg-muted/60 text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary'
-                          )}
-                        >
-                          <item.icon className="h-4 w-4" />
-                        </span>
-                        {!isCollapsed && (
-                          <span className="flex flex-col items-start animate-fade-in">
-                            <span>{item.title}</span>
-                            <span className="text-[10px] font-normal text-muted-foreground">
-                              {item.description}
-                            </span>
-                          </span>
-                        )}
-                        {isActive && !isCollapsed && (
-                          <span className="ml-auto h-6 w-1 rounded-full bg-primary animate-scale-in" />
-                        )}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
+            {/* Workspaces */}
+            <SidebarServiceItem
+              title="Workspaces"
+              description="Team collaboration"
+              icon={Briefcase}
+              isActive={isWorkspacesActive}
+              isExpanded={workspacesExpanded}
+              onToggle={() => setWorkspacesExpanded(!workspacesExpanded)}
+              quickActions={getWorkspaceQuickActions(base)}
+              quickCreatePath={`${base}/workspaces`}
+              quickCreateTitle="Create workspace"
+              isCollapsed={isCollapsed}
+            />
+
+            {/* Marketplace */}
+            <SidebarServiceItem
+              title="Marketplace"
+              description="Products & services"
+              icon={Store}
+              isActive={isMarketplaceActive}
+              isExpanded={marketplaceExpanded}
+              onToggle={() => setMarketplaceExpanded(!marketplaceExpanded)}
+              quickActions={getMarketplaceQuickActions(base)}
+              quickCreatePath={`${base}/settings/story`}
+              quickCreateTitle="Add product"
+              isCollapsed={isCollapsed}
+            />
+
+            {/* Analytics */}
+            <SidebarServiceItem
+              title="Analytics"
+              description="Performance insights"
+              icon={BarChart3}
+              isActive={isAnalyticsActive}
+              isExpanded={analyticsExpanded}
+              onToggle={() => setAnalyticsExpanded(!analyticsExpanded)}
+              quickActions={getAnalyticsQuickActions(base)}
+              isCollapsed={isCollapsed}
+            />
+
+            {/* Team */}
+            <SidebarServiceItem
+              title="Team"
+              description="Members & roles"
+              icon={Users}
+              isActive={isTeamActive}
+              isExpanded={teamExpanded}
+              onToggle={() => setTeamExpanded(!teamExpanded)}
+              quickActions={getTeamQuickActions(base)}
+              quickCreatePath={`${base}/team?tab=invite`}
+              quickCreateTitle="Invite member"
+              isCollapsed={isCollapsed}
+            />
+
+            {/* Organizations */}
+            <SidebarServiceItem
+              title="Organizations"
+              description="Manage orgs"
+              icon={Building2}
+              isActive={isOrganizationsActive}
+              isExpanded={organizationsExpanded}
+              onToggle={() => setOrganizationsExpanded(!organizationsExpanded)}
+              quickActions={getOrganizationQuickActions(base)}
+              quickCreatePath={`${base}/organizations/list?action=create`}
+              quickCreateTitle="Create organization"
+              isCollapsed={isCollapsed}
+            />
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Event Management Section */}
-        <SidebarGroup>
-          <button
-            onClick={() => setEventManagementExpanded(!eventManagementExpanded)}
-            className={cn(
-              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
-              'hover:bg-primary/10',
-              isEventManagementActive && 'bg-primary/15'
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <span
-                className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
-                  isEventManagementActive
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-muted/60 text-muted-foreground'
-                )}
-              >
-                <CalendarDays className="h-4 w-4" />
-              </span>
-              {!isCollapsed && (
-                <span className="flex flex-col items-start">
-                  <span className={cn("text-sm font-medium", isEventManagementActive && "text-primary")}>
-                    Event Management
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    Manage events
-                  </span>
-                </span>
-              )}
-            </div>
-            {!isCollapsed && (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`${base}/eventmanagement/create`);
-                  }}
-                  className="p-1 hover:bg-muted rounded"
-                  title="Create event"
-                >
-                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-                </button>
-                {eventManagementExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-            )}
-          </button>
-
-          {eventManagementExpanded && !isCollapsed && (
-            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
-              {eventQuickActions.map((action, index) => {
-                const isActive = currentPath === action.path;
-                const ActionIcon = action.primary ? PlusCircle : 
-                  action.title.includes('Template') ? LayoutTemplate :
-                  action.title.includes('View') ? List :
-                  action.title.includes('Analytics') ? BarChart3 : ClipboardList;
-                
-                return (
-                  <button
-                    key={index}
-                    onClick={() => navigate(action.path)}
-                    className={cn(
-                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
-                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
-                      action.primary && "text-primary font-medium"
-                    )}
-                  >
-                    <ActionIcon className={cn(
-                      "h-3.5 w-3.5 flex-shrink-0",
-                      action.primary ? "text-primary" : "text-muted-foreground"
-                    )} />
-                    <span className="truncate flex-1">{action.title}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </SidebarGroup>
-
-        {/* Workspaces Section */}
-        <SidebarGroup>
-          <button
-            onClick={() => setWorkspacesExpanded(!workspacesExpanded)}
-            className={cn(
-              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
-              'hover:bg-primary/10',
-              isWorkspacesActive && 'bg-primary/15'
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <span
-                className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
-                  isWorkspacesActive
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-muted/60 text-muted-foreground'
-                )}
-              >
-                <Briefcase className="h-4 w-4" />
-              </span>
-              {!isCollapsed && (
-                <span className="flex flex-col items-start">
-                  <span className={cn("text-sm font-medium", isWorkspacesActive && "text-primary")}>
-                    Workspaces
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    Team collaboration
-                  </span>
-                </span>
-              )}
-            </div>
-            {!isCollapsed && (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`${base}/workspaces`);
-                  }}
-                  className="p-1 hover:bg-muted rounded"
-                  title="Create workspace"
-                >
-                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-                </button>
-                {workspacesExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-            )}
-          </button>
-
-          {workspacesExpanded && !isCollapsed && (
-            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-2">
-              {/* Quick Actions */}
-              <div className="space-y-0.5">
-                {workspaceQuickActions.map((action, index) => {
-                  const isActive = currentPath.includes('/workspaces') && 
-                    (action.path.includes('?tab=') ? location.search.includes(action.path.split('?')[1]) : false);
-                  
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => navigate(action.path)}
-                      className={cn(
-                        "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
-                        isActive ? "bg-primary/10 text-primary" : "text-foreground",
-                        action.primary && "text-primary font-medium"
-                      )}
-                    >
-                      <action.icon className={cn(
-                        "h-3.5 w-3.5 flex-shrink-0",
-                        action.primary ? "text-primary" : "text-muted-foreground"
-                      )} />
-                      <span className="truncate flex-1">{action.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="h-px bg-border/50" />
+        {/* Workspaces Tree - shown when workspace section is expanded */}
+        {workspacesExpanded && !isCollapsed && (
+          <SidebarGroup>
+            <div className="px-3 space-y-3">
               {/* My Workspaces */}
-              <div className="mb-2">
+              <div>
                 <button
                   onClick={() => setMyWorkspacesExpanded(!myWorkspacesExpanded)}
-                  className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <Users className="h-3.5 w-3.5" />
                     <span>My Workspaces</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] bg-muted px-1 rounded">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">
                       {workspacesData?.myWorkspaces?.length || 0}
                     </span>
                     {myWorkspacesExpanded ? (
@@ -753,10 +450,10 @@ export const OrganizationSidebar: React.FC = () => {
                   </div>
                 </button>
                 {myWorkspacesExpanded && (
-                  <ScrollArea className="max-h-[150px]">
+                  <ScrollArea className="max-h-[140px]">
                     <div className="space-y-0.5 mt-1">
                       {workspacesData?.myWorkspaces?.length === 0 ? (
-                        <p className="px-2 py-1 text-[10px] text-muted-foreground italic">No workspaces yet</p>
+                        <p className="px-3 py-2 text-[10px] text-muted-foreground/60 italic">No workspaces yet</p>
                       ) : (
                         workspacesData?.myWorkspaces?.map((workspace: any) => (
                           <WorkspaceItem key={workspace.id} workspace={workspace} />
@@ -771,14 +468,14 @@ export const OrganizationSidebar: React.FC = () => {
               <div>
                 <button
                   onClick={() => setOrgWorkspacesExpanded(!orgWorkspacesExpanded)}
-                  className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <Building2 className="h-3.5 w-3.5" />
                     <span>Organization</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] bg-muted px-1 rounded">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium">
                       {workspacesData?.orgWorkspaces?.length || 0}
                     </span>
                     {orgWorkspacesExpanded ? (
@@ -789,10 +486,10 @@ export const OrganizationSidebar: React.FC = () => {
                   </div>
                 </button>
                 {orgWorkspacesExpanded && (
-                  <ScrollArea className="max-h-[150px]">
+                  <ScrollArea className="max-h-[140px]">
                     <div className="space-y-0.5 mt-1">
                       {workspacesData?.orgWorkspaces?.length === 0 ? (
-                        <p className="px-2 py-1 text-[10px] text-muted-foreground italic">No other workspaces</p>
+                        <p className="px-3 py-2 text-[10px] text-muted-foreground/60 italic">No other workspaces</p>
                       ) : (
                         workspacesData?.orgWorkspaces?.map((workspace: any) => (
                           <WorkspaceItem key={workspace.id} workspace={workspace} />
@@ -803,441 +500,57 @@ export const OrganizationSidebar: React.FC = () => {
                 )}
               </div>
             </div>
-          )}
-        </SidebarGroup>
+          </SidebarGroup>
+        )}
 
-        {/* Marketplace Section */}
-        <SidebarGroup>
-          <button
-            onClick={() => setMarketplaceExpanded(!marketplaceExpanded)}
-            className={cn(
-              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
-              'hover:bg-primary/10',
-              isMarketplaceActive && 'bg-primary/15'
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <span
-                className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
-                  isMarketplaceActive
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-muted/60 text-muted-foreground'
-                )}
-              >
-                <Store className="h-4 w-4" />
-              </span>
-              {!isCollapsed && (
-                <span className="flex flex-col items-start">
-                  <span className={cn("text-sm font-medium", isMarketplaceActive && "text-primary")}>
-                    Marketplace
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    Products & services
-                  </span>
-                </span>
-              )}
-            </div>
-            {!isCollapsed && (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`${base}/settings/story`);
-                  }}
-                  className="p-1 hover:bg-muted rounded"
-                  title="Add product"
-                >
-                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-                </button>
-                {marketplaceExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-            )}
-          </button>
-
-          {marketplaceExpanded && !isCollapsed && (
-            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
-              {marketplaceQuickActions.map((action, index) => {
-                const isActive = currentPath === action.path || currentPath.includes(action.path.split('?')[0]);
-                
-                return (
-                  <button
-                    key={index}
-                    onClick={() => navigate(action.path)}
-                    className={cn(
-                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
-                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
-                      action.primary && "text-primary font-medium"
-                    )}
-                  >
-                    <action.icon className={cn(
-                      "h-3.5 w-3.5 flex-shrink-0",
-                      action.primary ? "text-primary" : "text-muted-foreground"
-                    )} />
-                    <span className="truncate flex-1">{action.title}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </SidebarGroup>
-
-        {/* Analytics Section */}
-        <SidebarGroup>
-          <button
-            onClick={() => setAnalyticsExpanded(!analyticsExpanded)}
-            className={cn(
-              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
-              'hover:bg-primary/10',
-              isAnalyticsActive && 'bg-primary/15'
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <span
-                className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
-                  isAnalyticsActive
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-muted/60 text-muted-foreground'
-                )}
-              >
-                <BarChart3 className="h-4 w-4" />
-              </span>
-              {!isCollapsed && (
-                <span className="flex flex-col items-start">
-                  <span className={cn("text-sm font-medium", isAnalyticsActive && "text-primary")}>
-                    Analytics
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    Performance insights
-                  </span>
-                </span>
-              )}
-            </div>
-            {!isCollapsed && (
-              <div className="flex items-center gap-1.5">
-                {analyticsExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-            )}
-          </button>
-
-          {analyticsExpanded && !isCollapsed && (
-            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
-              {analyticsQuickActions.map((action, index) => {
-                const isActive = currentPath.includes('/analytics') && 
-                  (action.path.includes('?tab=') ? location.search.includes(action.path.split('?')[1]) : false);
-                
-                return (
-                  <button
-                    key={index}
-                    onClick={() => navigate(action.path)}
-                    className={cn(
-                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
-                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
-                      action.primary && "text-primary font-medium"
-                    )}
-                  >
-                    <action.icon className={cn(
-                      "h-3.5 w-3.5 flex-shrink-0",
-                      action.primary ? "text-primary" : "text-muted-foreground"
-                    )} />
-                    <span className="truncate flex-1">{action.title}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </SidebarGroup>
-
-        {/* Team Section */}
-        <SidebarGroup>
-          <button
-            onClick={() => setTeamExpanded(!teamExpanded)}
-            className={cn(
-              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
-              'hover:bg-primary/10',
-              isTeamActive && 'bg-primary/15'
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <span
-                className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
-                  isTeamActive
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-muted/60 text-muted-foreground'
-                )}
-              >
-                <Users className="h-4 w-4" />
-              </span>
-              {!isCollapsed && (
-                <span className="flex flex-col items-start">
-                  <span className={cn("text-sm font-medium", isTeamActive && "text-primary")}>
-                    Team
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    Members & roles
-                  </span>
-                </span>
-              )}
-            </div>
-            {!isCollapsed && (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`${base}/team?tab=invite`);
-                  }}
-                  className="p-1 hover:bg-muted rounded"
-                  title="Invite member"
-                >
-                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-                </button>
-                {teamExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-            )}
-          </button>
-
-          {teamExpanded && !isCollapsed && (
-            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
-              {teamQuickActions.map((action, index) => {
-                const isActive = currentPath.includes('/team') && 
-                  (action.path.includes('?tab=') ? location.search.includes(action.path.split('?')[1]) : false);
-                
-                return (
-                  <button
-                    key={index}
-                    onClick={() => navigate(action.path)}
-                    className={cn(
-                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
-                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
-                      action.primary && "text-primary font-medium"
-                    )}
-                  >
-                    <action.icon className={cn(
-                      "h-3.5 w-3.5 flex-shrink-0",
-                      action.primary ? "text-primary" : "text-muted-foreground"
-                    )} />
-                    <span className="truncate flex-1">{action.title}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </SidebarGroup>
-
-        {/* Organizations Section */}
-        <SidebarGroup>
-          <button
-            onClick={() => setOrganizationsExpanded(!organizationsExpanded)}
-            className={cn(
-              'w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200',
-              'hover:bg-primary/10',
-              isOrganizationsActive && 'bg-primary/15'
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <span
-                className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-200',
-                  isOrganizationsActive
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-muted/60 text-muted-foreground'
-                )}
-              >
-                <Building2 className="h-4 w-4" />
-              </span>
-              {!isCollapsed && (
-                <span className="flex flex-col items-start">
-                  <span className={cn("text-sm font-medium", isOrganizationsActive && "text-primary")}>
-                    Organizations
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    Manage orgs
-                  </span>
-                </span>
-              )}
-            </div>
-            {!isCollapsed && (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`${base}/organizations/list?action=create`);
-                  }}
-                  className="p-1 hover:bg-muted rounded"
-                  title="Create organization"
-                >
-                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-                </button>
-                {organizationsExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-            )}
-          </button>
-
-          {organizationsExpanded && !isCollapsed && (
-            <div className="mt-2 ml-3 border-l border-border/50 pl-2 space-y-0.5">
-              {organizationQuickActions.map((action, index) => {
-                const isActive = currentPath === action.path;
-                
-                return (
-                  <button
-                    key={index}
-                    onClick={() => navigate(action.path)}
-                    className={cn(
-                      "w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-muted/70 transition-colors text-left",
-                      isActive ? "bg-primary/10 text-primary" : "text-foreground",
-                      action.primary && "text-primary font-medium"
-                    )}
-                  >
-                    <action.icon className={cn(
-                      "h-3.5 w-3.5 flex-shrink-0",
-                      action.primary ? "text-primary" : "text-muted-foreground"
-                    )} />
-                    <span className="truncate flex-1">{action.title}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </SidebarGroup>
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent mx-3 my-3" />
 
         {/* Public Page Link */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
+          <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
             Public
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  tooltip="View Public Page"
-                  className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground transition-all duration-200 hover:bg-muted/70 hover:text-foreground"
-                >
-                  <a
-                    href={`/${orgSlug ?? ''}`.replace(/\/$/, '')}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex w-full items-center gap-3"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors duration-200 group-hover:bg-primary/20">
-                      <ExternalLink className="h-4 w-4" />
-                    </span>
-                    {!isCollapsed && (
-                      <span className="flex flex-col items-start animate-fade-in">
-                        <span>View Public Page</span>
-                        <span className="text-[10px] font-normal text-muted-foreground">
-                          Opens in new tab
-                        </span>
-                      </span>
-                    )}
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            <SidebarNavLink
+              to={`/${orgSlug ?? ''}`.replace(/\/$/, '')}
+              icon={ExternalLink}
+              title="View Public Page"
+              description="Opens in new tab"
+              isCollapsed={isCollapsed}
+              external
+            />
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Admin Section - Only for thittam1hub */}
         {isThittamHubOrg && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
-              Admin
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-1">
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={currentPath.startsWith(`/${orgSlug}/admin/users`)}
-                    tooltip="User Roles"
-                    className={cn(
-                      'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
-                      'hover:bg-muted/70 hover:text-foreground',
-                      currentPath.startsWith(`/${orgSlug}/admin/users`) && 'bg-primary/15 text-primary font-medium'
-                    )}
-                  >
-                    <NavLink
-                      to={`/${orgSlug}/admin/users`}
-                      className="flex w-full items-center gap-3"
-                    >
-                      <span
-                        className={cn(
-                          'flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-200',
-                          currentPath.startsWith(`/${orgSlug}/admin/users`)
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-primary/10 text-primary group-hover:bg-primary/20'
-                        )}
-                      >
-                        <Shield className="h-4 w-4" />
-                      </span>
-                      {!isCollapsed && (
-                        <span className="flex flex-col items-start animate-fade-in">
-                          <span>User Roles</span>
-                          <span className="text-[10px] font-normal text-muted-foreground">
-                            Manage platform access
-                          </span>
-                        </span>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={currentPath.startsWith(`/${orgSlug}/admin/activity`)}
-                    tooltip="Activity Logs"
-                    className={cn(
-                      'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200',
-                      'hover:bg-muted/70 hover:text-foreground',
-                      currentPath.startsWith(`/${orgSlug}/admin/activity`) && 'bg-primary/15 text-primary font-medium'
-                    )}
-                  >
-                    <NavLink
-                      to={`/${orgSlug}/admin/activity`}
-                      className="flex w-full items-center gap-3"
-                    >
-                      <span
-                        className={cn(
-                          'flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-200',
-                          currentPath.startsWith(`/${orgSlug}/admin/activity`)
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-primary/10 text-primary group-hover:bg-primary/20'
-                        )}
-                      >
-                        <Building2 className="h-4 w-4" />
-                      </span>
-                      {!isCollapsed && (
-                        <span className="flex flex-col items-start animate-fade-in">
-                          <span>Activity Logs</span>
-                          <span className="text-[10px] font-normal text-muted-foreground">
-                            Admin audit trail
-                          </span>
-                        </span>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          <>
+            <div className="h-px bg-gradient-to-r from-transparent via-border/50 to-transparent mx-3 my-3" />
+            <SidebarGroup>
+              <SidebarGroupLabel className="px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-2">
+                Admin
+              </SidebarGroupLabel>
+              <SidebarGroupContent className="space-y-1">
+                <SidebarNavLink
+                  to={`/${orgSlug}/admin/users`}
+                  icon={Shield}
+                  title="User Roles"
+                  description="Manage platform access"
+                  isCollapsed={isCollapsed}
+                  isActive={currentPath.startsWith(`/${orgSlug}/admin/users`)}
+                />
+                <SidebarNavLink
+                  to={`/${orgSlug}/admin/activity`}
+                  icon={Building2}
+                  title="Activity Logs"
+                  description="Admin audit trail"
+                  isCollapsed={isCollapsed}
+                  isActive={currentPath.startsWith(`/${orgSlug}/admin/activity`)}
+                />
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
         )}
       </SidebarContent>
 
