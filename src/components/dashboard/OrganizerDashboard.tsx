@@ -9,6 +9,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useApiHealth } from '@/hooks/useApiHealth';
 import { useEventCreatePath } from '@/hooks/useEventCreatePath';
 import { OrgRoleAccessBanner } from '@/components/organization/OrgRoleAccessBanner';
+import { Calendar, Users, Clock, ArrowRight, Plus, Zap, Eye, Pencil, FolderOpen } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 import { OrganizerBreadcrumbs } from '@/components/organization/OrganizerBreadcrumbs';
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
@@ -297,51 +301,157 @@ export function OrganizerDashboard() {
                 {/* Profile Completion Prompt (Requirements 2.4, 2.5) */}
                 {isProfileIncomplete}
 
-                {activeTab === 'events' && <div className="order-1">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
-                            <h2 className="text-lg sm:text-2xl font-bold text-foreground">My Events</h2>
-                            <Link to={eventCreatePath} className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-xs sm:text-sm hover:bg-primary/90 transition-colors">
-                                Create New Event
-                            </Link>
+                {activeTab === 'events' && <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="order-1"
+                >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 rounded-xl bg-primary/10">
+                                <Calendar className="h-5 w-5 text-primary" />
+                            </div>
+                            <h2 className="text-xl sm:text-2xl font-bold text-foreground">My Events</h2>
                         </div>
+                        <Button asChild size="sm" className="rounded-full gap-2 shadow-md hover:shadow-lg transition-shadow">
+                            <Link to={eventCreatePath}>
+                                <Plus className="h-4 w-4" />
+                                Create Event
+                            </Link>
+                        </Button>
+                    </div>
 
-                        {events && events.length > 0 ? <div className="grid gap-3 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
-                                {events.map(event => <div key={event.id} className="bg-card rounded-lg shadow p-3 sm:p-6 border border-border/60">
-                                        <h3 className="text-sm sm:text-lg font-semibold text-foreground mb-1.5 sm:mb-2">{event.name}</h3>
-                                        <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
-                                            {event.description}
-                                        </p>
-                                        <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-muted-foreground">
-                                            <p>Start: {new Date(event.startDate).toLocaleDateString()}</p>
-                                            <p>End: {new Date(event.endDate).toLocaleDateString()}</p>
-                                            <p>
-                                                Status: <span className="capitalize text-foreground">{event.status}</span>
-                                            </p>
-                                            <p>
-                                                Registrations: <span className="text-foreground">{event.registrationCount}</span>
-                                                {event.capacity && <span className="text-muted-foreground">{` / ${event.capacity}`}</span>}
-                                            </p>
+                    {events && events.length > 0 ? (
+                        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 2xl:grid-cols-3">
+                            {events.map((event, index) => {
+                                const startDate = new Date(event.startDate);
+                                const endDate = new Date(event.endDate);
+                                const isLive = event.status === 'ONGOING';
+                                const isDraft = event.status === 'DRAFT';
+                                const isPublished = event.status === 'PUBLISHED';
+                                
+                                return (
+                                    <motion.div
+                                        key={event.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                                        className="group relative bg-card rounded-2xl border-2 border-border/50 overflow-hidden hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
+                                    >
+                                        {/* Live indicator bar */}
+                                        {isLive && (
+                                            <div className="h-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-500 animate-pulse" />
+                                        )}
+                                        
+                                        <div className="p-4 sm:p-5">
+                                            {/* Header with date badge */}
+                                            <div className="flex items-start gap-4 mb-4">
+                                                <div className={`flex-shrink-0 w-14 text-center rounded-xl p-2.5 transition-colors ${
+                                                    isLive 
+                                                        ? 'bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30' 
+                                                        : 'bg-primary/10 group-hover:bg-primary/15'
+                                                }`}>
+                                                    <span className="block text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                                                        {startDate.toLocaleDateString('en-US', { month: 'short' })}
+                                                    </span>
+                                                    <span className={`block text-xl font-bold ${isLive ? 'text-red-500' : 'text-primary'}`}>
+                                                        {startDate.getDate()}
+                                                    </span>
+                                                </div>
+                                                
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1.5 line-clamp-1 group-hover:text-primary transition-colors">
+                                                        {event.name}
+                                                    </h3>
+                                                    <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2">
+                                                        {event.description || 'No description provided'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Status & Stats */}
+                                            <div className="flex flex-wrap items-center gap-2 mb-4">
+                                                <Badge 
+                                                    variant={isLive ? 'default' : isDraft ? 'secondary' : 'outline'}
+                                                    className={`text-xs ${
+                                                        isLive 
+                                                            ? 'bg-red-500/10 text-red-600 border-red-500/30 animate-pulse' 
+                                                            : isDraft 
+                                                                ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
+                                                                : isPublished
+                                                                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30'
+                                                                    : ''
+                                                    }`}
+                                                >
+                                                    {isLive && <Zap className="h-3 w-3 mr-1" />}
+                                                    {event.status}
+                                                </Badge>
+                                                
+                                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                    <Users className="h-3.5 w-3.5" />
+                                                    <span className="font-medium text-foreground">{event.registrationCount}</span>
+                                                    {event.capacity && <span>/ {event.capacity}</span>}
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                    <Clock className="h-3.5 w-3.5" />
+                                                    <span>{startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Actions */}
+                                            <div className="flex items-center gap-2 pt-3 border-t border-border/50">
+                                                <Link 
+                                                    to={`/events/${event.id}`} 
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                                >
+                                                    <Eye className="h-3.5 w-3.5" />
+                                                    View
+                                                </Link>
+                                                <Link 
+                                                    to={`/events/${event.id}/edit`} 
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-lg transition-colors"
+                                                >
+                                                    <Pencil className="h-3.5 w-3.5" />
+                                                    Edit
+                                                </Link>
+                                                <Link 
+                                                    to={`/${organization.slug}/workspaces?eventId=${event.id}`} 
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-500/10 rounded-lg transition-colors ml-auto"
+                                                >
+                                                    <FolderOpen className="h-3.5 w-3.5" />
+                                                    Workspace
+                                                    <ArrowRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                                </Link>
+                                            </div>
                                         </div>
-                                        <div className="mt-4 flex flex-wrap gap-2">
-                                            <Link to={`/events/${event.id}`} className="text-primary hover:text-primary/80 text-xs sm:text-sm font-medium">
-                                                View details
-                                            </Link>
-                                            <Link to={`/events/${event.id}/edit`} className="text-muted-foreground hover:text-foreground text-xs sm:text-sm font-medium">
-                                                Edit
-                                            </Link>
-                                            <Link to={`/${organization.slug}/workspaces?eventId=${event.id}`} className="text-emerald-600 hover:text-emerald-700 text-xs sm:text-sm font-medium">
-                                                Event workspace
-                                            </Link>
-                                        </div>
-                                    </div>)}
-                            </div> : <div className="text-center py-10 sm:py-12 bg-card rounded-lg border border-border/60">
-                                <h3 className="text-base sm:text-lg font-medium text-foreground mb-2">No events yet</h3>
-                                <p className="text-xs sm:text-sm text-muted-foreground mb-4">Get started by creating your first event.</p>
-                                <Link to={eventCreatePath} className="bg-primary text-primary-foreground px-4 py-2 rounded-full hover:bg-primary/90 transition-colors text-xs sm:text-sm font-medium">
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="text-center py-12 sm:py-16 bg-gradient-to-br from-card to-muted/30 rounded-2xl border-2 border-dashed border-border/60"
+                        >
+                            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+                                <Calendar className="h-8 w-8 text-primary/60" />
+                            </div>
+                            <h3 className="text-lg font-semibold text-foreground mb-2">No events yet</h3>
+                            <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+                                Create your first event and start managing registrations, attendance, and more.
+                            </p>
+                            <Button asChild className="rounded-full gap-2">
+                                <Link to={eventCreatePath}>
+                                    <Plus className="h-4 w-4" />
                                     Create your first event
                                 </Link>
-                            </div>}
-                    </div>}
+                            </Button>
+                        </motion.div>
+                    )}
+                </motion.div>}
 
                 {activeTab === 'analytics' && <div className="order-1 mt-6 sm:mt-8">
                         <h2 className="text-lg sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Analytics Overview</h2>
