@@ -20,6 +20,7 @@ import {
 import { UserPlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useToast } from '@/hooks/use-toast';
 import { OrgPageWrapper } from '@/components/organization/OrgPageWrapper';
+import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
 
 import { Users, UserPlus, UserCog, Clock, UserCheck } from 'lucide-react';
 
@@ -33,6 +34,7 @@ export const OrganizationTeamManagement: React.FC = () => {
   const { data: pendingMembers, isLoading: loadingPending } = useOrganizationMemberships(organization?.id || '', 'PENDING');
   const updateMembership = useUpdateMembershipStatus(organization?.id || '');
   const { toast } = useToast();
+  const { confirm, dialogProps } = useConfirmation();
 
   const tabFromUrl = searchParams.get('tab') as TabValue | null;
   const activeTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : 'members';
@@ -67,7 +69,13 @@ export const OrganizationTeamManagement: React.FC = () => {
   };
 
   const handleRemoveAdmin = async (membershipId: string) => {
-    if (window.confirm('Are you sure you want to remove this team member?')) {
+    const confirmed = await confirm({
+      title: 'Remove Team Member',
+      description: 'Are you sure you want to remove this team member?',
+      confirmLabel: 'Remove',
+      variant: 'danger',
+    });
+    if (confirmed) {
       await updateMembership.mutateAsync({ membershipId, status: 'REMOVED' });
     }
   };
@@ -300,6 +308,7 @@ export const OrganizationTeamManagement: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      <ConfirmationDialog {...dialogProps} />
     </OrgPageWrapper>
   );
 };

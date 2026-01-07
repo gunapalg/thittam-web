@@ -4,6 +4,7 @@ import {
   PencilIcon,
   EllipsisHorizontalIcon,
 } from '@heroicons/react/24/outline';
+import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
 
 interface DetailTab {
   id: string;
@@ -55,12 +56,19 @@ export const ResourceDetailPage: React.FC<ResourceDetailPageProps> = ({
   onRefresh,
   children,
 }) => {
+  const { confirm, dialogProps } = useConfirmation();
   const [activeTab, setActiveTab] = useState(tabs[0]?.id || '');
   const [showMoreActions, setShowMoreActions] = useState(false);
 
-  const handleAction = (action: ResourceAction) => {
+  const handleAction = async (action: ResourceAction) => {
     if (action.confirmationRequired) {
-      if (window.confirm(`Are you sure you want to ${action.label.toLowerCase()}?`)) {
+      const confirmed = await confirm({
+        title: action.label,
+        description: `Are you sure you want to ${action.label.toLowerCase()}?`,
+        confirmLabel: action.label,
+        variant: action.variant === 'danger' ? 'danger' : 'warning',
+      });
+      if (confirmed) {
         action.action();
       }
     } else {
@@ -105,60 +113,67 @@ export const ResourceDetailPage: React.FC<ResourceDetailPageProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <PageHeader
-          title="Loading..."
-          breadcrumbs={breadcrumbs}
-        />
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
-          <div className="bg-white shadow rounded-lg p-8">
-            <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+      <>
+        <div className="min-h-screen bg-gray-50">
+          <PageHeader
+            title="Loading..."
+            breadcrumbs={breadcrumbs}
+          />
+          <div className="px-4 sm:px-6 lg:px-8 py-6">
+            <div className="bg-white shadow rounded-lg p-8">
+              <div className="animate-pulse">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+        <ConfirmationDialog {...dialogProps} />
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <PageHeader
-          title="Error"
-          breadcrumbs={breadcrumbs}
-          actions={onRefresh ? [{
-            label: 'Retry',
-            action: onRefresh,
-            variant: 'primary' as const,
-          }] : []}
-        />
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
-          <div className="bg-white shadow rounded-lg p-8">
-            <div className="text-center">
-              <div className="text-red-600 text-lg font-medium mb-2">
-                Failed to load {resourceType}
+      <>
+        <div className="min-h-screen bg-gray-50">
+          <PageHeader
+            title="Error"
+            breadcrumbs={breadcrumbs}
+            actions={onRefresh ? [{
+              label: 'Retry',
+              action: onRefresh,
+              variant: 'primary' as const,
+            }] : []}
+          />
+          <div className="px-4 sm:px-6 lg:px-8 py-6">
+            <div className="bg-white shadow rounded-lg p-8">
+              <div className="text-center">
+                <div className="text-red-600 text-lg font-medium mb-2">
+                  Failed to load {resourceType}
+                </div>
+                <p className="text-gray-500 mb-4">{error}</p>
+                {onRefresh && (
+                  <button
+                    onClick={onRefresh}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Try Again
+                  </button>
+                )}
               </div>
-              <p className="text-gray-500 mb-4">{error}</p>
-              {onRefresh && (
-                <button
-                  onClick={onRefresh}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Try Again
-                </button>
-              )}
             </div>
           </div>
         </div>
-      </div>
+        <ConfirmationDialog {...dialogProps} />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <div className="min-h-screen bg-gray-50">
       <PageHeader
         title={title}
         subtitle={subtitle}
@@ -221,7 +236,9 @@ export const ResourceDetailPage: React.FC<ResourceDetailPageProps> = ({
           )}
         </div>
       </div>
-    </div>
+      </div>
+      <ConfirmationDialog {...dialogProps} />
+    </>
   );
 };
 

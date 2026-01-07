@@ -97,20 +97,19 @@ export function ConfirmationDialog({
 
 // Hook for easier confirmation dialog usage
 export function useConfirmation() {
+  const resolveRef = React.useRef<((value: boolean) => void) | null>(null);
   const [state, setState] = React.useState<{
     open: boolean;
     title: string;
     description: string;
     confirmLabel: string;
     variant: ConfirmationVariant;
-    onConfirm: () => void | Promise<void>;
   }>({
     open: false,
     title: '',
     description: '',
     confirmLabel: 'Confirm',
     variant: 'danger',
-    onConfirm: () => {},
   });
 
   const confirm = React.useCallback(
@@ -121,31 +120,40 @@ export function useConfirmation() {
       variant?: ConfirmationVariant;
     }): Promise<boolean> => {
       return new Promise((resolve) => {
+        resolveRef.current = resolve;
         setState({
           open: true,
           title: options.title,
           description: options.description,
           confirmLabel: options.confirmLabel || 'Confirm',
           variant: options.variant || 'danger',
-          onConfirm: () => resolve(true),
         });
       });
     },
     []
   );
 
+  const handleOpenChange = React.useCallback((open: boolean) => {
+    if (!open) {
+      resolveRef.current?.(false);
+      resolveRef.current = null;
+      setState((prev) => ({ ...prev, open: false }));
+    }
+  }, []);
+
+  const handleConfirm = React.useCallback(() => {
+    resolveRef.current?.(true);
+    resolveRef.current = null;
+  }, []);
+
   const dialogProps = {
     open: state.open,
-    onOpenChange: (open: boolean) => {
-      if (!open) {
-        setState((prev) => ({ ...prev, open: false }));
-      }
-    },
+    onOpenChange: handleOpenChange,
     title: state.title,
     description: state.description,
     confirmLabel: state.confirmLabel,
     variant: state.variant,
-    onConfirm: state.onConfirm,
+    onConfirm: handleConfirm,
   };
 
   return { confirm, dialogProps, ConfirmationDialog };
