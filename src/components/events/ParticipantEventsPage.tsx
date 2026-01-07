@@ -53,7 +53,7 @@ function mapRowToEvent(row: SupabaseEventRow): Event | null {
   };
 }
 
-type DateFilter = 'ALL' | 'UPCOMING' | 'PAST';
+type DateFilter = 'ALL' | 'PAST';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -73,9 +73,8 @@ const cardVariants = {
 };
 
 export function ParticipantEventsPage() {
-  const [statusFilter, setStatusFilter] = useState<EventStatus | 'ALL'>('ALL');
   const [modeFilter, setModeFilter] = useState<EventMode | 'ALL'>('ALL');
-  const [dateFilter, setDateFilter] = useState<DateFilter>('UPCOMING');
+  const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -86,7 +85,8 @@ export function ParticipantEventsPage() {
         .from('events')
         .select('id, name, description, mode, start_date, end_date, capacity, visibility, status, landing_page_slug')
         .eq('visibility', 'PUBLIC')
-        .order('start_date', { ascending: true });
+        .eq('status', 'PUBLISHED')
+        .order('start_date', { ascending: false });
 
       if (error) throw error;
 
@@ -124,22 +124,19 @@ export function ParticipantEventsPage() {
 
     const matchesDate =
       dateFilter === 'ALL' ||
-      (dateFilter === 'UPCOMING' && startTime >= now) ||
       (dateFilter === 'PAST' && startTime < now);
 
-    const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     const matchesMode = modeFilter === 'ALL' || event.mode === modeFilter;
     const matchesSearch = !searchQuery || 
       event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesDate && matchesStatus && matchesMode && matchesSearch;
+    return matchesDate && matchesMode && matchesSearch;
   });
 
   const activeFiltersCount = [
     modeFilter !== 'ALL',
-    statusFilter !== 'ALL',
-    dateFilter !== 'UPCOMING'
+    dateFilter !== 'ALL'
   ].filter(Boolean).length;
 
   const getModeIcon = (mode: EventMode, size = 4) => {
@@ -184,9 +181,8 @@ export function ParticipantEventsPage() {
   };
 
   const clearFilters = () => {
-    setDateFilter('UPCOMING');
+    setDateFilter('ALL');
     setModeFilter('ALL');
-    setStatusFilter('ALL');
     setSearchQuery('');
   };
 
@@ -194,7 +190,7 @@ export function ParticipantEventsPage() {
     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
       {/* Date Filter Tabs */}
       <div className="flex items-center p-1 bg-muted/60 rounded-xl backdrop-blur-sm">
-        {(['UPCOMING', 'PAST', 'ALL'] as DateFilter[]).map((filter) => (
+        {(['ALL', 'PAST'] as DateFilter[]).map((filter) => (
           <button
             key={filter}
             onClick={() => setDateFilter(filter)}
@@ -204,7 +200,7 @@ export function ParticipantEventsPage() {
                 : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
             }`}
           >
-            {filter === 'ALL' ? 'All' : filter === 'UPCOMING' ? 'Upcoming' : 'Past'}
+            {filter === 'ALL' ? 'All Events' : 'Past Events'}
           </button>
         ))}
       </div>
@@ -319,7 +315,7 @@ export function ParticipantEventsPage() {
           {/* Mobile Filter Button */}
           <div className="flex sm:hidden items-center justify-between w-full">
             <div className="flex items-center p-1 bg-muted/60 rounded-xl">
-              {(['UPCOMING', 'PAST', 'ALL'] as DateFilter[]).map((filter) => (
+              {(['ALL', 'PAST'] as DateFilter[]).map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setDateFilter(filter)}
@@ -329,7 +325,7 @@ export function ParticipantEventsPage() {
                       : 'text-muted-foreground'
                   }`}
                 >
-                  {filter === 'ALL' ? 'All' : filter === 'UPCOMING' ? 'Upcoming' : 'Past'}
+                  {filter === 'ALL' ? 'All' : 'Past'}
                 </button>
               ))}
             </div>
