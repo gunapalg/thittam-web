@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, Suspense, lazy } from 'react';
 import { Navigate, Route, Routes, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyMemberOrganizations, useOrganizationBySlug } from '@/hooks/useOrganization';
@@ -16,13 +16,25 @@ import { OrgStorySettingsPage } from './OrgStorySettingsPage';
 import { OrgMarketplacePage } from '@/components/routing/services/OrgMarketplacePage';
 import { EventPageBuilder } from '@/components/events/EventPageBuilder';
 import { OrgScopedBreadcrumbs } from './OrgScopedBreadcrumbs';
-import { AdminLayout } from '@/components/admin/AdminLayout';
-import { AdminDashboard } from '@/components/admin/AdminDashboard';
-import { AdminUserRolesPage } from '@/components/admin/AdminUserRolesPage';
-import { RolesDiagramPage } from '@/components/admin/RolesDiagramPage';
 import { UserRole } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileAppShell } from '@/components/mobile/MobileAppShell';
+
+// Lazy-load admin components - only downloaded when SUPER_ADMIN accesses admin routes
+const AdminLayout = lazy(() => import('@/components/admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('@/components/admin/AdminDashboard'));
+const AdminUserRolesPage = lazy(() => import('@/components/admin/AdminUserRolesPage'));
+const RolesDiagramPage = lazy(() => import('@/components/admin/RolesDiagramPage'));
+
+// Loading fallback for lazy-loaded admin components
+const AdminLoadingFallback = () => (
+  <div className="min-h-[400px] flex items-center justify-center">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+      <p className="text-muted-foreground text-sm">Loading admin panel...</p>
+    </div>
+  </div>
+);
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -138,10 +150,26 @@ export const OrgScopedLayout: React.FC = () => {
             <Route path="analytics" element={<OrganizationAnalyticsDashboard />} />
             <Route path="team" element={<OrganizationTeamManagement />} />
             {isSuperAdmin && (
-              <Route path="admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="users" element={<AdminUserRolesPage />} />
-                <Route path="roles-diagram" element={<RolesDiagramPage />} />
+              <Route path="admin" element={
+                <Suspense fallback={<AdminLoadingFallback />}>
+                  <AdminLayout />
+                </Suspense>
+              }>
+                <Route index element={
+                  <Suspense fallback={<AdminLoadingFallback />}>
+                    <AdminDashboard />
+                  </Suspense>
+                } />
+                <Route path="users" element={
+                  <Suspense fallback={<AdminLoadingFallback />}>
+                    <AdminUserRolesPage />
+                  </Suspense>
+                } />
+                <Route path="roles-diagram" element={
+                  <Suspense fallback={<AdminLoadingFallback />}>
+                    <RolesDiagramPage />
+                  </Suspense>
+                } />
               </Route>
             )}
             <Route path="*" element={<Navigate to="dashboard" replace />} />
@@ -180,10 +208,26 @@ export const OrgScopedLayout: React.FC = () => {
                   <Route path="team" element={<OrganizationTeamManagement />} />
                   {/* Admin routes - only for SUPER_ADMIN */}
                   {isSuperAdmin && (
-                    <Route path="admin" element={<AdminLayout />}>
-                      <Route index element={<AdminDashboard />} />
-                      <Route path="users" element={<AdminUserRolesPage />} />
-                      <Route path="roles-diagram" element={<RolesDiagramPage />} />
+                    <Route path="admin" element={
+                      <Suspense fallback={<AdminLoadingFallback />}>
+                        <AdminLayout />
+                      </Suspense>
+                    }>
+                      <Route index element={
+                        <Suspense fallback={<AdminLoadingFallback />}>
+                          <AdminDashboard />
+                        </Suspense>
+                      } />
+                      <Route path="users" element={
+                        <Suspense fallback={<AdminLoadingFallback />}>
+                          <AdminUserRolesPage />
+                        </Suspense>
+                      } />
+                      <Route path="roles-diagram" element={
+                        <Suspense fallback={<AdminLoadingFallback />}>
+                          <RolesDiagramPage />
+                        </Suspense>
+                      } />
                     </Route>
                   )}
                   <Route path="*" element={<Navigate to="dashboard" replace />} />

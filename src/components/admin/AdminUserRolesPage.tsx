@@ -587,3 +587,5 @@ export const AdminUserRolesPage: React.FC = () => {
     </div>
   );
 };
+
+export default AdminUserRolesPage;
