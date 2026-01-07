@@ -36,34 +36,25 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
+      className="space-y-2"
     >
-      {/* Group Header */}
+      {/* Compact Group Header */}
       <button
         onClick={() => setExpanded(!expanded)}
         className={cn(
-          "w-full flex items-center justify-between px-2 py-3 rounded-xl",
-          "hover:bg-muted/50 transition-colors duration-200",
+          "w-full flex items-center justify-between px-2 py-2 rounded-lg",
+          "hover:bg-muted/40 transition-colors duration-150",
           "group"
         )}
       >
-        <div className="flex items-center gap-3">
-          <div className={cn(
-            "p-2 rounded-lg",
-            "bg-gradient-to-br from-muted to-muted/50",
-            "border border-border/50"
-          )}>
-            {icon}
-          </div>
-          <div className="text-left">
-            <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-          </div>
+        <div className="flex items-center gap-2">
+          {icon}
+          <h2 className="text-xs font-semibold text-foreground">{title}</h2>
           <span className={cn(
-            "text-xs font-medium px-2.5 py-1 rounded-full",
-            "bg-muted/80 text-muted-foreground",
-            "border border-border/50"
+            "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+            "bg-muted/70 text-muted-foreground"
           )}>
             {workspaces.length}
           </span>
@@ -83,29 +74,19 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
             {workspaces.length === 0 ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className={cn(
-                  "py-10 text-center rounded-2xl",
-                  "bg-gradient-to-br from-muted/30 to-muted/10",
-                  "border border-dashed border-border/60"
-                )}
-              >
-                <div className={cn(
-                  "inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4",
-                  "bg-muted/50 border border-border/50"
-                )}>
-                  <FolderIcon className="h-7 w-7 text-muted-foreground/50" />
-                </div>
-                <p className="text-sm text-muted-foreground">{emptyMessage}</p>
-              </motion.div>
+              <div className={cn(
+                "py-6 text-center rounded-lg",
+                "bg-muted/20 border border-dashed border-border/50"
+              )}>
+                <FolderIcon className="h-5 w-5 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-xs text-muted-foreground">{emptyMessage}</p>
+              </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-1.5">
                 {workspaces.map((workspace, index) => (
                   <WorkspaceCard
                     key={workspace.id}
