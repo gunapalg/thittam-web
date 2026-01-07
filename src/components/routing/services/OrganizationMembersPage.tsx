@@ -1,22 +1,16 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCurrentOrganization } from '@/components/organization/OrganizationContext';
 import { useMyOrganizationMemberships } from '@/hooks/useOrganization';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { 
   Users, 
   UserPlus, 
   Shield, 
-  Check, 
-  X, 
   Settings2,
-  ArrowLeft,
-  Clock
+  ArrowLeft
 } from 'lucide-react';
 
 /**
@@ -28,10 +22,6 @@ export const OrganizationMembersPage: React.FC = () => {
   const organization = useCurrentOrganization();
   const { user } = useAuth();
   const { data: memberships, isLoading: membershipsLoading } = useMyOrganizationMemberships();
-  const { toast } = useToast();
-  const [pendingOrganizers, setPendingOrganizers] = useState<any[]>([]);
-  const [isLoadingPending, setIsLoadingPending] = useState(false);
-  const [pendingError, setPendingError] = useState<string | null>(null);
 
   // Get user's role in this organization
   const activeMembership = useMemo(() => {
@@ -45,66 +35,12 @@ export const OrganizationMembersPage: React.FC = () => {
   const isOwner = organization?.owner_id === user?.id;
   const canManage = isOwner || userRole === 'admin' || userRole === 'organizer';
 
-  useEffect(() => {
-    const loadPendingOrganizers = async () => {
-      if (!canManage || !organization?.id) return;
-      setIsLoadingPending(true);
-      setPendingError(null);
-      try {
-        const { data, error } = await supabase.functions.invoke('pending-organizers');
-        if (error) throw error;
-        const all = (data as any)?.organizers ?? [];
-        const filtered = all.filter(
-          (o: any) => !organization.id || o.firstOrganizationId === organization.id
-        );
-        setPendingOrganizers(filtered);
-      } catch (err: any) {
-        console.error('Failed to load pending organizers', err);
-        setPendingError(err?.message || 'Failed to load pending organizer requests.');
-      } finally {
-        setIsLoadingPending(false);
-      }
-    };
-
-    loadPendingOrganizers();
-  }, [canManage, organization?.id]);
-
-  const handleApprove = async (req: any) => {
-    try {
-      const { error } = await supabase.functions.invoke('approve-organizer', {
-        body: { userId: req.userId, organizationId: organization?.id },
-      });
-      if (error) throw error;
-      setPendingOrganizers((prev) => prev.filter((p) => p.userId !== req.userId));
-      toast({
-        title: 'Organizer approved',
-        description: 'The user now has organizer access.',
-      });
-    } catch (err: any) {
-      console.error('Failed to approve organizer', err);
-      toast({
-        title: 'Failed to approve organizer',
-        description: err?.message || 'Please try again.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleDeny = (userId: string) => {
-    setPendingOrganizers((prev) => prev.filter((p) => p.userId !== userId));
-  };
-
   // Loading state
   if (membershipsLoading) {
     return (
       <div className="space-y-6">
         <div className="animate-pulse space-y-4">
           <div className="h-32 bg-muted rounded-xl" />
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-muted rounded-lg" />
-            ))}
-          </div>
           <div className="h-64 bg-muted rounded-lg" />
         </div>
       </div>
@@ -153,7 +89,6 @@ export const OrganizationMembersPage: React.FC = () => {
     );
   }
 
-
   return (
     <div className="space-y-6">
       {/* Hero Header */}
@@ -191,83 +126,6 @@ export const OrganizationMembersPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-
-      {/* Pending Organizer Requests */}
-      {(pendingError || isLoadingPending || pendingOrganizers.length > 0) && (
-        <Card className="border-border">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-orange-500" />
-                  Pending Requests
-                </CardTitle>
-                <CardDescription>Organizer access requests awaiting approval</CardDescription>
-              </div>
-              {isLoadingPending && (
-                <Badge variant="secondary" className="animate-pulse">Loading...</Badge>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {pendingError && (
-              <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm mb-4">
-                {pendingError}
-              </div>
-            )}
-            {pendingOrganizers.length === 0 && !isLoadingPending ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Check className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
-                <p>No pending requests</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {pendingOrganizers.map((req) => (
-                  <div
-                    key={req.userId}
-                    className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Users className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {req.name || req.email || 'Unknown User'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {req.email}
-                          {req.requestedAt && ` • ${new Date(req.requestedAt).toLocaleDateString()}`}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="default"
-                        className="bg-emerald-600 hover:bg-emerald-700"
-                        onClick={() => handleApprove(req)}
-                      >
-                        <Check className="w-4 h-4 mr-1" />
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeny(req.userId)}
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Deny
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
 
       {/* Team Members Card */}
       <Card className="border-border">
