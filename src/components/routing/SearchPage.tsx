@@ -9,6 +9,7 @@ import { PageHeader } from './PageHeader';
 import { SkeletonList } from './LoadingStates';
 import { SearchResultCard } from './SearchResultCard';
 import { SearchFilters } from './SearchFilters';
+import { SearchEmptyState } from '@/components/ui/empty-state';
 
 export interface SearchResult {
   id: string;
@@ -441,21 +442,23 @@ export const SearchPage: React.FC<SearchPageProps> = ({ className = '' }) => {
 
                 {/* No Results */}
                 {!isLoading && (query.trim() || activeFilterCount > 0) && results.length === 0 && (
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-                    <MagnifyingGlassIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
-                    <p className="text-gray-600 mb-4">
-                      Try adjusting your search terms or filters
-                    </p>
+                  <div className="bg-card rounded-lg shadow-sm border border-border p-8">
+                    <SearchEmptyState
+                      searchTerm={query}
+                      onClear={() => {
+                        setActiveFilters({});
+                        handleSearch('');
+                      }}
+                    />
                     {suggestions.length > 0 && (
-                      <div>
-                        <p className="text-sm text-gray-500 mb-2">Popular searches:</p>
+                      <div className="mt-4 text-center">
+                        <p className="text-sm text-muted-foreground mb-2">Popular searches:</p>
                         <div className="flex flex-wrap gap-2 justify-center">
                           {suggestions.slice(0, 4).map((suggestion, index) => (
                             <button
                               key={index}
                               onClick={() => handleSearch(suggestion.query)}
-                              className="text-sm text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1 rounded-full"
+                              className="text-sm text-primary hover:text-primary/80 bg-primary/10 px-3 py-1 rounded-full"
                             >
                               {suggestion.query}
                             </button>

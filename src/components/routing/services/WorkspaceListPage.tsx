@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
-  PlusIcon,
   EyeIcon,
   PencilIcon,
   TrashIcon,
@@ -17,6 +16,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
 import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
+import { EmptyState, SearchEmptyState } from '@/components/ui/empty-state';
+import { Briefcase } from 'lucide-react';
 
 /**
  * WorkspaceListPage provides AWS-style resource list interface for workspaces.
@@ -352,37 +353,24 @@ export const WorkspaceListPage: React.FC = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
             </div>
           ) : !hasAnyWorkspaces ? (
-            <div className="text-center py-12 px-4">
-              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">🏗️</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No workspaces yet</h3>
-              <p className="text-gray-600 mb-6">
-                Get started by creating your first workspace for event collaboration.
-              </p>
-              {canManageWorkspaces && (
-                <Link
-                  to={`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <PlusIcon className="w-4 h-4 mr-2" />
-                  Create Workspace
-                </Link>
-              )}
-            </div>
+            <EmptyState
+              icon={Briefcase}
+              title="No workspaces yet"
+              description="Get started by creating your first workspace for event collaboration."
+              action={
+                canManageWorkspaces
+                  ? {
+                      label: 'Create Workspace',
+                      onClick: () => window.location.href = `${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`,
+                    }
+                  : undefined
+              }
+            />
           ) : filteredWorkspaces.length === 0 ? (
-            <div className="text-center py-12 px-4">
-              <div className="mx-auto h-12 w-12 text-gray-400 mb-4">🔍</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No workspaces match your search or filters</h3>
-              <p className="text-gray-600 mb-6">
-                Try adjusting your search term or status filter to see more workspaces.
-              </p>
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Clear filters
-              </button>
-            </div>
+            <SearchEmptyState
+              searchTerm={searchTerm}
+              onClear={handleClearFilters}
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -498,32 +486,7 @@ export const WorkspaceListPage: React.FC = () => {
           </div>
         )}
 
-        {/* Empty State */}
-        {!isLoading && filteredWorkspaces.length === 0 && (
-          <div className="text-center py-12">
-            <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
-              🏗️
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm || statusFilter !== 'all' ? 'No workspaces found' : 'No workspaces yet'}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {searchTerm || statusFilter !== 'all' 
-                ? 'Try adjusting your search or filter criteria.'
-                : 'Get started by creating your first workspace for event collaboration.'
-              }
-            </p>
-            {canManageWorkspaces && !searchTerm && statusFilter === 'all' && (
-              <Link
-                to={`${baseWorkspacePath}/create${eventId ? `?eventId=${eventId}` : ''}`}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-              >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                Create Your First Workspace
-              </Link>
-            )}
-          </div>
-        )}
+        {/* Empty State - handled in table view above */}
       </div>
       <ConfirmationDialog {...dialogProps} />
     </div>
