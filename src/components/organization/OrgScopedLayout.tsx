@@ -241,3 +241,5 @@ export const OrgScopedLayout: React.FC = () => {
     </OrganizationProvider>
   );
 };
+
+export default OrgScopedLayout;

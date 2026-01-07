@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
@@ -8,36 +8,50 @@ import { ConsoleRoute } from './ConsoleRoute';
 import { ConsoleLayout } from './ConsoleLayout';
 import { NotFoundPage } from './NotFoundPage';
 import { SearchPage } from './SearchPage';
-import { MarketplaceService, OrganizationService as OrganizationServiceComponent } from './services';
-import { HelpPage } from '../help';
 import { NotificationPage } from './NotificationPage';
 import { CommunicationPage } from './CommunicationPage';
 import { LoginForm } from '../auth/LoginForm';
 import { RegisterForm } from '../auth/RegisterForm';
 import { AuthLayout } from '../auth/AuthLayout';
-import { DashboardDataLab } from '../enhanced/DashboardDataLab';
 import { DashboardRouter } from '../dashboard/DashboardRouter';
 import { FollowedOrganizationsPage } from '../organization/FollowedOrganizationsPage';
 import { ParticipantEventsPage } from '../events/ParticipantEventsPage';
 import { EventLandingPage } from '../events/EventLandingPage';
-import { OrgScopedLayout } from '../organization/OrgScopedLayout';
-import { OrganizationRegistrationPage } from '../organization/OrganizationRegistrationPage';
-import { JoinOrganizationPage } from '../organization/JoinOrganizationPage';
-import { OrganizerOnboardingPage } from '../organization/OrganizerOnboardingPage';
 import { ProfilePage } from '../profile/ProfilePage';
 import { ProfileSettingsPage } from '../profile/ProfileSettingsPage';
 import { PublicProfilePage } from '../profile/PublicProfilePage';
 import { GlobalErrorBoundary } from '@/components/common/GlobalErrorBoundary';
 import { OrganizerSpecificDashboard } from '../dashboard/OrganizerSpecificDashboard';
-import { OrganizerDashboardLayout } from '../dashboard/OrganizerDashboardLayout';
-import { ParticipantPortfolioPage } from '../portfolio/ParticipantPortfolioPage';
 import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
-import { VendorPublicProfilePage } from './services/VendorPublicProfilePage';
 
 import AttendflowLanding from '@/pages/AttendflowLanding';
 import PricingPage from '@/pages/PricingPage';
+
+// Lazy-loaded components for better bundle splitting
+// Heavy/role-specific components only downloaded when needed
+const OrgScopedLayout = lazy(() => import('../organization/OrgScopedLayout'));
+const OrganizerDashboardLayout = lazy(() => import('../dashboard/OrganizerDashboardLayout'));
+const MarketplaceService = lazy(() => import('./services/MarketplaceService'));
+const OrganizationServiceComponent = lazy(() => import('./services').then(m => ({ default: m.OrganizationService })));
+const DashboardDataLab = lazy(() => import('../enhanced/DashboardDataLab'));
+const OrganizationRegistrationPage = lazy(() => import('../organization/OrganizationRegistrationPage'));
+const OrganizerOnboardingPage = lazy(() => import('../organization/OrganizerOnboardingPage'));
+const JoinOrganizationPage = lazy(() => import('../organization/JoinOrganizationPage'));
+const VendorPublicProfilePage = lazy(() => import('./services/VendorPublicProfilePage'));
+const ParticipantPortfolioPage = lazy(() => import('../portfolio/ParticipantPortfolioPage'));
+const HelpPage = lazy(() => import('../help/HelpPage'));
+
+// Loading fallback for lazy-loaded routes
+const RouteLoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/95">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <p className="text-muted-foreground text-sm">Loading...</p>
+    </div>
+  </div>
+);
 
 
 // Create a query client instance with optimized settings for the console application
@@ -421,7 +435,11 @@ const SupportService = () => {
       window.location.pathname.includes('/marketplace') ? 'marketplace' :
         undefined;
 
-  return <HelpPage currentContext={currentContext} />;
+  return (
+    <Suspense fallback={<RouteLoadingFallback />}>
+      <HelpPage currentContext={currentContext} />
+    </Suspense>
+  );
 };
 
 const NotificationService = () => {
@@ -490,7 +508,9 @@ export const AppRouter: React.FC = () => {
               path="/dashboard/onboarding/organizer"
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <OrganizerOnboardingPage />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <OrganizerOnboardingPage />
+                  </Suspense>
                 </ConsoleRoute>
               }
             />
@@ -505,12 +525,13 @@ export const AppRouter: React.FC = () => {
               }
             />
 
-            {/* Create organization page */}
             <Route
               path="/organizations/create"
               element={
                 <ConsoleRoute requireEmailVerification={false}>
-                  <OrganizationRegistrationPage />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <OrganizationRegistrationPage />
+                  </Suspense>
                 </ConsoleRoute>
               }
             />
@@ -519,12 +540,19 @@ export const AppRouter: React.FC = () => {
             <Route path="/events" element={<ParticipantEventsPage />} />
             <Route path="/events/:eventId/*" element={<EventLandingPage />} />
 
-            {/* Public participant portfolio */}
-            <Route path="/portfolio/:userId" element={<ParticipantPortfolioPage />} />
+            <Route path="/portfolio/:userId" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <ParticipantPortfolioPage />
+              </Suspense>
+            } />
             <Route path="/embed/portfolio/:userId" element={<EmbedPortfolioRoute />} />
 
             {/* Public vendor profile */}
-            <Route path="/vendor/:vendorId" element={<VendorPublicProfilePage />} />
+            <Route path="/vendor/:vendorId" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <VendorPublicProfilePage />
+              </Suspense>
+            } />
 
             {/* Public organization landing by slug */}
             <Route path="/:orgSlug" element={<OrganizationLandingPage />} />
@@ -539,7 +567,9 @@ export const AppRouter: React.FC = () => {
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                   <GlobalErrorBoundary>
-                    <OrgScopedLayout />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrgScopedLayout />
+                    </Suspense>
                   </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
@@ -551,7 +581,9 @@ export const AppRouter: React.FC = () => {
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
                   <GlobalErrorBoundary>
-                    <OrganizerDashboardLayout />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrganizerDashboardLayout />
+                    </Suspense>
                   </GlobalErrorBoundary>
                 </ConsoleRoute>
               }
@@ -592,7 +624,9 @@ export const AppRouter: React.FC = () => {
                 path="organizations/join"
                 element={
                   <ConsoleRoute requireEmailVerification={false}>
-                    <JoinOrganizationPage />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <JoinOrganizationPage />
+                    </Suspense>
                   </ConsoleRoute>
                 }
               />
@@ -600,7 +634,9 @@ export const AppRouter: React.FC = () => {
                 path="organizations/*"
                 element={
                   <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                    <OrganizationServiceComponent />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <OrganizationServiceComponent />
+                    </Suspense>
                   </ConsoleRoute>
                 }
               />
@@ -650,7 +686,9 @@ export const AppRouter: React.FC = () => {
                 path="data-lab"
                 element={
                   <ConsoleRoute>
-                    <DashboardDataLab />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <DashboardDataLab />
+                    </Suspense>
                   </ConsoleRoute>
                 }
               />
@@ -661,7 +699,9 @@ export const AppRouter: React.FC = () => {
               path="/marketplace/*"
               element={
                 <ConsoleRoute requiredRoles={[UserRole.ORGANIZER, UserRole.SUPER_ADMIN]}>
-                  <MarketplaceService />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <MarketplaceService />
+                  </Suspense>
                 </ConsoleRoute>
               }
             />
