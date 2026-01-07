@@ -748,3 +748,5 @@ export const EventPageBuilder: React.FC = () => {
     </div>
   );
 };
+
+export default EventPageBuilder;

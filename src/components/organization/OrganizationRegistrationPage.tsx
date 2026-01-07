@@ -251,3 +251,5 @@ export const OrganizationRegistrationPage: React.FC = () => {
     </div>
   );
 };
+
+export default OrganizationRegistrationPage;
