@@ -16,6 +16,7 @@ import { Workspace, WorkspaceStatus } from '../../../types';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { UserRole } from '@/types';
+import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
 
 /**
  * WorkspaceListPage provides AWS-style resource list interface for workspaces.
@@ -29,6 +30,7 @@ export const WorkspaceListPage: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { confirm, dialogProps } = useConfirmation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<WorkspaceStatus | 'all'>('all');
@@ -271,10 +273,14 @@ export const WorkspaceListPage: React.FC = () => {
     : [];
 
 
-  const handleDeleteWorkspace = (workspaceId: string) => {
-    if (!window.confirm('Are you sure you want to delete this workspace? This action cannot be undone.')) {
-      return;
-    }
+  const handleDeleteWorkspace = async (workspaceId: string) => {
+    const confirmed = await confirm({
+      title: 'Delete Workspace',
+      description: 'Are you sure you want to delete this workspace? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
     console.log('Delete workspace:', workspaceId);
     // TODO: Wire to backend delete endpoint and refresh list via React Query
   };
@@ -464,10 +470,16 @@ export const WorkspaceListPage: React.FC = () => {
                 {bulkActions.map((action, index) => (
                   <button
                     key={index}
-                    onClick={() => {
+                    onClick={async () => {
                       const selectedItems = filteredWorkspaces.filter(w => selectedWorkspaces.includes(w.id));
                       if (action.confirmationRequired) {
-                        if (window.confirm(`Are you sure you want to ${action.label.toLowerCase()}?`)) {
+                        const confirmed = await confirm({
+                          title: action.label,
+                          description: `Are you sure you want to ${action.label.toLowerCase()}?`,
+                          confirmLabel: action.label,
+                          variant: 'warning',
+                        });
+                        if (confirmed) {
                           action.action(selectedItems);
                           setSelectedWorkspaces([]);
                         }
@@ -513,6 +525,7 @@ export const WorkspaceListPage: React.FC = () => {
           </div>
         )}
       </div>
+      <ConfirmationDialog {...dialogProps} />
     </div>
   );
 };

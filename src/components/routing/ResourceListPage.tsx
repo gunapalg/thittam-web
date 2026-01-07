@@ -6,6 +6,7 @@ import {
   ChevronDownIcon,
   EllipsisHorizontalIcon,
 } from '@heroicons/react/24/outline';
+import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
 
 interface TableColumn {
   key: string;
@@ -70,6 +71,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
   onRowClick,
   pageSize = 20,
 }) => {
+  const { confirm, dialogProps } = useConfirmation();
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
   const [filterValues, setFilterValues] = useState<Record<string, any>>({});
@@ -165,10 +167,16 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
     setSelectedItems(newSelected);
   };
 
-  const handleBulkAction = (action: BulkAction) => {
+  const handleBulkAction = async (action: BulkAction) => {
     const selectedData = data.filter(item => selectedItems.has(item.id));
     if (action.confirmationRequired) {
-      if (window.confirm(`Are you sure you want to ${action.label.toLowerCase()} ${selectedItems.size} items?`)) {
+      const confirmed = await confirm({
+        title: action.label,
+        description: `Are you sure you want to ${action.label.toLowerCase()} ${selectedItems.size} items?`,
+        confirmLabel: action.label,
+        variant: action.variant === 'danger' ? 'danger' : 'warning',
+      });
+      if (confirmed) {
         action.action(selectedData);
         setSelectedItems(new Set());
       }
@@ -448,6 +456,7 @@ export const ResourceListPage: React.FC<ResourceListPageProps> = ({
           )}
         </div>
       </div>
+      <ConfirmationDialog {...dialogProps} />
     </div>
   );
 };

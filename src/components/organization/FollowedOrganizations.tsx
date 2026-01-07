@@ -6,6 +6,7 @@ import { useFollowedOrganizations } from '@/hooks/useOrganization';
 import { organizationService } from '@/services/organizationService';
 import { useAuth } from '../../hooks/useAuth';
 import type { DirectoryOrganization } from './OrganizationDirectory';
+import { ConfirmationDialog, useConfirmation } from '@/components/ui/confirmation-dialog';
 
 interface FollowedOrganizationsProps {
   className?: string;
@@ -14,6 +15,7 @@ interface FollowedOrganizationsProps {
 export default function FollowedOrganizations({ className = '' }: FollowedOrganizationsProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { confirm, dialogProps } = useConfirmation();
 
   const { data: followedOrganizations, isLoading, error } = useFollowedOrganizations(user?.id || '');
 
@@ -29,7 +31,13 @@ export default function FollowedOrganizations({ className = '' }: FollowedOrgani
   });
 
   const handleUnfollow = async (organizationId: string, organizationName: string) => {
-    if (window.confirm(`Are you sure you want to unfollow ${organizationName}?`)) {
+    const confirmed = await confirm({
+      title: 'Unfollow Organization',
+      description: `Are you sure you want to unfollow ${organizationName}?`,
+      confirmLabel: 'Unfollow',
+      variant: 'warning',
+    });
+    if (confirmed) {
       try {
         await unfollowMutation.mutateAsync(organizationId);
       } catch (error) {
@@ -107,6 +115,7 @@ export default function FollowedOrganizations({ className = '' }: FollowedOrgani
           ))}
         </div>
       )}
+      <ConfirmationDialog {...dialogProps} />
     </div>
   );
 }
