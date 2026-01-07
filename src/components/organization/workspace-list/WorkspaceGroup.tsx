@@ -36,16 +36,20 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-2"
+      className={cn(
+        "rounded-lg border border-border/50 bg-card/50 backdrop-blur-sm",
+        "overflow-hidden"
+      )}
     >
-      {/* Compact Group Header */}
+      {/* Group Header */}
       <button
         onClick={() => setExpanded(!expanded)}
         className={cn(
-          "w-full flex items-center justify-between px-2 py-2 rounded-lg",
-          "hover:bg-muted/40 transition-colors duration-150",
+          "w-full flex items-center justify-between px-3 py-2.5",
+          "bg-muted/30 hover:bg-muted/50 transition-colors duration-150",
+          "border-b border-border/30",
           "group"
         )}
       >
@@ -54,7 +58,7 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
           <h2 className="text-xs font-semibold text-foreground">{title}</h2>
           <span className={cn(
             "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-            "bg-muted/70 text-muted-foreground"
+            "bg-background/80 text-muted-foreground"
           )}>
             {workspaces.length}
           </span>
@@ -63,7 +67,7 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
           animate={{ rotate: expanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDownIcon className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+          <ChevronDownIcon className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
         </motion.div>
       </button>
 
@@ -78,15 +82,12 @@ export const WorkspaceGroup: React.FC<WorkspaceGroupProps> = ({
             className="overflow-hidden"
           >
             {workspaces.length === 0 ? (
-              <div className={cn(
-                "py-6 text-center rounded-lg",
-                "bg-muted/20 border border-dashed border-border/50"
-              )}>
-                <FolderIcon className="h-5 w-5 text-muted-foreground/40 mx-auto mb-2" />
-                <p className="text-xs text-muted-foreground">{emptyMessage}</p>
+              <div className="py-4 px-3 text-center">
+                <FolderIcon className="h-4 w-4 text-muted-foreground/40 mx-auto mb-1.5" />
+                <p className="text-[11px] text-muted-foreground">{emptyMessage}</p>
               </div>
             ) : (
-              <div className="space-y-1.5">
+              <div className="p-1.5 space-y-1">
                 {workspaces.map((workspace, index) => (
                   <WorkspaceCard
                     key={workspace.id}
