@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { optimisticHelpers } from './useOptimisticMutation';
 
 export interface TeamAssignment {
   id: string;
@@ -36,9 +37,10 @@ export interface TeamMemberWorkload {
 export function useTeamAssignments(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const queryKey = ['team-assignments', workspaceId];
 
   const assignmentsQuery = useQuery({
-    queryKey: ['team-assignments', workspaceId],
+    queryKey,
     queryFn: async () => {
       if (!workspaceId) return [];
       const { data, error } = await supabase
@@ -65,9 +67,35 @@ export function useTeamAssignments(workspaceId: string | undefined) {
       if (error) throw error;
       return data;
     },
+    onMutate: async (newAssignment) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousAssignments = queryClient.getQueryData<TeamAssignment[]>(queryKey);
+      
+      const optimisticAssignment: TeamAssignment = {
+        ...newAssignment,
+        id: `temp-${Date.now()}`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      
+      queryClient.setQueryData(queryKey, optimisticHelpers.prependToList(previousAssignments, optimisticAssignment));
+      return { previousAssignments };
+    },
+    onError: (error, _, context) => {
+      if (context?.previousAssignments) {
+        queryClient.setQueryData(queryKey, context.previousAssignments);
+      }
+      toast({
+        title: 'Failed to create assignment',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['team-assignments', workspaceId] });
       toast({ title: 'Assignment created' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -82,8 +110,29 @@ export function useTeamAssignments(workspaceId: string | undefined) {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['team-assignments', workspaceId] });
+    onMutate: async ({ id, ...updates }) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousAssignments = queryClient.getQueryData<TeamAssignment[]>(queryKey);
+      
+      queryClient.setQueryData(
+        queryKey,
+        optimisticHelpers.updateInList(previousAssignments, id, updates)
+      );
+      
+      return { previousAssignments };
+    },
+    onError: (error, _, context) => {
+      if (context?.previousAssignments) {
+        queryClient.setQueryData(queryKey, context.previousAssignments);
+      }
+      toast({
+        title: 'Failed to update assignment',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -92,18 +141,47 @@ export function useTeamAssignments(workspaceId: string | undefined) {
       const assignment = assignmentsQuery.data?.find(a => a.id === id);
       if (!assignment) throw new Error('Assignment not found');
 
+      const newHoursLogged = assignment.hours_logged + hours;
       const { data, error } = await supabase
         .from('workspace_team_assignments')
-        .update({ hours_logged: assignment.hours_logged + hours })
+        .update({ hours_logged: newHoursLogged })
         .eq('id', id)
         .select()
         .single();
       if (error) throw error;
       return data;
     },
+    onMutate: async ({ id, hours }) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousAssignments = queryClient.getQueryData<TeamAssignment[]>(queryKey);
+      const assignment = previousAssignments?.find(a => a.id === id);
+      
+      if (assignment) {
+        queryClient.setQueryData(
+          queryKey,
+          optimisticHelpers.updateInList(previousAssignments, id, {
+            hours_logged: assignment.hours_logged + hours,
+          })
+        );
+      }
+      
+      return { previousAssignments };
+    },
+    onError: (error, _, context) => {
+      if (context?.previousAssignments) {
+        queryClient.setQueryData(queryKey, context.previousAssignments);
+      }
+      toast({
+        title: 'Failed to log hours',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['team-assignments', workspaceId] });
       toast({ title: 'Hours logged' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -111,8 +189,11 @@ export function useTeamAssignments(workspaceId: string | undefined) {
     assignments: assignmentsQuery.data ?? [],
     isLoading: assignmentsQuery.isLoading,
     createAssignment: createAssignmentMutation.mutate,
+    isCreatingAssignment: createAssignmentMutation.isPending,
     updateAssignment: updateAssignmentMutation.mutate,
+    isUpdatingAssignment: updateAssignmentMutation.isPending,
     logHours: logHoursMutation.mutate,
+    isLoggingHours: logHoursMutation.isPending,
   };
 }
 
