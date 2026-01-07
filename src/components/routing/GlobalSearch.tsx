@@ -6,6 +6,7 @@ import {
   ClockIcon,
   CommandLineIcon,
 } from '@heroicons/react/24/outline';
+import { SearchEmptyState } from '@/components/ui/empty-state';
 
 export interface SearchResult {
   id: string;
@@ -336,13 +337,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
           {query.trim() && !isLoading && (
             <div className="p-4">
               {results.length === 0 ? (
-                <div className="text-center py-6">
-                  <MagnifyingGlassIcon className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">No results found for "{query}"</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Try different keywords or check your spelling
-                  </p>
-                </div>
+                <SearchEmptyState searchTerm={query} />
               ) : (
                 <>
                   <div className="mb-3">

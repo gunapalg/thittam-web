@@ -16,6 +16,8 @@ import { Workspace, TeamMember, WorkspaceRole } from '../../../types';
 import api from '../../../lib/api';
 import { supabase } from '@/integrations/supabase/client';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { EmptyState, SearchEmptyState } from '@/components/ui/empty-state';
+import { Users } from 'lucide-react';
 
 interface MobileTeamManagementProps {
   workspace: Workspace;
@@ -271,23 +273,26 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       {/* Team Members List */}
       <div className="space-y-3">
         {filteredMembers.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-            <UserPlusIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No members found</h3>
-            <p className="text-xs text-gray-500 mb-4">
-              {searchTerm || roleFilter !== 'all' || statusFilter !== 'all'
-                ? 'Try adjusting your search or filters'
-                : 'Start building your team by inviting members'
-              }
-            </p>
-            {!searchTerm && roleFilter === 'all' && statusFilter === 'all' && (
-              <button
-                onClick={onInviteMember}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                <UserPlusIcon className="w-4 h-4 mr-2" />
-                Invite Members
-              </button>
+          <div className="bg-card rounded-lg shadow-sm">
+            {searchTerm || roleFilter !== 'all' || statusFilter !== 'all' ? (
+              <SearchEmptyState
+                searchTerm={searchTerm}
+                onClear={() => {
+                  setSearchTerm('');
+                  setRoleFilter('all');
+                  setStatusFilter('all');
+                }}
+              />
+            ) : (
+              <EmptyState
+                icon={Users}
+                title="No team members yet"
+                description="Start building your team by inviting members"
+                action={{
+                  label: 'Invite Members',
+                  onClick: onInviteMember,
+                }}
+              />
             )}
           </div>
         ) : (
