@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { TaskPriority, TaskStatus, WorkspaceRoleScope } from '@/types';
+import { TaskPriority, TaskStatus, WorkspaceRoleScope, WorkspaceTask, TaskCategory, WorkspaceRole } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { TablesInsert } from '@/integrations/supabase/types';
+import { optimisticHelpers } from './useOptimisticMutation';
 
 interface UseWorkspaceMutationsProps {
   workspaceId: string | undefined;
@@ -13,7 +14,7 @@ interface UseWorkspaceMutationsProps {
 
 /**
  * Shared hook for workspace mutations (task CRUD, event publish, role views)
- * Used by both desktop and mobile workspace dashboards
+ * Uses optimistic updates for instant UI feedback
  */
 export function useWorkspaceMutations({
   workspaceId,
@@ -23,8 +24,9 @@ export function useWorkspaceMutations({
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { user } = useAuth();
+  const queryKey = ['workspace-tasks', workspaceId];
 
-  // Create task
+  // Create task with optimistic update
   const createTaskMutation = useMutation({
     mutationFn: async () => {
       if (!workspaceId) throw new Error('Workspace ID is required');
@@ -44,12 +46,54 @@ export function useWorkspaceMutations({
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousTasks = queryClient.getQueryData<WorkspaceTask[]>(queryKey);
+      
+      // Create optimistic task with required fields
+      const now = new Date().toISOString();
+      const optimisticTask: WorkspaceTask = {
+        id: `temp-${Date.now()}`,
+        workspaceId: workspaceId!,
+        title: 'New task',
+        description: '',
+        category: TaskCategory.LOGISTICS,
+        priority: TaskPriority.MEDIUM,
+        status: TaskStatus.NOT_STARTED,
+        progress: 0,
+        dependencies: [],
+        tags: [],
+        metadata: {},
+        roleScope: activeRoleSpace === 'ALL' ? undefined : activeRoleSpace,
+        creator: {
+          id: user?.id || 'temp',
+          userId: user?.id || 'temp',
+          role: WorkspaceRole.EVENT_COORDINATOR,
+          user: { id: user?.id || 'temp', name: user?.email || 'You' },
+        },
+        createdAt: now,
+        updatedAt: now,
+      };
+      
+      queryClient.setQueryData(queryKey, optimisticHelpers.appendToList(previousTasks, optimisticTask));
+      return { previousTasks };
+    },
+    onError: (error, _, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData(queryKey, context.previousTasks);
+      }
+      toast({
+        title: 'Failed to create task',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
-  // Update task status
+  // Update task status with optimistic update
   const updateTaskStatusMutation = useMutation({
     mutationFn: async ({ taskId, status }: { taskId: string; status: TaskStatus }) => {
       const { error } = await supabase
@@ -59,13 +103,35 @@ export function useWorkspaceMutations({
         .eq('workspace_id', workspaceId as string);
 
       if (error) throw error;
+      return { taskId, status };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+    onMutate: async ({ taskId, status }) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousTasks = queryClient.getQueryData<WorkspaceTask[]>(queryKey);
+      
+      queryClient.setQueryData(
+        queryKey,
+        optimisticHelpers.updateInList(previousTasks, taskId, { status })
+      );
+      
+      return { previousTasks };
+    },
+    onError: (error, _, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData(queryKey, context.previousTasks);
+      }
+      toast({
+        title: 'Failed to update task',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
-  // Delete task
+  // Delete task with optimistic update
   const deleteTaskMutation = useMutation({
     mutationFn: async (taskId: string) => {
       const { error } = await supabase
@@ -75,9 +141,34 @@ export function useWorkspaceMutations({
         .eq('workspace_id', workspaceId as string);
 
       if (error) throw error;
+      return taskId;
+    },
+    onMutate: async (taskId) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousTasks = queryClient.getQueryData<WorkspaceTask[]>(queryKey);
+      
+      queryClient.setQueryData(
+        queryKey,
+        optimisticHelpers.removeFromList(previousTasks, taskId)
+      );
+      
+      return { previousTasks };
+    },
+    onError: (error, _, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData(queryKey, context.previousTasks);
+      }
+      toast({
+        title: 'Failed to delete task',
+        description: error.message,
+        variant: 'destructive',
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
+      toast({ title: 'Task deleted' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -102,7 +193,7 @@ export function useWorkspaceMutations({
         queryClient.invalidateQueries({ queryKey: ['event', eventId] });
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'Failed to publish event',
         description: error?.message || 'Please try again.',
@@ -144,7 +235,9 @@ export function useWorkspaceMutations({
     isCreatingTask: createTaskMutation.isPending,
     updateTaskStatus: (taskId: string, status: TaskStatus) =>
       updateTaskStatusMutation.mutate({ taskId, status }),
+    isUpdatingTaskStatus: updateTaskStatusMutation.isPending,
     deleteTask: (taskId: string) => deleteTaskMutation.mutate(taskId),
+    isDeletingTask: deleteTaskMutation.isPending,
     publishEvent: () => publishEventMutation.mutate(),
     isPublishingEvent: publishEventMutation.isPending,
     upsertRoleView: (roleScope: WorkspaceRoleScope, lastActiveTab: string) =>
