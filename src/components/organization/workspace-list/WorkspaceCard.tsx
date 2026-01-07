@@ -59,81 +59,74 @@ export const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
   const hasSubWorkspaces = workspace.subWorkspaces && workspace.subWorkspaces.length > 0;
 
   return (
-    <div style={{ marginLeft: depth * 20 }}>
+    <div style={{ marginLeft: depth * 16 }}>
       <motion.button
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.05, duration: 0.3 }}
-        whileHover={{ scale: 1.01, y: -2 }}
-        whileTap={{ scale: 0.99 }}
+        transition={{ delay: index * 0.03, duration: 0.2 }}
+        whileHover={{ scale: 1.005 }}
+        whileTap={{ scale: 0.995 }}
         onClick={() => onClick(workspace)}
         className={cn(
-          "w-full group relative p-4 sm:p-5 rounded-2xl border border-border/50",
-          "bg-card/60 backdrop-blur-md",
-          "hover:border-primary/50 hover:bg-card/90",
-          "hover:shadow-lg hover:shadow-primary/5",
-          "transition-all duration-300 text-left",
-          "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+          "w-full group relative p-3 rounded-lg border border-border/50",
+          "bg-card/60 backdrop-blur-sm",
+          "hover:border-primary/40 hover:bg-card/80",
+          "transition-all duration-200 text-left",
+          "focus:outline-none focus:ring-1 focus:ring-primary/30"
         )}
       >
-        {/* Gradient overlay on hover */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
-        <div className="relative flex items-start gap-3 sm:gap-4">
+        <div className="flex items-center gap-2.5">
           {/* Icon */}
           <div className={cn(
-            "flex-shrink-0 p-2.5 sm:p-3 rounded-xl",
-            "bg-gradient-to-br from-primary/10 to-primary/5",
-            "border border-primary/10",
-            "group-hover:from-primary/20 group-hover:to-primary/10",
-            "transition-all duration-300"
+            "flex-shrink-0 p-1.5 rounded-md",
+            "bg-primary/10 border border-primary/10"
           )}>
             {hasSubWorkspaces ? (
-              <FolderOpenIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <FolderOpenIcon className="h-4 w-4 text-primary" />
             ) : (
-              <Squares2X2Icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <Squares2X2Icon className="h-4 w-4 text-primary" />
             )}
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors text-sm sm:text-base">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="font-medium text-foreground truncate group-hover:text-primary transition-colors text-sm">
                 {workspace.name}
               </h3>
               {workspace.isOwner && (
-                <span className="text-[10px] sm:text-xs px-2 py-0.5 bg-primary/15 text-primary rounded-full font-medium border border-primary/20">
+                <span className="text-[9px] px-1.5 py-0.5 bg-primary/15 text-primary rounded font-medium">
                   Owner
                 </span>
               )}
               {workspace.isMember && !workspace.isOwner && (
-                <span className="text-[10px] sm:text-xs px-2 py-0.5 bg-blue-500/15 text-blue-600 dark:text-blue-400 rounded-full font-medium border border-blue-500/20">
+                <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/15 text-blue-600 dark:text-blue-400 rounded font-medium">
                   Member
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3 mt-2 flex-wrap">
+            <div className="flex items-center gap-2 mt-0.5">
               {workspace.event && (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <CalendarIcon className="h-3.5 w-3.5" />
-                  <span className="truncate max-w-[120px] sm:max-w-none">{workspace.event.name}</span>
+                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <CalendarIcon className="h-3 w-3" />
+                  <span className="truncate max-w-[100px]">{workspace.event.name}</span>
                 </span>
               )}
               <span className={cn(
-                "px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium border",
+                "px-1.5 py-0.5 rounded text-[9px] font-medium border",
                 getStatusStyles(workspace.status)
               )}>
                 {workspace.status}
               </span>
-              <span className="text-xs text-muted-foreground/70 hidden sm:inline">
-                Updated {formatDistanceToNow(new Date(workspace.updatedAt), { addSuffix: true })}
+              <span className="text-[10px] text-muted-foreground/60 hidden sm:inline">
+                {formatDistanceToNow(new Date(workspace.updatedAt), { addSuffix: true })}
               </span>
             </div>
           </div>
 
           {/* Arrow */}
-          <ChevronRightIcon className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-1 transition-all flex-shrink-0" />
+          <ChevronRightIcon className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors flex-shrink-0" />
         </div>
       </motion.button>
 
