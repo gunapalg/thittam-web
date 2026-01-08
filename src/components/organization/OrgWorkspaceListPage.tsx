@@ -7,7 +7,6 @@ import { useCurrentOrganization } from './OrganizationContext';
 import { useAuth } from '@/hooks/useAuth';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  UserIcon,
   BuildingOfficeIcon,
   EnvelopeIcon,
 } from '@heroicons/react/24/outline';
@@ -126,15 +125,6 @@ export const OrgWorkspaceListPage: React.FC = () => {
         {!isLoading && (
           <ScrollArea className="h-[calc(100vh-16rem)] sm:h-[calc(100vh-14rem)]">
             <div className="space-y-6 sm:space-y-8 pb-8 pr-2">
-              {/* My Workspaces */}
-              <WorkspaceGroup
-                title="My Workspaces"
-                icon={<UserIcon className="h-5 w-5 text-primary" />}
-                workspaces={workspacesData?.myWorkspaces || []}
-                emptyMessage="You haven't created any workspaces yet"
-                defaultExpanded={true}
-                orgSlug={orgSlug}
-              />
 
               {/* Invited Workspaces */}
               <WorkspaceGroup
