@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Building2, Users, Briefcase, UsersRound, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { buildHierarchyChain, buildWorkspaceUrl, slugify } from '@/lib/workspaceNavigation';
 
 interface WorkspaceHierarchyMiniMapProps {
   workspaceId: string;
@@ -19,6 +20,7 @@ interface WorkspaceHierarchyMiniMapProps {
 interface MiniMapWorkspace {
   id: string;
   name: string;
+  slug: string | null;
   parentWorkspaceId: string | null;
   workspaceType: string | null;
 }
@@ -74,6 +76,22 @@ export function WorkspaceHierarchyMiniMap({
   const orgSlug = propOrgSlug || params.orgSlug;
   const resolvedEventId = eventId || params.eventId;
 
+  // Fetch event data for slug
+  const { data: event } = useQuery({
+    queryKey: ['workspace-minimap-event', resolvedEventId],
+    queryFn: async () => {
+      if (!resolvedEventId) return null;
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, slug, name')
+        .eq('id', resolvedEventId)
+        .single();
+      if (error) return null;
+      return data;
+    },
+    enabled: !!resolvedEventId,
+  });
+
   const { data: workspaces } = useQuery({
     queryKey: ['workspace-minimap', resolvedEventId, workspaceId],
     queryFn: async () => {
@@ -93,13 +111,14 @@ export function WorkspaceHierarchyMiniMap({
 
       const { data, error } = await supabase
         .from('workspaces')
-        .select('id, name, parent_workspace_id, workspace_type')
+        .select('id, name, slug, parent_workspace_id, workspace_type')
         .eq('event_id', targetEventId);
 
       if (error) throw error;
       return (data || []).map((ws) => ({
         id: ws.id,
         name: ws.name,
+        slug: ws.slug,
         parentWorkspaceId: ws.parent_workspace_id,
         workspaceType: ws.workspace_type,
       })) as MiniMapWorkspace[];
@@ -130,10 +149,26 @@ export function WorkspaceHierarchyMiniMap({
   }, [workspaces, workspaceId]);
 
   const getWorkspaceLink = (wsId: string) => {
-    if (orgSlug && resolvedEventId) {
-      return `/${orgSlug}/workspaces/${resolvedEventId}/${wsId}`;
+    if (!orgSlug || !event || !workspaces) {
+      return '/dashboard';
     }
-    return `/workspaces/${wsId}`;
+
+    const eventSlug = event.slug || slugify(event.name);
+    const workspaceData = workspaces.map(ws => ({
+      id: ws.id,
+      slug: ws.slug || slugify(ws.name),
+      name: ws.name,
+      workspaceType: ws.workspaceType,
+      parentWorkspaceId: ws.parentWorkspaceId,
+    }));
+
+    const hierarchy = buildHierarchyChain(wsId, workspaceData);
+    return buildWorkspaceUrl({
+      orgSlug,
+      eventSlug,
+      eventId: event.id,
+      hierarchy,
+    });
   };
 
   const getLevelConfig = (wsType: string | null, index: number) => {

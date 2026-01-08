@@ -281,7 +281,7 @@ export function OrganizerDashboard() {
                                     {ws.event && <p className="text-muted-foreground text-xs sm:text-sm mb-3 sm:mb-4">Event: {ws.event.name}</p>}
                                     <div className="flex items-center justify-between">
                                         <span className="text-xs text-muted-foreground capitalize">{ws.status}</span>
-                                        <Link to={`/${organization.slug}/workspaces?eventId=${ws.event?.id || ''}`} className="text-primary hover:text-primary/80 text-xs sm:text-sm font-medium">
+                                        <Link to={`/${organization.slug}/workspaces`} className="text-primary hover:text-primary/80 text-xs sm:text-sm font-medium">
                                             Open Workspace
                                         </Link>
                                     </div>
@@ -417,7 +417,7 @@ export function OrganizerDashboard() {
                                                     Edit
                                                 </Link>
                                                 <Link 
-                                                    to={`/${organization.slug}/workspaces?eventId=${event.id}`} 
+                                                    to={`/${organization.slug}/workspaces`} 
                                                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-500/10 rounded-lg transition-colors ml-auto"
                                                 >
                                                     <FolderOpen className="h-3.5 w-3.5" />
