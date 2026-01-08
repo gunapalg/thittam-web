@@ -29,6 +29,7 @@ import { OrganizationProductsLandingPage } from '../organization/OrganizationPro
 
 import AttendflowLanding from '@/pages/AttendflowLanding';
 import PricingPage from '@/pages/PricingPage';
+import IllustrationGalleryPage from '@/pages/IllustrationGalleryPage';
 
 // Lazy-loaded components for better bundle splitting
 // Heavy/role-specific components only downloaded when needed
@@ -505,6 +506,9 @@ export const AppRouter: React.FC = () => {
              {/* Attendflow-style marketing landing at root */}
              <Route path="/" element={<RootLandingRoute />} />
              <Route path="/pricing" element={<PricingPage />} />
+             
+             {/* Dev tools */}
+             <Route path="/dev/illustrations" element={<IllustrationGalleryPage />} />
 
             {/* Public authentication routes */}
             <Route path="/login" element={<LoginForm />} />
