@@ -48,8 +48,8 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
   const rbac = useWorkspaceRBAC(currentUserRole ?? null);
   const { user } = useAuth();
   
-  // Check if current user is the workspace owner (we'll check via the workspace's first team member with owner role or event owner)
-  const isWorkspaceOwner = !!user && workspace.teamMembers?.some(m => m.userId === user.id && m.role === WorkspaceRole.ORGANIZER);
+  // Check if current user is the workspace owner via the organizer_id field in the workspace
+  const isWorkspaceOwner = !!user && workspace.teamMembers?.some(m => m.userId === user.id && m.role === WorkspaceRole.WORKSPACE_OWNER);
   
   // Get the default role based on what the user can assign
   const getDefaultRole = (): WorkspaceRole => {
