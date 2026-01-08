@@ -429,7 +429,14 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
   const resourceActions = [
     {
       label: 'Edit Workspace',
-      action: () => navigate(`/console/workspaces/${workspaceId}/edit`),
+      action: () => {
+        // For console routes, use dashboard navigation
+        if (orgSlug) {
+          navigate(`/${orgSlug}/workspaces`);
+        } else {
+          navigate('/dashboard');
+        }
+      },
       variant: 'secondary' as const,
     },
     {
@@ -439,12 +446,19 @@ export const WorkspaceDetailPage: React.FC<WorkspaceDetailPageProps> = ({ defaul
     },
     {
       label: 'Settings',
-      action: () => navigate(`/console/workspaces/${workspaceId}/settings`),
+      action: () => {
+        // For console routes, use dashboard navigation
+        if (orgSlug) {
+          navigate(`/${orgSlug}/workspaces`);
+        } else {
+          navigate('/dashboard');
+        }
+      },
       variant: 'secondary' as const,
     },
   ];
 
-  const baseWorkspacePath = orgSlug ? `/${orgSlug}/workspaces` : '/console/workspaces';
+  const baseWorkspacePath = orgSlug ? `/${orgSlug}/workspaces` : '/dashboard';
   const eventManagementBase = orgSlug ? `/${orgSlug}/eventmanagement` : '/dashboard/eventmanagement';
 
   const breadcrumbs = [

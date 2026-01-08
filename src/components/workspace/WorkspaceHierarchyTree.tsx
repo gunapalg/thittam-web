@@ -232,7 +232,8 @@ export function WorkspaceHierarchyTree({
       
       navigate(url);
     } else {
-      navigate(`/workspaces/${workspaceId}`);
+      console.warn('[HierarchyTree] Missing data for hierarchical URL, redirecting to dashboard');
+      navigate('/dashboard');
     }
   };
 

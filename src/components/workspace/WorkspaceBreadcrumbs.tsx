@@ -157,7 +157,7 @@ export function WorkspaceBreadcrumbs({
   // Build hierarchical URL for a workspace at a given index in the path
   const getWorkspaceLink = (targetIndex: number) => {
     if (!orgSlug || !event || !breadcrumbPath.length) {
-      return `/workspaces/${breadcrumbPath[targetIndex]?.id || ''}`;
+      return '/dashboard';
     }
 
     const eventSlug = event.slug || slugify(event.name);
@@ -183,9 +183,6 @@ export function WorkspaceBreadcrumbs({
     if (orgSlug && event) {
       const eventSlug = event.slug || slugify(event.name);
       return `/${orgSlug}/workspaces/${eventSlug}?eventId=${event.id}`;
-    }
-    if (orgSlug && resolvedEventId) {
-      return `/${orgSlug}/workspaces/${resolvedEventId}`;
     }
     return '/dashboard';
   };

@@ -249,8 +249,9 @@ export function useWorkspaceShell({
       }
     }
     
-    // Fallback
-    navigate(`/workspaces/${workspaceId}/settings`);
+    // Fallback - redirect to dashboard if hierarchical URL cannot be built
+    console.warn('[WorkspaceShell] Cannot build settings URL, redirecting to dashboard');
+    navigate('/dashboard');
   };
 
   const handleViewTasks = () => {
@@ -295,8 +296,9 @@ export function useWorkspaceShell({
       }
     }
     
-    // Fallback
-    navigate(`/workspaces/${newWorkspaceId}`);
+    // Fallback - redirect to dashboard if hierarchical URL cannot be built
+    console.warn('[WorkspaceShell] Cannot build workspace URL, redirecting to dashboard');
+    navigate('/dashboard');
   };
 
   const handleTaskStatusChange = (taskId: string, status: TaskStatus) => {
