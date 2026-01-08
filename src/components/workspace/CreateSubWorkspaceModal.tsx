@@ -56,8 +56,8 @@ export function CreateSubWorkspaceModal({
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set());
 
-  // Fetch parent workspace
-  const { data: parentWorkspace } = useQuery({
+  // Fetch parent workspace (used for context)
+  useQuery({
     queryKey: ['workspace-parent', parentWorkspaceId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -156,24 +156,89 @@ export function CreateSubWorkspaceModal({
 
       const createdWorkspaces: { id: string; name: string }[] = [];
 
-      for (const item of selectedItems) {
-        const workspaceType = item.type === 'department' 
-          ? WorkspaceType.DEPARTMENT 
-          : WorkspaceType.COMMITTEE;
+      // Split selected items into departments and committees
+      const selectedDeptItems = selectedItems.filter(i => i.type === 'department');
+      const selectedCommItems = selectedItems.filter(i => i.type === 'committee');
 
-        const departmentId = item.type === 'department' 
-          ? item.id 
-          : item.departmentId || parentWorkspace?.department_id || null;
+      // Build a map of department IDs to their workspace IDs
+      const departmentWorkspaceMap = new Map<string, string>();
+
+      // First, fetch existing department workspaces for this event
+      const { data: existingDepts } = await supabase
+        .from('workspaces')
+        .select('id, department_id')
+        .eq('event_id', eventId)
+        .eq('workspace_type', 'DEPARTMENT');
+
+      existingDepts?.forEach(dept => {
+        if (dept.department_id) {
+          departmentWorkspaceMap.set(dept.department_id, dept.id);
+        }
+      });
+
+      // Step 1: Create departments first (they are children of root)
+      for (const item of selectedDeptItems) {
+        const { data: workspace, error: wsError } = await supabase
+          .from('workspaces')
+          .insert({
+            name: item.name,
+            event_id: eventId,
+            parent_workspace_id: parentWorkspaceId, // Root as parent
+            organizer_id: user.id,
+            status: 'ACTIVE',
+            workspace_type: WorkspaceType.DEPARTMENT,
+            department_id: item.id,
+          })
+          .select('id, name')
+          .single();
+
+        if (wsError) throw wsError;
+
+        // Track the new department workspace ID
+        departmentWorkspaceMap.set(item.id, workspace.id);
+
+        const responsibleRole = getResponsibleRoleForWorkspace(
+          WorkspaceType.DEPARTMENT,
+          item.id,
+          undefined
+        );
+
+        if (responsibleRole) {
+          await supabase
+            .from('workspace_team_members')
+            .insert({
+              workspace_id: workspace.id,
+              user_id: user.id,
+              role: responsibleRole,
+              status: 'active',
+            });
+        }
+
+        createdWorkspaces.push(workspace);
+      }
+
+      // Step 2: Create committees (they are children of their department workspace)
+      for (const item of selectedCommItems) {
+        const departmentId = item.departmentId;
+        if (!departmentId) {
+          throw new Error(`Committee "${item.name}" is missing a department reference`);
+        }
+
+        // Get the department workspace ID (either existing or just created)
+        const departmentWorkspaceId = departmentWorkspaceMap.get(departmentId);
+        if (!departmentWorkspaceId) {
+          throw new Error(`Department workspace for "${item.name}" not found. Please create the department first.`);
+        }
 
         const { data: workspace, error: wsError } = await supabase
           .from('workspaces')
           .insert({
             name: item.name,
             event_id: eventId,
-            parent_workspace_id: parentWorkspaceId,
+            parent_workspace_id: departmentWorkspaceId, // Department as parent (NOT root!)
             organizer_id: user.id,
             status: 'ACTIVE',
-            workspace_type: workspaceType,
+            workspace_type: WorkspaceType.COMMITTEE,
             department_id: departmentId,
           })
           .select('id, name')
@@ -182,9 +247,9 @@ export function CreateSubWorkspaceModal({
         if (wsError) throw wsError;
 
         const responsibleRole = getResponsibleRoleForWorkspace(
-          workspaceType,
-          departmentId || undefined,
-          item.type === 'committee' ? item.id : undefined
+          WorkspaceType.COMMITTEE,
+          departmentId,
+          item.id
         );
 
         if (responsibleRole) {
