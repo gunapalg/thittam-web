@@ -64,17 +64,55 @@ export function TeamRosterManagement({
     };
   };
 
+  // Count owners in the workspace
+  const ownerCount = teamMembers.filter(m => m.role === WorkspaceRole.WORKSPACE_OWNER).length;
+
+
   const roleOptions = [
     { value: 'all', label: 'All Roles' },
+    // Level 1 - Owner
     { value: WorkspaceRole.WORKSPACE_OWNER, label: 'Workspace Owner' },
+    // Level 2 - Managers
     { value: WorkspaceRole.OPERATIONS_MANAGER, label: 'Operations Manager' },
     { value: WorkspaceRole.GROWTH_MANAGER, label: 'Growth Manager' },
     { value: WorkspaceRole.CONTENT_MANAGER, label: 'Content Manager' },
     { value: WorkspaceRole.TECH_FINANCE_MANAGER, label: 'Tech & Finance Manager' },
     { value: WorkspaceRole.VOLUNTEERS_MANAGER, label: 'Volunteers Manager' },
+    // Level 3 - Leads
     { value: WorkspaceRole.EVENT_LEAD, label: 'Event Lead' },
+    { value: WorkspaceRole.CATERING_LEAD, label: 'Catering Lead' },
+    { value: WorkspaceRole.LOGISTICS_LEAD, label: 'Logistics Lead' },
+    { value: WorkspaceRole.FACILITY_LEAD, label: 'Facility Lead' },
     { value: WorkspaceRole.MARKETING_LEAD, label: 'Marketing Lead' },
+    { value: WorkspaceRole.COMMUNICATION_LEAD, label: 'Communication Lead' },
+    { value: WorkspaceRole.SPONSORSHIP_LEAD, label: 'Sponsorship Lead' },
+    { value: WorkspaceRole.SOCIAL_MEDIA_LEAD, label: 'Social Media Lead' },
+    { value: WorkspaceRole.CONTENT_LEAD, label: 'Content Lead' },
+    { value: WorkspaceRole.SPEAKER_LIAISON_LEAD, label: 'Speaker Liaison Lead' },
+    { value: WorkspaceRole.JUDGE_LEAD, label: 'Judge Lead' },
+    { value: WorkspaceRole.MEDIA_LEAD, label: 'Media Lead' },
+    { value: WorkspaceRole.FINANCE_LEAD, label: 'Finance Lead' },
+    { value: WorkspaceRole.REGISTRATION_LEAD, label: 'Registration Lead' },
+    { value: WorkspaceRole.TECHNICAL_LEAD, label: 'Technical Lead' },
+    { value: WorkspaceRole.IT_LEAD, label: 'IT Lead' },
+    { value: WorkspaceRole.VOLUNTEERS_LEAD, label: 'Volunteers Lead' },
+    // Level 4 - Coordinators
     { value: WorkspaceRole.EVENT_COORDINATOR, label: 'Event Coordinator' },
+    { value: WorkspaceRole.CATERING_COORDINATOR, label: 'Catering Coordinator' },
+    { value: WorkspaceRole.LOGISTICS_COORDINATOR, label: 'Logistics Coordinator' },
+    { value: WorkspaceRole.FACILITY_COORDINATOR, label: 'Facility Coordinator' },
+    { value: WorkspaceRole.MARKETING_COORDINATOR, label: 'Marketing Coordinator' },
+    { value: WorkspaceRole.COMMUNICATION_COORDINATOR, label: 'Communication Coordinator' },
+    { value: WorkspaceRole.SPONSORSHIP_COORDINATOR, label: 'Sponsorship Coordinator' },
+    { value: WorkspaceRole.SOCIAL_MEDIA_COORDINATOR, label: 'Social Media Coordinator' },
+    { value: WorkspaceRole.CONTENT_COORDINATOR, label: 'Content Coordinator' },
+    { value: WorkspaceRole.SPEAKER_LIAISON_COORDINATOR, label: 'Speaker Liaison Coordinator' },
+    { value: WorkspaceRole.JUDGE_COORDINATOR, label: 'Judge Coordinator' },
+    { value: WorkspaceRole.MEDIA_COORDINATOR, label: 'Media Coordinator' },
+    { value: WorkspaceRole.FINANCE_COORDINATOR, label: 'Finance Coordinator' },
+    { value: WorkspaceRole.REGISTRATION_COORDINATOR, label: 'Registration Coordinator' },
+    { value: WorkspaceRole.TECHNICAL_COORDINATOR, label: 'Technical Coordinator' },
+    { value: WorkspaceRole.IT_COORDINATOR, label: 'IT Coordinator' },
     { value: WorkspaceRole.VOLUNTEER_COORDINATOR, label: 'Volunteer Coordinator' },
   ];
 
@@ -129,14 +167,20 @@ export function TeamRosterManagement({
   };
 
   const canEditMember = (member: TeamMember) => {
-    // Only workspace owners and team leads can edit other members
-    // Members cannot edit workspace owners
-    return member.role !== WorkspaceRole.WORKSPACE_OWNER;
+    // If member is an owner and they're the only owner, prevent editing their role
+    if (member.role === WorkspaceRole.WORKSPACE_OWNER && ownerCount <= 1) {
+      return false;
+    }
+    // Allow editing owners if there are multiple owners
+    return true;
   };
 
   const canRemoveMember = (member: TeamMember) => {
-    // Cannot remove workspace owners
-    return member.role !== WorkspaceRole.WORKSPACE_OWNER;
+    // Cannot remove the last owner
+    if (member.role === WorkspaceRole.WORKSPACE_OWNER && ownerCount <= 1) {
+      return false;
+    }
+    return true;
   };
 
   const getPermissionPreview = (role: WorkspaceRole) => {
