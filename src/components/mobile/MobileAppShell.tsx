@@ -5,6 +5,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { MobileFAB } from './MobileFAB';
 import { MobileQuickActionsSheet } from './MobileQuickActionsSheet';
 import { MobileSearchOverlay } from './MobileSearchOverlay';
+import { MobileHomePage } from './MobileHomePage';
 import { PullToRefresh } from './shared/PullToRefresh';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -125,8 +126,19 @@ export const MobileAppShell: React.FC<MobileAppShellProps> = ({
     });
   }, [queryClient, organization.id]);
 
+  // Determine if we're on the home/dashboard route
+  const isOnHomeRoute = () => {
+    const path = location.pathname;
+    return path.endsWith('/dashboard') || path === `/${organization.slug}`;
+  };
+
   // Render content based on the actual route or fallback to children
   const renderContent = () => {
+    // If on home route, render the dedicated mobile home page
+    if (isOnHomeRoute()) {
+      return <MobileHomePage organization={organization} />;
+    }
+
     // If children are provided, render them (this handles most routes)
     if (children) {
       return children;
