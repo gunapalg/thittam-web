@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, PaintBrushIcon, CursorArrowRaysIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, PaintBrushIcon, CursorArrowRaysIcon, MapPinIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
@@ -17,6 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarIcon, Building2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+
 import {
   Form,
   FormControl,
@@ -28,6 +29,59 @@ import {
 } from '@/components/ui/form';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
+// Category display config
+const categoryLabels: Record<string, string> = {
+  HACKATHON: '💻 Hackathon',
+  BOOTCAMP: '🎓 Bootcamp',
+  WORKSHOP: '🔧 Workshop',
+  CONFERENCE: '🎤 Conference',
+  MEETUP: '👥 Meetup',
+  STARTUP_PITCH: '🚀 Startup Pitch',
+  HIRING_CHALLENGE: '💼 Hiring Challenge',
+  WEBINAR: '🖥️ Webinar',
+  COMPETITION: '🏆 Competition',
+  SEMINAR: '📚 Seminar',
+  SYMPOSIUM: '🎓 Symposium',
+  CULTURAL_FEST: '🎭 Cultural Fest',
+  SPORTS_EVENT: '⚽ Sports Event',
+  ORIENTATION: '🎯 Orientation',
+  ALUMNI_MEET: '🤝 Alumni Meet',
+  CAREER_FAIR: '💼 Career Fair',
+  LECTURE: '📖 Lecture',
+  QUIZ: '❓ Quiz',
+  DEBATE: '🗣️ Debate',
+  PRODUCT_LAUNCH: '🎉 Product Launch',
+  TOWN_HALL: '🏛️ Town Hall',
+  TEAM_BUILDING: '🏗️ Team Building',
+  TRAINING: '📋 Training',
+  AWARDS_CEREMONY: '🏅 Awards Ceremony',
+  OFFSITE: '✈️ Offsite',
+  NETWORKING: '🔗 Networking',
+  TRADE_SHOW: '🏪 Trade Show',
+  EXPO: '🎪 Expo',
+  SUMMIT: '⛰️ Summit',
+  PANEL_DISCUSSION: '💬 Panel Discussion',
+  DEMO_DAY: '🎬 Demo Day',
+  FUNDRAISER: '💰 Fundraiser',
+  GALA: '🌟 Gala',
+  CHARITY_EVENT: '❤️ Charity Event',
+  VOLUNTEER_DRIVE: '🙋 Volunteer Drive',
+  AWARENESS_CAMPAIGN: '📢 Awareness Campaign',
+  CONCERT: '🎵 Concert',
+  EXHIBITION: '🖼️ Exhibition',
+  FESTIVAL: '🎊 Festival',
+  SOCIAL_GATHERING: '🎈 Social Gathering',
+  OTHER: '📌 Other',
+};
+
+const virtualPlatforms = [
+  { value: 'zoom', label: '📹 Zoom' },
+  { value: 'teams', label: '💼 Microsoft Teams' },
+  { value: 'meet', label: '📞 Google Meet' },
+  { value: 'webex', label: '🎥 Webex' },
+  { value: 'other', label: '🔗 Other' },
+];
+
 // Modern section header with icon
 const SectionHeader: React.FC<{
   title: string;
@@ -35,7 +89,8 @@ const SectionHeader: React.FC<{
   icon: React.ElementType;
   isOpen: boolean;
   stepNumber: number;
-}> = ({ title, description, icon: Icon, isOpen, stepNumber }) => (
+  isConditional?: boolean;
+}> = ({ title, description, icon: Icon, isOpen, stepNumber, isConditional }) => (
   <div className="flex items-center gap-4 w-full py-4 px-2">
     <div className={cn(
       "flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300",
@@ -53,6 +108,11 @@ const SectionHeader: React.FC<{
         )}>
           Step {stepNumber}
         </span>
+        {isConditional && (
+          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-accent/50 text-accent-foreground">
+            Conditional
+          </span>
+        )}
       </div>
       <h3 className="text-base font-semibold text-foreground mt-0.5">{title}</h3>
       <p className="text-sm text-muted-foreground truncate">{description}</p>
@@ -78,6 +138,7 @@ const eventSchema = z
     name: z.string().trim().min(1, 'Event name is required'),
     description: z.string().trim().min(1, 'Description is required'),
     mode: z.enum(['ONLINE', 'OFFLINE', 'HYBRID'], { required_error: 'Mode is required' }),
+    category: z.string().optional(),
     organizationId: z.string().min(1, 'Organization is required'),
     capacity: z
       .string()
@@ -93,6 +154,21 @@ const eventSchema = z
     startDate: z.string().min(1, 'Start date is required'),
     endDate: z.string().min(1, 'End date is required'),
     registrationDeadline: z.string().optional(),
+    // Venue fields (for OFFLINE/HYBRID)
+    venueName: z.string().optional(),
+    venueAddress: z.string().optional(),
+    venueCity: z.string().optional(),
+    venueState: z.string().optional(),
+    venueCountry: z.string().optional(),
+    venuePostalCode: z.string().optional(),
+    venueCapacity: z.string().optional(),
+    // Virtual fields (for ONLINE/HYBRID)
+    virtualPlatform: z.string().optional(),
+    virtualMeetingUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+    virtualMeetingId: z.string().optional(),
+    virtualPassword: z.string().optional(),
+    virtualInstructions: z.string().optional(),
+    // Branding
     primaryColor: z.string().optional(),
     logoUrl: z.string().url('Logo URL must be a valid URL').optional().or(z.literal('')),
     heroSubtitle: z.string().trim().optional(),
@@ -134,6 +210,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     basic: true,
     schedule: false,
+    venue: false,
+    virtual: false,
     branding: false,
     cta: false,
   });
@@ -144,11 +222,27 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       name: '',
       description: '',
       mode: 'ONLINE',
+      category: '',
       organizationId: '',
       capacity: '',
       startDate: '',
       endDate: '',
       registrationDeadline: '',
+      // Venue defaults
+      venueName: '',
+      venueAddress: '',
+      venueCity: '',
+      venueState: '',
+      venueCountry: '',
+      venuePostalCode: '',
+      venueCapacity: '',
+      // Virtual defaults
+      virtualPlatform: '',
+      virtualMeetingUrl: '',
+      virtualMeetingId: '',
+      virtualPassword: '',
+      virtualInstructions: '',
+      // Branding defaults
       primaryColor: '#2563eb',
       logoUrl: '',
       heroSubtitle: '',
@@ -160,6 +254,11 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   });
 
   const { handleSubmit, reset, control } = form;
+  
+  // Watch mode to conditionally show venue/virtual sections
+  const selectedMode = useWatch({ control, name: 'mode' });
+  const showVenueSection = selectedMode === 'OFFLINE' || selectedMode === 'HYBRID';
+  const showVirtualSection = selectedMode === 'ONLINE' || selectedMode === 'HYBRID';
 
   const toggleSection = (section: string) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -199,21 +298,38 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           return;
         }
 
+        const branding = data.branding as any;
         reset({
           name: data.name ?? '',
           description: data.description ?? '',
           mode: data.mode ?? 'ONLINE',
+          category: (data as any).category ?? '',
           organizationId: data.organization_id ?? '',
           capacity: data.capacity != null ? String(data.capacity) : '',
           startDate: data.start_date ? new Date(data.start_date).toISOString().slice(0, 16) : '',
           endDate: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : '',
           registrationDeadline: '',
-          primaryColor: (data.branding as any)?.primaryColor ?? '#2563eb',
-          logoUrl: (data.branding as any)?.logoUrl ?? '',
-          heroSubtitle: (data.branding as any)?.heroSubtitle ?? '',
-          bannerUrl: (data.branding as any)?.bannerUrl ?? '',
-          primaryCtaLabel: (data.branding as any)?.primaryCtaLabel ?? '',
-          secondaryCtaLabel: (data.branding as any)?.secondaryCtaLabel ?? '',
+          // Venue fields
+          venueName: branding?.venue?.name ?? '',
+          venueAddress: branding?.venue?.address ?? '',
+          venueCity: branding?.venue?.city ?? '',
+          venueState: branding?.venue?.state ?? '',
+          venueCountry: branding?.venue?.country ?? '',
+          venuePostalCode: branding?.venue?.postalCode ?? '',
+          venueCapacity: branding?.venue?.capacity != null ? String(branding.venue.capacity) : '',
+          // Virtual fields
+          virtualPlatform: branding?.virtualLinks?.platform ?? '',
+          virtualMeetingUrl: branding?.virtualLinks?.meetingUrl ?? '',
+          virtualMeetingId: branding?.virtualLinks?.meetingId ?? '',
+          virtualPassword: branding?.virtualLinks?.password ?? '',
+          virtualInstructions: branding?.virtualLinks?.instructions ?? '',
+          // Branding
+          primaryColor: branding?.primaryColor ?? '#2563eb',
+          logoUrl: branding?.logoUrl ?? '',
+          heroSubtitle: branding?.heroSubtitle ?? '',
+          bannerUrl: branding?.bannerUrl ?? '',
+          primaryCtaLabel: branding?.primaryCtaLabel ?? '',
+          secondaryCtaLabel: branding?.secondaryCtaLabel ?? '',
           canvasState: (data as any).canvas_state ?? undefined,
         });
       } catch (err: any) {
@@ -268,10 +384,35 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         }
       }
 
+      // Build venue object if applicable
+      const venueData = (values.mode === 'OFFLINE' || values.mode === 'HYBRID') && values.venueName
+        ? {
+            name: values.venueName.trim(),
+            address: values.venueAddress?.trim() || '',
+            city: values.venueCity?.trim() || '',
+            state: values.venueState?.trim() || '',
+            country: values.venueCountry?.trim() || '',
+            postalCode: values.venuePostalCode?.trim() || '',
+            capacity: values.venueCapacity ? Number(values.venueCapacity) : undefined,
+          }
+        : undefined;
+
+      // Build virtual links object if applicable
+      const virtualLinksData = (values.mode === 'ONLINE' || values.mode === 'HYBRID') && values.virtualMeetingUrl
+        ? {
+            platform: values.virtualPlatform || 'other',
+            meetingUrl: values.virtualMeetingUrl,
+            meetingId: values.virtualMeetingId?.trim() || undefined,
+            password: values.virtualPassword || undefined,
+            instructions: values.virtualInstructions?.trim() || undefined,
+          }
+        : undefined;
+
       const payload: any = {
         name: values.name.trim(),
         description: values.description.trim(),
         mode: values.mode,
+        category: values.category || null,
         start_date: values.startDate,
         end_date: values.endDate,
         capacity:
@@ -285,6 +426,8 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           bannerUrl: values.bannerUrl || undefined,
           primaryCtaLabel: values.primaryCtaLabel?.trim() || undefined,
           secondaryCtaLabel: values.secondaryCtaLabel?.trim() || undefined,
+          venue: venueData,
+          virtualLinks: virtualLinksData,
         },
         owner_id: user.id,
         canvas_state: values.canvasState ?? null,
@@ -575,6 +718,33 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
                       <FormField
                         control={control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Event category</FormLabel>
+                            <FormControl>
+                              <select
+                                className="w-full h-11 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                {...field}
+                              >
+                                <option value="">Select category...</option>
+                                {Object.entries(categoryLabels).map(([key, label]) => (
+                                  <option key={key} value={key}>{label}</option>
+                                ))}
+                              </select>
+                            </FormControl>
+                            <FormDescription>
+                              Helps attendees discover your event.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <FormField
+                        control={control}
                         name="capacity"
                         render={({ field }) => (
                           <FormItem>
@@ -776,6 +946,322 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                 </CollapsibleContent>
               </Collapsible>
 
+              {/* Location & Venue Section - Conditional */}
+              {showVenueSection && (
+                <Collapsible
+                  open={openSections.venue}
+                  onOpenChange={() => toggleSection('venue')}
+                >
+                  <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                    <SectionHeader
+                      title="Location & Venue"
+                      description="Physical venue details for in-person attendance"
+                      icon={MapPinIcon}
+                      isOpen={openSections.venue}
+                      stepNumber={3}
+                      isConditional
+                    />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-accent/30 ml-7 mr-4">
+                      <div className="rounded-xl border border-border/50 bg-accent/5 p-4">
+                        <p className="text-sm text-muted-foreground">
+                          📍 These details will be shown to attendees for your <span className="font-medium text-foreground">{selectedMode === 'HYBRID' ? 'in-person' : 'offline'}</span> event.
+                        </p>
+                      </div>
+
+                      <FormField
+                        control={control}
+                        name="venueName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Venue name</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="e.g. Tech Hub Convention Center"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Name of the venue or building.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name="venueAddress"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Street address</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="123 Main Street, Suite 100"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <FormField
+                          control={control}
+                          name="venueCity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="e.g. Chennai"
+                                  className="h-11"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={control}
+                          name="venueState"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>State / Province</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="e.g. Tamil Nadu"
+                                  className="h-11"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <FormField
+                          control={control}
+                          name="venueCountry"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Country</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="e.g. India"
+                                  className="h-11"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={control}
+                          name="venuePostalCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Postal code</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="e.g. 600001"
+                                  className="h-11"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={control}
+                        name="venueCapacity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Venue capacity</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="e.g. 500"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Maximum attendees the venue can accommodate.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+
+              {/* Virtual Platform Section - Conditional */}
+              {showVirtualSection && (
+                <Collapsible
+                  open={openSections.virtual}
+                  onOpenChange={() => toggleSection('virtual')}
+                >
+                  <CollapsibleTrigger className="w-full hover:bg-muted/30 transition-colors">
+                    <SectionHeader
+                      title="Virtual Platform"
+                      description="Online meeting details for virtual attendance"
+                      icon={VideoCameraIcon}
+                      isOpen={openSections.virtual}
+                      stepNumber={showVenueSection ? 4 : 3}
+                      isConditional
+                    />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="px-4 sm:px-6 pb-6 space-y-6 border-l-2 border-accent/30 ml-7 mr-4">
+                      <div className="rounded-xl border border-border/50 bg-accent/5 p-4">
+                        <p className="text-sm text-muted-foreground">
+                          🎥 These details will be shared with attendees joining <span className="font-medium text-foreground">online</span>.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <FormField
+                          control={control}
+                          name="virtualPlatform"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Platform</FormLabel>
+                              <FormControl>
+                                <select
+                                  className="w-full h-11 rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                  {...field}
+                                >
+                                  <option value="">Select platform...</option>
+                                  {virtualPlatforms.map((p) => (
+                                    <option key={p.value} value={p.value}>{p.label}</option>
+                                  ))}
+                                </select>
+                              </FormControl>
+                              <FormDescription>
+                                Video conferencing platform you'll use.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={control}
+                          name="virtualMeetingId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Meeting ID</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="e.g. 123 456 7890"
+                                  className="h-11"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Optional meeting ID or room code.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={control}
+                        name="virtualMeetingUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Meeting URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="url"
+                                placeholder="https://zoom.us/j/123456789"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              The link attendees will use to join.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <FormField
+                          control={control}
+                          name="virtualPassword"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Meeting password</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="Optional password"
+                                  className="h-11"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Password required to join (if any).
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={control}
+                        name="virtualInstructions"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Joining instructions</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                rows={3}
+                                placeholder="Any additional instructions for joining the virtual session..."
+                                className="resize-none"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Tips or requirements for attendees (e.g., download app beforehand).
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+
               {/* Branding Section */}
               <Collapsible
                 open={openSections.branding}
@@ -787,7 +1273,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                     description="Visual identity for your event page"
                     icon={PaintBrushIcon}
                     isOpen={openSections.branding}
-                    stepNumber={3}
+                    stepNumber={showVenueSection && showVirtualSection ? 5 : (showVenueSection || showVirtualSection ? 4 : 3)}
                   />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
