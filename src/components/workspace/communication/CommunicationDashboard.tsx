@@ -120,7 +120,7 @@ export function CommunicationDashboard({
 
       {/* Messaging Channels and Press Releases */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <MessagingChannels />
+        <MessagingChannels workspaceId={workspace.id} />
         <PressReleaseTracker />
       </div>
 

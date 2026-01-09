@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.respond-access-request]
 verify_jwt = false
+
+[functions.send-webhook-notification]
+verify_jwt = false
