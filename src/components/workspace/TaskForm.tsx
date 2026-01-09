@@ -295,6 +295,16 @@ export function TaskForm({
                 disabled={isLoading}
               />
             )}
+
+            {/* TODO: Phase 5 - AI Suggestions Integration
+             * - AI-powered task title/description suggestions
+             * - Smart priority recommendations based on context
+             * - Automatic category detection from description
+             * - Suggested assignees based on workload/skills
+             * - Deadline recommendations based on task complexity
+             * - Subtask auto-generation from description
+             * - Natural language task parsing
+             */}
           </div>
         )}
 
