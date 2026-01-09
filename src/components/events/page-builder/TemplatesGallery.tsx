@@ -337,6 +337,240 @@ export const PAGE_TEMPLATES: TemplateData[] = [
     `,
     css: '',
   },
+  {
+    id: 'saas-product-launch',
+    name: 'SaaS Product Launch',
+    category: 'Conference',
+    description: 'Modern gradient design for product launches and demos',
+    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop',
+    icon: Sparkles,
+    html: `
+      <section style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%); padding: 100px 40px; text-align: center; min-height: 90vh; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 20%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%); filter: blur(60px);"></div>
+        <div style="position: absolute; bottom: 20%; right: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(236,72,153,0.2) 0%, transparent 70%); filter: blur(80px);"></div>
+        <div style="position: relative; z-index: 1;">
+          <span style="display: inline-block; background: linear-gradient(135deg, #6366f1, #ec4899); background-clip: text; -webkit-background-clip: text; color: transparent; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 24px;">LAUNCHING SOON</span>
+          <h1 style="font-size: 4.5rem; font-weight: 800; color: #fff; margin-bottom: 24px; line-height: 1.1; letter-spacing: -0.03em;">The Future of<br/><span style="background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); background-clip: text; -webkit-background-clip: text; color: transparent;">AI Productivity</span></h1>
+          <p style="font-size: 1.25rem; color: rgba(255,255,255,0.7); margin-bottom: 48px; max-width: 600px; margin-left: auto; margin-right: auto;">Be the first to experience our revolutionary platform that transforms how teams work together.</p>
+          <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a href="#waitlist" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; padding: 18px 40px; border-radius: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 10px 40px rgba(99,102,241,0.4);">Join the Waitlist</a>
+            <a href="#demo" style="background: rgba(255,255,255,0.1); color: #fff; padding: 18px 40px; border-radius: 12px; font-weight: 600; text-decoration: none; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">Watch Demo →</a>
+          </div>
+        </div>
+      </section>
+      <section style="padding: 100px 40px; background: #0f172a;">
+        <div style="max-width: 1100px; margin: 0 auto;">
+          <h2 style="font-size: 2.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 16px;">Why Choose Us</h2>
+          <p style="color: rgba(255,255,255,0.5); text-align: center; margin-bottom: 64px;">Built for modern teams who demand excellence</p>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;">
+            <div style="background: linear-gradient(180deg, rgba(99,102,241,0.1) 0%, transparent 100%); border: 1px solid rgba(99,102,241,0.2); border-radius: 20px; padding: 40px 32px;">
+              <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">⚡</div>
+              <h3 style="color: #fff; font-size: 1.25rem; font-weight: 600; margin-bottom: 12px;">Lightning Fast</h3>
+              <p style="color: rgba(255,255,255,0.6); line-height: 1.6;">Experience blazing fast performance with our optimized infrastructure.</p>
+            </div>
+            <div style="background: linear-gradient(180deg, rgba(168,85,247,0.1) 0%, transparent 100%); border: 1px solid rgba(168,85,247,0.2); border-radius: 20px; padding: 40px 32px;">
+              <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #a855f7, #ec4899); border-radius: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🔒</div>
+              <h3 style="color: #fff; font-size: 1.25rem; font-weight: 600; margin-bottom: 12px;">Enterprise Security</h3>
+              <p style="color: rgba(255,255,255,0.6); line-height: 1.6;">Bank-grade encryption and compliance you can trust.</p>
+            </div>
+            <div style="background: linear-gradient(180deg, rgba(236,72,153,0.1) 0%, transparent 100%); border: 1px solid rgba(236,72,153,0.2); border-radius: 20px; padding: 40px 32px;">
+              <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #ec4899, #f43f5e); border-radius: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🚀</div>
+              <h3 style="color: #fff; font-size: 1.25rem; font-weight: 600; margin-bottom: 12px;">Scale Infinitely</h3>
+              <p style="color: rgba(255,255,255,0.6); line-height: 1.6;">From startup to enterprise, we grow with your needs.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    `,
+    css: '',
+  },
+  {
+    id: 'creative-summit',
+    name: 'Creative Summit',
+    category: 'Conference',
+    description: 'Bold artistic design for creative industry events',
+    thumbnail: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
+    icon: Mic2,
+    html: `
+      <section style="background: #000; padding: 60px 40px; min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; right: 0; width: 60%; height: 100%; background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3); opacity: 0.8; clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);"></div>
+        <div style="position: relative; z-index: 1; max-width: 600px;">
+          <span style="display: inline-block; color: #fff; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3em; margin-bottom: 24px; border-left: 4px solid #ff6b6b; padding-left: 16px;">APRIL 20-22, 2025</span>
+          <h1 style="font-size: 5rem; font-weight: 900; color: #fff; margin-bottom: 24px; line-height: 0.95; text-transform: uppercase;">Create.<br/>Inspire.<br/>Transform.</h1>
+          <p style="font-size: 1.1rem; color: rgba(255,255,255,0.7); margin-bottom: 40px; line-height: 1.7;">Three days of groundbreaking talks, hands-on workshops, and unforgettable networking with the world's most innovative creatives.</p>
+          <div style="display: flex; gap: 16px;">
+            <a href="#tickets" style="background: #fff; color: #000; padding: 18px 36px; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em;">Get Tickets</a>
+            <a href="#speakers" style="background: transparent; color: #fff; padding: 18px 36px; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em; border: 2px solid #fff;">Speakers</a>
+          </div>
+        </div>
+      </section>
+      <section style="padding: 100px 40px; background: #111;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+          <h2 style="font-size: 1rem; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 48px;">Featured Speakers</h2>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+            <div style="position: relative; aspect-ratio: 3/4; overflow: hidden;">
+              <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, #000 100%);"></div>
+              <div style="position: absolute; bottom: 24px; left: 24px;">
+                <h3 style="color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">Maya Chen</h3>
+                <p style="color: #ff6b6b; font-size: 0.875rem;">Creative Director</p>
+              </div>
+            </div>
+            <div style="position: relative; aspect-ratio: 3/4; overflow: hidden; background: linear-gradient(135deg, #ff6b6b, #feca57);">
+              <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, #000 100%);"></div>
+              <div style="position: absolute; bottom: 24px; left: 24px;">
+                <h3 style="color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">James Okafor</h3>
+                <p style="color: #feca57; font-size: 0.875rem;">Brand Strategist</p>
+              </div>
+            </div>
+            <div style="position: relative; aspect-ratio: 3/4; overflow: hidden; background: linear-gradient(135deg, #48dbfb, #0abde3);">
+              <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, #000 100%);"></div>
+              <div style="position: absolute; bottom: 24px; left: 24px;">
+                <h3 style="color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">Sofia Rodriguez</h3>
+                <p style="color: #48dbfb; font-size: 0.875rem;">Motion Designer</p>
+              </div>
+            </div>
+            <div style="position: relative; aspect-ratio: 3/4; overflow: hidden; background: linear-gradient(135deg, #ff9ff3, #f368e0);">
+              <div style="position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, #000 100%);"></div>
+              <div style="position: absolute; bottom: 24px; left: 24px;">
+                <h3 style="color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">Alex Kim</h3>
+                <p style="color: #ff9ff3; font-size: 0.875rem;">UX Lead</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `,
+    css: '',
+  },
+  {
+    id: 'startup-demo-day',
+    name: 'Startup Demo Day',
+    category: 'Hackathon',
+    description: 'Modern startup pitch event with investor focus',
+    thumbnail: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=300&fit=crop',
+    icon: Trophy,
+    html: `
+      <section style="background: #fff; padding: 80px 40px; min-height: 85vh; display: flex; align-items: center;">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+          <div>
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: #fef3c7; color: #92400e; padding: 8px 16px; border-radius: 100px; font-size: 0.875rem; font-weight: 600; margin-bottom: 24px;">
+              <span>🏆</span> 50+ Startups Pitching
+            </div>
+            <h1 style="font-size: 4rem; font-weight: 800; color: #111; margin-bottom: 24px; line-height: 1.05; letter-spacing: -0.03em;">Demo Day<br/>Spring 2025</h1>
+            <p style="font-size: 1.25rem; color: #666; margin-bottom: 32px; line-height: 1.6;">Watch the next generation of unicorns pitch to top VCs and angel investors. Don't miss your chance to discover the future.</p>
+            <div style="display: flex; gap: 24px; margin-bottom: 40px;">
+              <div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: #111;">$2M+</div>
+                <div style="color: #666; font-size: 0.875rem;">In Prizes</div>
+              </div>
+              <div style="width: 1px; background: #e5e7eb;"></div>
+              <div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: #111;">100+</div>
+                <div style="color: #666; font-size: 0.875rem;">Investors</div>
+              </div>
+              <div style="width: 1px; background: #e5e7eb;"></div>
+              <div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: #111;">2K</div>
+                <div style="color: #666; font-size: 0.875rem;">Attendees</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 16px;">
+              <a href="#register" style="background: #111; color: #fff; padding: 18px 36px; border-radius: 12px; font-weight: 600; text-decoration: none;">Register Now</a>
+              <a href="#startups" style="background: #f3f4f6; color: #111; padding: 18px 36px; border-radius: 12px; font-weight: 600; text-decoration: none;">View Startups</a>
+            </div>
+          </div>
+          <div style="position: relative;">
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 32px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">
+              <div style="text-align: center;">
+                <div style="font-size: 6rem;">🚀</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: #92400e; margin-top: 16px;">March 15, 2025</div>
+                <div style="color: #b45309;">San Francisco, CA</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section style="padding: 80px 40px; background: #111;">
+        <div style="max-width: 1000px; margin: 0 auto; text-align: center;">
+          <h2 style="font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 48px;">Past Winners Have Raised</h2>
+          <div style="display: flex; justify-content: center; gap: 64px; flex-wrap: wrap;">
+            <div>
+              <div style="font-size: 3rem; font-weight: 800; color: #fbbf24;">$50M</div>
+              <div style="color: #666;">Series A Average</div>
+            </div>
+            <div>
+              <div style="font-size: 3rem; font-weight: 800; color: #fbbf24;">12</div>
+              <div style="color: #666;">Unicorns Created</div>
+            </div>
+            <div>
+              <div style="font-size: 3rem; font-weight: 800; color: #fbbf24;">$1B+</div>
+              <div style="color: #666;">Total Raised</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `,
+    css: '',
+  },
+  {
+    id: 'networking-mixer',
+    name: 'Networking Mixer',
+    category: 'Meetup',
+    description: 'Casual yet professional networking event design',
+    thumbnail: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&h=300&fit=crop',
+    icon: Calendar,
+    html: `
+      <section style="background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); padding: 80px 40px; text-align: center; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; position: relative;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%); pointer-events: none;"></div>
+        <div style="position: relative; z-index: 1;">
+          <div style="display: inline-flex; items-center; gap: 12px; margin-bottom: 32px;">
+            <span style="font-size: 2rem;">🍸</span>
+            <span style="color: rgba(255,255,255,0.5); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.2em;">EXCLUSIVE EVENT</span>
+            <span style="font-size: 2rem;">✨</span>
+          </div>
+          <h1 style="font-size: 4rem; font-weight: 700; color: #fff; margin-bottom: 16px; letter-spacing: -0.02em;">Tech Leaders<br/>Mixer</h1>
+          <p style="font-size: 1.25rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Thursday, February 20th • 6:00 PM</p>
+          <p style="font-size: 1rem; color: rgba(255,255,255,0.4); margin-bottom: 48px;">The Rooftop Lounge, Downtown</p>
+          <a href="#rsvp" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; padding: 18px 48px; border-radius: 100px; font-weight: 600; text-decoration: none; box-shadow: 0 10px 40px rgba(99,102,241,0.3);">RSVP Now — Limited Spots</a>
+        </div>
+      </section>
+      <section style="padding: 80px 40px; background: #0f0f1a;">
+        <div style="max-width: 900px; margin: 0 auto;">
+          <h2 style="font-size: 1.5rem; font-weight: 600; color: #fff; text-align: center; margin-bottom: 48px;">What's Included</h2>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; text-align: center;">
+            <div>
+              <div style="font-size: 3rem; margin-bottom: 16px;">🍷</div>
+              <h3 style="color: #fff; font-weight: 600; margin-bottom: 8px;">Open Bar</h3>
+              <p style="color: rgba(255,255,255,0.5); font-size: 0.875rem;">Premium drinks included</p>
+            </div>
+            <div>
+              <div style="font-size: 3rem; margin-bottom: 16px;">🍽️</div>
+              <h3 style="color: #fff; font-weight: 600; margin-bottom: 8px;">Gourmet Bites</h3>
+              <p style="color: rgba(255,255,255,0.5); font-size: 0.875rem;">Chef-curated appetizers</p>
+            </div>
+            <div>
+              <div style="font-size: 3rem; margin-bottom: 16px;">🎵</div>
+              <h3 style="color: #fff; font-weight: 600; margin-bottom: 8px;">Live DJ</h3>
+              <p style="color: rgba(255,255,255,0.5); font-size: 0.875rem;">Ambient vibes all night</p>
+            </div>
+            <div>
+              <div style="font-size: 3rem; margin-bottom: 16px;">🤝</div>
+              <h3 style="color: #fff; font-weight: 600; margin-bottom: 8px;">Speed Networking</h3>
+              <p style="color: rgba(255,255,255,0.5); font-size: 0.875rem;">Curated connections</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section style="padding: 60px 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+        <div style="max-width: 600px; margin: 0 auto; text-align: center;">
+          <h2 style="font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 16px;">Only 50 Spots Available</h2>
+          <p style="color: rgba(255,255,255,0.8); margin-bottom: 32px;">This is an invite-only event. Secure your spot before it's too late.</p>
+          <a href="#rsvp" style="display: inline-block; background: #fff; color: #6366f1; padding: 16px 48px; border-radius: 100px; font-weight: 600; text-decoration: none;">Request Invite</a>
+        </div>
+      </section>
+    `,
+    css: '',
+  },
 ];
 
 export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({
