@@ -127,7 +127,11 @@ export function VolunteersDashboard({
         {/* Right Column - Check-In Stats & Quick Actions */}
         <div className="space-y-6">
           <VolunteerCheckInStats workspaceId={workspace.id} />
-          <VolunteerQuickActions workspaceId={workspace.id} />
+          <VolunteerQuickActions 
+            workspaceId={workspace.id} 
+            eventId={workspace.eventId}
+            orgSlug={orgSlug}
+          />
         </div>
       </div>
 

@@ -9,6 +9,8 @@ import {
   UserPlus,
   Zap,
   Loader2,
+  ScanLine,
+  ExternalLink,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,11 +18,22 @@ import { useQueryClient } from '@tanstack/react-query';
 
 interface VolunteerQuickActionsProps {
   workspaceId: string;
+  eventId?: string | null;
+  orgSlug?: string;
 }
 
-export function VolunteerQuickActions({ workspaceId }: VolunteerQuickActionsProps) {
+export function VolunteerQuickActions({ workspaceId, eventId, orgSlug }: VolunteerQuickActionsProps) {
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const queryClient = useQueryClient();
+
+  const handleOpenCheckIn = () => {
+    if (!eventId || !orgSlug) {
+      toast.error('Event check-in is not available for this workspace');
+      return;
+    }
+    const checkInUrl = `/${orgSlug}/eventmanagement/${eventId}/check-in`;
+    window.open(checkInUrl, '_blank', 'noopener,noreferrer');
+  };
 
   const handleSendBrief = async () => {
     setLoadingAction('send_brief');
@@ -167,7 +180,19 @@ export function VolunteerQuickActions({ workspaceId }: VolunteerQuickActionsProp
     queryClient.invalidateQueries({ queryKey: ['volunteer-shifts', workspaceId] });
   };
 
+  const checkInAvailable = !!eventId && !!orgSlug;
+
   const actions = [
+    {
+      id: 'open_checkin',
+      label: 'Event Check-In',
+      description: checkInAvailable ? 'Open check-in scanner' : 'No event linked',
+      icon: ScanLine,
+      color: 'text-green-500',
+      onClick: handleOpenCheckIn,
+      disabled: !checkInAvailable,
+      external: true,
+    },
     {
       id: 'send_brief',
       label: 'Send Brief',
@@ -226,15 +251,18 @@ export function VolunteerQuickActions({ workspaceId }: VolunteerQuickActionsProp
               variant="outline"
               className="h-auto flex-col items-start gap-1 p-3 text-left hover:bg-muted/50"
               onClick={action.onClick}
-              disabled={loadingAction === action.id}
+              disabled={loadingAction === action.id || action.disabled}
             >
               <div className="flex items-center gap-2">
                 {loadingAction === action.id ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <action.icon className={`h-4 w-4 ${action.color}`} />
+                  <action.icon className={`h-4 w-4 ${action.disabled ? 'text-muted-foreground' : action.color}`} />
                 )}
                 <span className="font-medium text-sm">{action.label}</span>
+                {action.external && !action.disabled && (
+                  <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                )}
               </div>
               <span className="text-xs text-muted-foreground">{action.description}</span>
             </Button>
