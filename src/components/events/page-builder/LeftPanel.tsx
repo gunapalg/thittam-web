@@ -363,20 +363,26 @@ const AssetsPanel: React.FC<AssetsPanelProps> = ({
         </button>
       </div>
 
-      {activeSection === 'templates' && onSelectTemplate && (
-        <TemplatesGallery
-          onSelectTemplate={onSelectTemplate}
-          selectedTemplateId={selectedTemplateId}
-        />
-      )}
+      <div className="space-y-3">
+        <div className={cn(activeSection === 'templates' ? 'block' : 'hidden')}>
+          {onSelectTemplate && (
+            <TemplatesGallery
+              onSelectTemplate={onSelectTemplate}
+              selectedTemplateId={selectedTemplateId}
+            />
+          )}
+        </div>
 
-      {activeSection === 'blocks' && (
-        <>
-          <p className="mb-3 px-2 text-xs text-muted-foreground">Drag blocks to add sections</p>
-          {/* GrapesJS blocks container */}
-          <div ref={blocksContainerRef} className="panel-blocks" />
-        </>
-      )}
+        <div className={cn(activeSection === 'blocks' ? 'block' : 'hidden')}>
+          <p className="px-2 text-xs text-muted-foreground">Drag blocks to add sections</p>
+        </div>
+
+        {/* GrapesJS blocks container (keep mounted so it can render on editor load) */}
+        <div
+          ref={blocksContainerRef}
+          className={cn('panel-blocks', activeSection === 'blocks' ? 'block' : 'hidden')}
+        />
+      </div>
     </div>
   );
 };
