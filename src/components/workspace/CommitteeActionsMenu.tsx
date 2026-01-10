@@ -116,11 +116,11 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'export-data', label: 'Export Data', icon: Download, color: 'text-purple-500', tab: 'reports' },
   ],
   registration: [
-    { id: 'scan-checkin', label: 'Scan Check-in', icon: Scan, color: 'text-teal-500', tab: 'overview', sectionId: 'checkin-stats' },
-    { id: 'add-attendee', label: 'Add Attendee', icon: UserPlus, color: 'text-blue-500', tab: 'overview' },
-    { id: 'export-list', label: 'Export List', icon: Download, color: 'text-purple-500', tab: 'reports' },
-    { id: 'send-reminders', label: 'Send Reminders', icon: Mail, color: 'text-amber-500', tab: 'communication' },
-    { id: 'view-waitlist', label: 'View Waitlist', icon: ListChecks, color: 'text-cyan-500', tab: 'overview' },
+    { id: 'scan-checkin', label: 'Scan Check-in', icon: Scan, color: 'text-teal-500', tab: 'scan-checkin' },
+    { id: 'add-attendee', label: 'Add Attendee', icon: UserPlus, color: 'text-blue-500', tab: 'add-attendee' },
+    { id: 'export-list', label: 'Export List', icon: Download, color: 'text-purple-500', tab: 'export-list' },
+    { id: 'send-reminders', label: 'Send Reminders', icon: Mail, color: 'text-amber-500', tab: 'send-reminders' },
+    { id: 'view-waitlist', label: 'View Waitlist', icon: ListChecks, color: 'text-cyan-500', tab: 'view-waitlist' },
   ],
   catering: [
     { id: 'update-menu', label: 'Update Menu', icon: Utensils, color: 'text-orange-500', tab: 'overview' },

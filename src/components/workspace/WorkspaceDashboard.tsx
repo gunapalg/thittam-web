@@ -57,6 +57,12 @@ import {
   UpdateRunsheetTab,
   TechCheckTab,
   IssueReportTab,
+  // Registration Committee tabs
+  ScanCheckInTab,
+  AddAttendeeTab,
+  ExportListTab,
+  SendRemindersTab,
+  ViewWaitlistTab,
 } from './committee-tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
@@ -425,6 +431,27 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'issue-report' && (
           <IssueReportTab workspaceId={workspace.id} />
+        )}
+
+        {/* Registration Committee tabs */}
+        {activeTab === 'scan-checkin' && (
+          <ScanCheckInTab workspace={workspace} />
+        )}
+
+        {activeTab === 'add-attendee' && (
+          <AddAttendeeTab workspace={workspace} />
+        )}
+
+        {activeTab === 'export-list' && (
+          <ExportListTab workspace={workspace} />
+        )}
+
+        {activeTab === 'send-reminders' && (
+          <SendRemindersTab workspace={workspace} />
+        )}
+
+        {activeTab === 'view-waitlist' && (
+          <ViewWaitlistTab workspace={workspace} />
         )}
       </div>
     </WorkspaceLayout>

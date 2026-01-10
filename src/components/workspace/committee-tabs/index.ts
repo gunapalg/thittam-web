@@ -36,3 +36,9 @@ export { TestEquipmentTab } from './TestEquipmentTab';
 export { UpdateRunsheetTab } from './UpdateRunsheetTab';
 export { TechCheckTab } from './TechCheckTab';
 export { IssueReportTab } from './IssueReportTab';
+// Registration Committee tabs
+export { ScanCheckInTab } from './ScanCheckInTab';
+export { AddAttendeeTab } from './AddAttendeeTab';
+export { ExportListTab } from './ExportListTab';
+export { SendRemindersTab } from './SendRemindersTab';
+export { ViewWaitlistTab } from './ViewWaitlistTab';

@@ -48,6 +48,12 @@ export type WorkspaceTab =
   | 'network-status'
   | 'security-audit'
   | 'equipment-report'
+  // Registration Committee tabs
+  | 'scan-checkin'
+  | 'add-attendee'
+  | 'export-list'
+  | 'send-reminders'
+  | 'view-waitlist'
   | 'backup-status'
   | 'report-incident'
   | 'config-review'
