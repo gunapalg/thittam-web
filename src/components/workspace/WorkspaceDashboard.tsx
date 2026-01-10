@@ -12,6 +12,7 @@ import { EventMarketplaceIntegration } from '../marketplace';
 import { TaskManagementInterface } from './TaskManagementInterface';
 import { WorkspaceAuditLog } from './WorkspaceAuditLog';
 import { WorkspaceRoleAssignment } from './WorkspaceRoleAssignment';
+import { RoleBasedActions } from './RoleBasedActions';
 import { WorkspaceRoleAnalytics } from './WorkspaceRoleAnalytics';
 import { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 import { DepartmentDashboard } from './department';
@@ -220,12 +221,25 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'role-management' && (
           <div className="space-y-6">
+            {/* Quick Actions */}
+            <RoleBasedActions
+              workspace={workspace}
+              userRole={permissions.currentMember?.role as WorkspaceRole || null}
+              onDelegateRole={() => {}}
+              onInviteMember={permissions.canInviteMembers ? actions.handleInviteTeamMember : undefined}
+              onManageSettings={permissions.canManageSettings ? actions.handleManageSettings : undefined}
+              onViewReport={() => {}}
+            />
+            
+            {/* Role Assignment */}
             <WorkspaceRoleAssignment
               workspaceId={workspace.id}
               teamMembers={teamMembers}
               currentUserRole={permissions.currentMember?.role as WorkspaceRole}
               isGlobalManager={permissions.isGlobalWorkspaceManager}
             />
+            
+            {/* Role Analytics */}
             <WorkspaceRoleAnalytics workspace={workspace} />
           </div>
         )}
