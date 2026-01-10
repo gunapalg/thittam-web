@@ -56,7 +56,12 @@ export type WorkspaceTab =
   | 'check-systems'
   | 'update-credentials'
   | 'service-status'
-  | 'ticket-queue';
+  | 'ticket-queue'
+  // Technical Committee tabs
+  | 'test-equipment'
+  | 'update-runsheet'
+  | 'tech-check'
+  | 'issue-report';
 
 export interface WorkspaceShellState {
   workspace: Workspace | undefined;

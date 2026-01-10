@@ -90,7 +90,12 @@ export type WorkspaceTab =
   | 'check-systems'
   | 'update-credentials'
   | 'service-status'
-  | 'ticket-queue';
+  | 'ticket-queue'
+  // Technical Committee tabs
+  | 'test-equipment'
+  | 'update-runsheet'
+  | 'tech-check'
+  | 'issue-report';
 
 interface WorkspaceSidebarProps {
   workspace: Workspace;

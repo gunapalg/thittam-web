@@ -52,6 +52,11 @@ import {
   UpdateCredentialsTab,
   ServiceStatusTab,
   TicketQueueTab,
+  // Technical Committee tabs
+  TestEquipmentTab,
+  UpdateRunsheetTab,
+  TechCheckTab,
+  IssueReportTab,
 } from './committee-tabs';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
@@ -403,6 +408,23 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'ticket-queue' && (
           <TicketQueueTab workspaceId={workspace.id} />
+        )}
+
+        {/* Technical Committee tabs */}
+        {activeTab === 'test-equipment' && (
+          <TestEquipmentTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'update-runsheet' && (
+          <UpdateRunsheetTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'tech-check' && (
+          <TechCheckTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'issue-report' && (
+          <IssueReportTab workspaceId={workspace.id} />
         )}
       </div>
     </WorkspaceLayout>
