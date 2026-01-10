@@ -195,10 +195,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'run-of-show', label: 'Run of Show', icon: Activity, color: 'text-emerald-500', tab: 'overview' },
   ],
   technical: [
-    { id: 'test-equipment', label: 'Test Equipment', icon: Monitor, color: 'text-sky-500', tab: 'checklists' },
-    { id: 'update-runsheet', label: 'Update Runsheet', icon: ClipboardList, color: 'text-blue-500', tab: 'tasks' },
-    { id: 'tech-check', label: 'Tech Check', icon: Settings, color: 'text-amber-500', tab: 'checklists' },
-    { id: 'issue-report', label: 'Issue Report', icon: AlertCircle, color: 'text-red-500', tab: 'tasks' },
+    { id: 'test-equipment', label: 'Test Equipment', icon: Monitor, color: 'text-sky-500', tab: 'test-equipment' },
+    { id: 'update-runsheet', label: 'Update Runsheet', icon: ClipboardList, color: 'text-blue-500', tab: 'update-runsheet' },
+    { id: 'tech-check', label: 'Tech Check', icon: Settings, color: 'text-amber-500', tab: 'tech-check' },
+    { id: 'issue-report', label: 'Issue Report', icon: AlertCircle, color: 'text-red-500', tab: 'issue-report' },
   ],
   it: [
     { id: 'check-systems', label: 'Check Systems', icon: Server, color: 'text-violet-500', tab: 'check-systems' },

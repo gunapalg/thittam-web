@@ -31,3 +31,8 @@ export { CheckSystemsTab } from './CheckSystemsTab';
 export { UpdateCredentialsTab } from './UpdateCredentialsTab';
 export { ServiceStatusTab } from './ServiceStatusTab';
 export { TicketQueueTab } from './TicketQueueTab';
+// Technical Committee tabs
+export { TestEquipmentTab } from './TestEquipmentTab';
+export { UpdateRunsheetTab } from './UpdateRunsheetTab';
+export { TechCheckTab } from './TechCheckTab';
+export { IssueReportTab } from './IssueReportTab';
