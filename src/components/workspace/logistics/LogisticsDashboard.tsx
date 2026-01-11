@@ -14,7 +14,7 @@ import { ShipmentTracker } from './ShipmentTracker';
 import { EquipmentManager } from './EquipmentManager';
 import { TransportSchedule } from './TransportSchedule';
 import { VenueLogistics } from './VenueLogistics';
-import { LogisticsQuickActions } from './LogisticsQuickActions';
+
 
 interface LogisticsDashboardProps {
   workspace: Workspace;
@@ -89,9 +89,6 @@ export function LogisticsDashboard({
         tasksTotal={tasks.length}
         teamsCount={teams.length}
       />
-
-      {/* Quick Actions */}
-      <LogisticsQuickActions workspaceId={workspace.id} />
 
       {/* Stats Overview */}
       <LogisticsStatsCards workspaceId={workspace.id} />

@@ -33,7 +33,7 @@ import {
   // Logistics Committee
   Truck,
   Map,
-  Wrench,
+  Bus,
   // Facility Committee
   Building,
   Shield,
@@ -129,10 +129,14 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'confirm-headcount', label: 'Confirm Headcount', icon: Users, color: 'text-blue-500', tab: 'overview' },
   ],
   logistics: [
-    { id: 'track-shipments', label: 'Track Shipments', icon: Truck, color: 'text-green-500', tab: 'overview', sectionId: 'shipments' },
-    { id: 'update-layout', label: 'Update Layout', icon: Map, color: 'text-blue-500', tab: 'overview' },
-    { id: 'equipment-status', label: 'Equipment Status', icon: Wrench, color: 'text-amber-500', tab: 'overview' },
-    { id: 'create-manifest', label: 'Create Manifest', icon: ClipboardList, color: 'text-purple-500', tab: 'tasks' },
+    { id: 'track-shipment', label: 'Track Shipment', icon: Truck, color: 'text-blue-500', tab: 'overview', sectionId: 'shipments' },
+    { id: 'add-equipment', label: 'Add Equipment', icon: Package, color: 'text-amber-500', tab: 'overview', sectionId: 'equipment' },
+    { id: 'schedule-transport', label: 'Schedule Transport', icon: Bus, color: 'text-green-500', tab: 'overview', sectionId: 'transport' },
+    { id: 'add-venue', label: 'Add Venue', icon: Map, color: 'text-purple-500', tab: 'overview', sectionId: 'venues' },
+    { id: 'create-checklist', label: 'Create Checklist', icon: ClipboardList, color: 'text-indigo-500', tab: 'checklists' },
+    { id: 'generate-report', label: 'Generate Report', icon: FileText, color: 'text-emerald-500', tab: 'reports' },
+    { id: 'report-issue', label: 'Report Issue', icon: AlertTriangle, color: 'text-red-500', tab: 'overview' },
+    { id: 'view-timeline', label: 'View Timeline', icon: Calendar, color: 'text-cyan-500', tab: 'overview', sectionId: 'milestones' },
   ],
   facility: [
     { id: 'safety-check-facility', label: 'Safety Check', icon: Shield, color: 'text-red-500', tab: 'safety-check-facility' },
