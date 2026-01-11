@@ -147,10 +147,12 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'ab-test', label: 'A/B Test', icon: Target, color: 'text-purple-500', tab: 'analytics' },
   ],
   communication: [
-    { id: 'send-update', label: 'Send Update', icon: MessageSquare, color: 'text-cyan-500', tab: 'communication' },
-    { id: 'draft-press', label: 'Draft Press Release', icon: Newspaper, color: 'text-blue-500', tab: 'tasks' },
-    { id: 'email-blast', label: 'Email Blast', icon: Mail, color: 'text-purple-500', tab: 'communication' },
-    { id: 'stakeholder-report', label: 'Stakeholder Report', icon: FileText, color: 'text-emerald-500', tab: 'reports' },
+    { id: 'send-announcement', label: 'Send Announcement', icon: Megaphone, color: 'text-pink-500', tab: 'communication' },
+    { id: 'create-email', label: 'Create Email', icon: Mail, color: 'text-blue-500', tab: 'communication' },
+    { id: 'draft-press', label: 'Draft Press Release', icon: Newspaper, color: 'text-purple-500', tab: 'tasks' },
+    { id: 'broadcast-message', label: 'Broadcast Message', icon: Send, color: 'text-cyan-500', tab: 'communication' },
+    { id: 'schedule-update', label: 'Schedule Update', icon: Calendar, color: 'text-amber-500', tab: 'tasks' },
+    { id: 'contact-stakeholders', label: 'Contact Stakeholders', icon: Users, color: 'text-emerald-500', tab: 'communication' },
   ],
   sponsorship: [
     { id: 'add-sponsor', label: 'Add Sponsor', icon: Handshake, color: 'text-amber-500', tab: 'overview' },

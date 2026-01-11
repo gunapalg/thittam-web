@@ -11,7 +11,6 @@ import { AnnouncementManager } from './AnnouncementManager';
 import { EmailCampaignTracker } from './EmailCampaignTracker';
 import { MessagingChannels } from './MessagingChannels';
 import { PressReleaseTracker } from './PressReleaseTracker';
-import { CommunicationQuickActions } from './CommunicationQuickActions';
 import { StakeholderDirectory } from './StakeholderDirectory';
 
 interface CommunicationDashboardProps {
@@ -107,13 +106,8 @@ export function CommunicationDashboard({
         onRequestResource={onRequestResource}
       />
 
-      {/* Quick Actions and Announcement Manager */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <CommunicationQuickActions />
-        <div className="lg:col-span-2">
-          <AnnouncementManager />
-        </div>
-      </div>
+      {/* Announcement Manager */}
+      <AnnouncementManager />
 
       {/* Email Campaigns - Full Width */}
       <EmailCampaignTracker />
