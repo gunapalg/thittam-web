@@ -2599,6 +2599,76 @@ export type Database = {
           },
         ]
       }
+      workspace_gallery_reviews: {
+        Row: {
+          asset_id: string
+          created_at: string | null
+          feedback: string | null
+          id: string
+          is_featured: boolean | null
+          rating: number | null
+          reviewed_at: string | null
+          reviewer_id: string | null
+          reviewer_name: string | null
+          status: string | null
+          updated_at: string | null
+          usage_rights: string | null
+          workspace_id: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string | null
+          feedback?: string | null
+          id?: string
+          is_featured?: boolean | null
+          rating?: number | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+          usage_rights?: string | null
+          workspace_id: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string | null
+          feedback?: string | null
+          id?: string
+          is_featured?: boolean | null
+          rating?: number | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          reviewer_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+          usage_rights?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_gallery_reviews_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_gallery_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_gallery_reviews_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_goals: {
         Row: {
           category: string | null
@@ -2751,11 +2821,14 @@ export type Database = {
       }
       workspace_media_assets: {
         Row: {
+          category: string | null
           created_at: string
           description: string | null
+          event_segment: string | null
           file_size: number | null
           file_url: string | null
           id: string
+          is_exported: boolean | null
           metadata: Json | null
           mime_type: string | null
           name: string
@@ -2769,11 +2842,14 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           description?: string | null
+          event_segment?: string | null
           file_size?: number | null
           file_url?: string | null
           id?: string
+          is_exported?: boolean | null
           metadata?: Json | null
           mime_type?: string | null
           name: string
@@ -2787,11 +2863,14 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           description?: string | null
+          event_segment?: string | null
           file_size?: number | null
           file_url?: string | null
           id?: string
+          is_exported?: boolean | null
           metadata?: Json | null
           mime_type?: string | null
           name?: string
@@ -3095,6 +3174,101 @@ export type Database = {
             foreignKeyName: "workspace_settings_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_shot_lists: {
+        Row: {
+          assigned_to: string | null
+          assignee_name: string | null
+          camera_settings: string | null
+          captured_asset_id: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          event_segment: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          priority: string | null
+          scheduled_time: string | null
+          shot_type: string | null
+          sort_order: number | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          assignee_name?: string | null
+          camera_settings?: string | null
+          captured_asset_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          event_segment?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          priority?: string | null
+          scheduled_time?: string | null
+          shot_type?: string | null
+          sort_order?: number | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          assignee_name?: string | null
+          camera_settings?: string | null
+          captured_asset_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          event_segment?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          priority?: string | null
+          scheduled_time?: string | null
+          shot_type?: string | null
+          sort_order?: number | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_shot_lists_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_shot_lists_captured_asset_id_fkey"
+            columns: ["captured_asset_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_shot_lists_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_shot_lists_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
             referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
