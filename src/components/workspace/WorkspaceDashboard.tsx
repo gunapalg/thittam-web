@@ -89,6 +89,17 @@ import {
   ScheduleSessionTab,
   ViewRubricsTab,
 } from './department/content/tabs';
+// Finance Department tabs (L2)
+import {
+  BudgetOverviewTab as FinanceBudgetOverviewTab,
+  ExpenseManagementTab as FinanceExpenseManagementTab,
+  InvoiceManagementTab as FinanceInvoiceManagementTab,
+  BudgetApprovalsTab as FinanceBudgetApprovalsTab,
+  SpendingAnalysisTab as FinanceSpendingAnalysisTab,
+  FinancialReportsTab as FinanceFinancialReportsTab,
+  BudgetForecastTab as FinanceBudgetForecastTab,
+  FinanceAuditTrailTab,
+} from './department/finance/tabs';
 // Growth Department tabs (L2)
 import {
   LaunchCampaignTab,
@@ -946,6 +957,39 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
         {/* Page Builder tab */}
         {activeTab === 'page-builder' && (
           <PageBuilderTab workspace={workspace} />
+        )}
+
+        {/* Finance Department tabs (L2) */}
+        {activeTab === 'budget-overview-finance' && (
+          <FinanceBudgetOverviewTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'expense-management-finance' && (
+          <FinanceExpenseManagementTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'invoice-management-finance' && (
+          <FinanceInvoiceManagementTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'budget-approvals-finance' && (
+          <FinanceBudgetApprovalsTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'spending-analysis-finance' && (
+          <FinanceSpendingAnalysisTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'financial-reports-finance' && (
+          <FinanceFinancialReportsTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'budget-forecast-finance' && (
+          <FinanceBudgetForecastTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'finance-audit-trail' && (
+          <FinanceAuditTrailTab workspaceId={workspace.id} />
         )}
 
         {/* Workspace Management tab (ROOT only) */}

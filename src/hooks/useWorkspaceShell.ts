@@ -49,12 +49,6 @@ export type WorkspaceTab =
   | 'network-status'
   | 'security-audit'
   | 'equipment-report'
-  // Registration Committee tabs
-  | 'scan-checkin'
-  | 'add-attendee'
-  | 'export-list'
-  | 'send-reminders'
-  | 'view-waitlist'
   | 'backup-status'
   | 'report-incident'
   | 'config-review'
@@ -69,12 +63,29 @@ export type WorkspaceTab =
   | 'update-runsheet'
   | 'tech-check'
   | 'issue-report'
+  // Registration Committee tabs
+  | 'scan-checkin'
+  | 'add-attendee'
+  | 'export-list'
+  | 'send-reminders'
+  | 'view-waitlist'
   // Finance Committee tabs
   | 'record-expense'
   | 'generate-report'
   | 'approve-request'
   | 'view-budget'
   | 'export-data'
+  // Finance Department tabs (L2)
+  | 'budget-overview-finance'
+  | 'expense-management-finance'
+  | 'invoice-management-finance'
+  | 'budget-approvals-finance'
+  | 'spending-analysis-finance'
+  | 'financial-reports-finance'
+  | 'budget-forecast-finance'
+  | 'payment-schedule-finance'
+  | 'vendor-payments-finance'
+  | 'finance-audit-trail'
   // Content Department tabs
   | 'create-content'
   | 'assign-judges'
@@ -116,7 +127,7 @@ export type WorkspaceTab =
   | 'publish-content-committee'
   | 'content-calendar-committee'
   | 'content-pipeline-committee'
-// Social Media Committee tabs (L3)
+  // Social Media Committee tabs (L3)
   | 'schedule-content-social'
   | 'monitor-hashtags-social'
   | 'engagement-report-social'

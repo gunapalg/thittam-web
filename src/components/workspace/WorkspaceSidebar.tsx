@@ -111,6 +111,17 @@ export type WorkspaceTab =
   | 'approve-request'
   | 'view-budget'
   | 'export-data'
+  // Finance Department tabs (L2)
+  | 'budget-overview-finance'
+  | 'expense-management-finance'
+  | 'invoice-management-finance'
+  | 'budget-approvals-finance'
+  | 'spending-analysis-finance'
+  | 'financial-reports-finance'
+  | 'budget-forecast-finance'
+  | 'payment-schedule-finance'
+  | 'vendor-payments-finance'
+  | 'finance-audit-trail'
   // Content Department tabs
   | 'create-content'
   | 'assign-judges'

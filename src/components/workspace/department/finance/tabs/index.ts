@@ -5,3 +5,4 @@ export { SpendingAnalysisTab } from './SpendingAnalysisTab';
 export { InvoiceManagementTab } from './InvoiceManagementTab';
 export { FinancialReportsTab } from './FinancialReportsTab';
 export { BudgetForecastTab } from './BudgetForecastTab';
+export { FinanceAuditTrailTab } from './FinanceAuditTrailTab';
