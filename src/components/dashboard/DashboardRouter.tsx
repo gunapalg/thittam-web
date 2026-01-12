@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ParticipantDashboard } from './ParticipantDashboard';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { UserRole } from '@/types';
+import { ParticipantDashboardSkeleton } from './DashboardSkeleton';
 
 /**
  * DashboardRouter
@@ -18,16 +19,9 @@ export const DashboardRouter: React.FC = () => {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { data: primaryOrg, isLoading: orgLoading } = usePrimaryOrganization();
 
-  // Show loading while auth or org is resolving
+  // Show skeleton while auth or org is resolving
   if (authLoading || orgLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
-          <p className="text-sm text-muted-foreground">Loading your workspace...</p>
-        </div>
-      </div>
-    );
+    return <ParticipantDashboardSkeleton />;
   }
 
   // Not authenticated - redirect to login

@@ -20,6 +20,7 @@ import { OrgScopedBreadcrumbs } from './OrgScopedBreadcrumbs';
 import { UserRole } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileAppShell } from '@/components/mobile/MobileAppShell';
+import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 
 // Lazy-load admin components - only downloaded when SUPER_ADMIN accesses admin routes
 const AdminLayout = lazy(() => import('@/components/admin/AdminLayout'));
@@ -99,11 +100,7 @@ export const OrgScopedLayout: React.FC = () => {
   const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
 
   if (isLoadingAny) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
-      </div>
-    );
+    return <DashboardSkeleton showSidebar={!isMobile} showHeader={true} />;
   }
 
   if (!isAuthenticated || !user || !organization || !orgSlug) {
