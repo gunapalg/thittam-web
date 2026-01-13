@@ -58,12 +58,12 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
 
     return (
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-primary/90 to-cyan-500 p-5 text-primary-foreground">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-card/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-card/5 rounded-full translate-y-1/2 -translate-x-1/2" />
         
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/20 rounded-full text-xs font-medium">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-card/20 rounded-full text-xs font-medium">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               Live Now
             </div>
@@ -77,7 +77,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
           <Button 
             size="sm" 
             variant="secondary"
-            className="bg-white/20 hover:bg-white/30 text-primary-foreground border-0"
+            className="bg-card/20 hover:bg-card/30 text-primary-foreground border-0"
             onClick={() => navigate(`/${orgSlug}/eventmanagement/${activeEvent.id}`)}
           >
             <Users className="h-4 w-4 mr-2" />
@@ -97,7 +97,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
 
     return (
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 p-5 text-white">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-card/10 rounded-full -translate-y-1/2 translate-x-1/2" />
         
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
@@ -113,7 +113,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
           <Button 
             size="sm" 
             variant="secondary"
-            className="bg-white/20 hover:bg-white/30 text-white border-0"
+            className="bg-card/20 hover:bg-card/30 text-white border-0"
             onClick={() => navigate(`/${orgSlug}/eventmanagement/${upcomingEventToday.id}`)}
           >
             <CalendarCheck className="h-4 w-4 mr-2" />
@@ -129,7 +129,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
   if (nextShift && isToday(new Date(nextShift.date))) {
     return (
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 p-5 text-white">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-card/10 rounded-full -translate-y-1/2 translate-x-1/2" />
         
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
@@ -148,7 +148,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
           <Button 
             size="sm" 
             variant="secondary"
-            className="bg-white/20 hover:bg-white/30 text-white border-0"
+            className="bg-card/20 hover:bg-card/30 text-white border-0"
             onClick={() => navigate(`/${orgSlug}/workspaces/${nextShift.workspace_id}`)}
           >
             View Shift Details
@@ -163,7 +163,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
   if (tasksDueCount > 0) {
     return (
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-500 p-5 text-white">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-card/10 rounded-full -translate-y-1/2 translate-x-1/2" />
         
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
@@ -179,7 +179,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
           <Button 
             size="sm" 
             variant="secondary"
-            className="bg-white/20 hover:bg-white/30 text-white border-0"
+            className="bg-card/20 hover:bg-card/30 text-white border-0"
             onClick={() => navigate(`/${orgSlug}/workspaces`)}
           >
             View Tasks
@@ -193,7 +193,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
   // All Caught Up state
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-5 text-white">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-card/10 rounded-full -translate-y-1/2 translate-x-1/2" />
       
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-3">
@@ -209,7 +209,7 @@ export const MobilePriorityCard: React.FC<MobilePriorityCardProps> = ({
         <Button 
           size="sm" 
           variant="secondary"
-          className="bg-white/20 hover:bg-white/30 text-white border-0"
+          className="bg-card/20 hover:bg-card/30 text-white border-0"
           onClick={() => navigate(`/${orgSlug}/workspaces`)}
         >
           Explore Workspaces

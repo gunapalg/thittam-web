@@ -68,7 +68,7 @@ export function LeaderboardPreview(_props: LeaderboardPreviewProps) {
       case 1:
         return <Trophy className="h-5 w-5 text-yellow-500" />;
       case 2:
-        return <Medal className="h-5 w-5 text-gray-400" />;
+        return <Medal className="h-5 w-5 text-muted-foreground" />;
       case 3:
         return <Award className="h-5 w-5 text-amber-600" />;
       default:
@@ -81,7 +81,7 @@ export function LeaderboardPreview(_props: LeaderboardPreviewProps) {
       case 1:
         return 'bg-yellow-50 border-yellow-200';
       case 2:
-        return 'bg-gray-50 border-gray-200';
+        return 'bg-muted/50 border-border';
       case 3:
         return 'bg-amber-50 border-amber-200';
       default:

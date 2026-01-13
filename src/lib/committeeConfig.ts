@@ -343,7 +343,7 @@ export function getCommitteeColors(color: string): {
     blue: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-500/20', icon: 'text-blue-500' },
     orange: { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', border: 'border-orange-500/20', icon: 'text-orange-500' },
     green: { bg: 'bg-green-500/10', text: 'text-green-600 dark:text-green-400', border: 'border-green-500/20', icon: 'text-green-500' },
-    slate: { bg: 'bg-slate-500/10', text: 'text-slate-600 dark:text-slate-400', border: 'border-slate-500/20', icon: 'text-slate-500' },
+    slate: { bg: 'bg-slate-500/10', text: 'text-muted-foreground dark:text-muted-foreground', border: 'border-slate-500/20', icon: 'text-muted-foreground' },
     pink: { bg: 'bg-pink-500/10', text: 'text-pink-600 dark:text-pink-400', border: 'border-pink-500/20', icon: 'text-pink-500' },
     cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-600 dark:text-cyan-400', border: 'border-cyan-500/20', icon: 'text-cyan-500' },
     amber: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-500/20', icon: 'text-amber-500' },

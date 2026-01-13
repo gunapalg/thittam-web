@@ -28,7 +28,7 @@ const mockBenefits: SponsorBenefit[] = [
 const tiers = [
   { key: 'platinum', label: 'Platinum', color: 'bg-slate-600' },
   { key: 'gold', label: 'Gold', color: 'bg-amber-500' },
-  { key: 'silver', label: 'Silver', color: 'bg-gray-400' },
+  { key: 'silver', label: 'Silver', color: 'bg-muted-foreground/20' },
   { key: 'bronze', label: 'Bronze', color: 'bg-orange-500' },
 ];
 

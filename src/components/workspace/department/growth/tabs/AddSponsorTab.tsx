@@ -17,9 +17,9 @@ interface AddSponsorTabProps {
 }
 
 const tierConfig: Record<string, { color: string; minValue: number }> = {
-  platinum: { color: 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800', minValue: 50000 },
+  platinum: { color: 'bg-gradient-to-r from-gray-300 to-gray-400 text-foreground', minValue: 50000 },
   gold: { color: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white', minValue: 25000 },
-  silver: { color: 'bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700', minValue: 10000 },
+  silver: { color: 'bg-gradient-to-r from-gray-200 to-gray-300 text-foreground', minValue: 10000 },
   bronze: { color: 'bg-gradient-to-r from-orange-300 to-orange-400 text-white', minValue: 5000 },
   custom: { color: 'bg-primary text-primary-foreground', minValue: 0 },
 };
@@ -29,7 +29,7 @@ const statusConfig: Record<string, { color: string; icon: React.ElementType }> =
   negotiating: { color: 'bg-blue-500/20 text-blue-600', icon: FileText },
   confirmed: { color: 'bg-green-500/20 text-green-600', icon: CheckCircle2 },
   declined: { color: 'bg-red-500/20 text-red-600', icon: Clock },
-  churned: { color: 'bg-gray-500/20 text-gray-600', icon: Clock },
+  churned: { color: 'bg-muted-foreground/30/20 text-muted-foreground', icon: Clock },
 };
 
 export function AddSponsorTab({ workspace }: AddSponsorTabProps) {

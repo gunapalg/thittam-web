@@ -91,7 +91,7 @@ export function CoverageSchedule() {
       case 'medium':
         return 'bg-amber-100 text-amber-800 border-amber-200';
       case 'low':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-muted text-foreground border-border';
     }
   };
 

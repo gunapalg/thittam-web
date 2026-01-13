@@ -153,7 +153,7 @@ const VendorDashboard: React.FC<VendorDashboardProps> = ({ userId }) => {
       case 'REJECTED':
         return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Rejected</Badge>;
       case 'SUSPENDED':
-        return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">Suspended</Badge>;
+        return <Badge className="bg-muted text-foreground hover:bg-muted">Suspended</Badge>;
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }

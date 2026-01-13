@@ -373,7 +373,7 @@ export const AdminUserRolesPage: React.FC = () => {
           </TabsList>
 
           <TabsContent value="roles" className="space-y-6">
-        <Card className="shadow-soft border-coral/20 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-soft border-coral/20 bg-card/80 backdrop-blur-sm">
           <CardHeader className="flex flex-col gap-4">
             <CardTitle className="text-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <span>Assign Roles to Users</span>
@@ -485,7 +485,7 @@ export const AdminUserRolesPage: React.FC = () => {
                 No role assignments found.
               </div>
             ) : (
-              <div className="rounded-xl border border-border bg-white/60 overflow-hidden">
+              <div className="rounded-xl border border-border bg-card/60 overflow-hidden">
                 <Table>
                   <TableHeader>
                     <TableRow>

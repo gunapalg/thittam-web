@@ -335,7 +335,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
 
       {mode === 'single' ? (
         /* Single Invitation Form */
-        <div className="bg-white dark:bg-card shadow rounded-lg p-6">
+        <div className="bg-card dark:bg-card shadow rounded-lg p-6">
           {canInviteAnyone ? (
             <>
               <h3 className="text-lg font-medium text-foreground mb-4">Invite Team Member</h3>
@@ -429,12 +429,12 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
         /* Bulk Invitation Interface */
         <div className="space-y-6">
           {/* CSV Upload */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Bulk Invite via CSV</h3>
+          <div className="bg-card shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-foreground mb-4">Bulk Invite via CSV</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Upload CSV File
                 </label>
                 <div className="flex items-center space-x-4">
@@ -447,16 +447,16 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="inline-flex items-center px-4 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                   >
                     <DocumentArrowUpIcon className="w-4 h-4 mr-2" />
                     Choose File
                   </button>
                   {csvFile && (
-                    <span className="text-sm text-gray-600">{csvFile.name}</span>
+                    <span className="text-sm text-muted-foreground">{csvFile.name}</span>
                   )}
                 </div>
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-muted-foreground">
                   CSV format: email,role (one per line). Role is optional and defaults to General Volunteer.
                 </p>
               </div>
@@ -464,7 +464,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
               <div>
                 <button
                   onClick={addManualInvitation}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  className="inline-flex items-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                 >
                   Add Manual Entry
                 </button>
@@ -474,14 +474,14 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
 
           {/* Manual Entries */}
           {bulkInvitations.length > 0 && (
-            <div className="bg-white shadow rounded-lg p-6">
+            <div className="bg-card shadow rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-foreground">
                   Invitation Preview ({bulkInvitations.length} members)
                 </h3>
                 <button
                   onClick={() => setShowPreview(!showPreview)}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  className="inline-flex items-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                 >
                   <EyeIcon className="w-4 h-4 mr-2" />
                   {showPreview ? 'Hide' : 'Show'} Preview
@@ -502,13 +502,13 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
               {showPreview && (
                 <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                   {bulkInvitations.map((invitation, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
+                    <div key={index} className="flex items-center space-x-3 p-3 bg-muted/50 rounded-md">
                       <div className="flex-1">
                         <input
                           type="email"
                           value={invitation.email}
                           onChange={(e) => updateBulkInvitation(index, 'email', e.target.value)}
-                          className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                          className="block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary text-sm"
                           placeholder="Email address"
                         />
                       </div>
@@ -516,7 +516,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                         <select
                           value={invitation.role}
                           onChange={(e) => updateBulkInvitation(index, 'role', e.target.value)}
-                          className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                          className="block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary text-sm"
                         >
                           {roleOptions.map(option => (
                             <option key={option.value} value={option.value}>
@@ -538,7 +538,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="bulk-message" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="bulk-message" className="block text-sm font-medium text-foreground">
                     Custom Message (Optional)
                   </label>
                   <textarea
@@ -546,7 +546,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                     rows={3}
                     value={bulkMessage}
                     onChange={(e) => setBulkMessage(e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    className="mt-1 block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary"
                     placeholder="Add a message that will be included in all invitations..."
                   />
                 </div>
@@ -558,7 +558,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                       setCsvFile(null);
                       setShowPreview(false);
                     }}
-                    className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="px-4 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                   >
                     Clear All
                   </button>
@@ -591,23 +591,23 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
 
       {/* Pending Invitations */}
       {pendingInvitations.length > 0 && (
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="bg-card shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-foreground mb-4">
             Pending Invitations ({pendingInvitations.length})
           </h3>
           
           <div className="space-y-3">
             {pendingInvitations.map((invitation) => (
-              <div key={invitation.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
+              <div key={invitation.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3">
-                    <span className="font-medium text-gray-900">{invitation.email}</span>
+                    <span className="font-medium text-foreground">{invitation.email}</span>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {roleOptions.find(r => r.value === invitation.role)?.label}
                     </span>
                     {getInvitationStatusBadge(invitation.status)}
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Invited by {invitation.invitedBy.name} on {new Date(invitation.invitedAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -616,7 +616,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                   <button
                     onClick={() => resendInviteMutation.mutate(invitation.id)}
                     disabled={resendInviteMutation.isPending}
-                    className="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                    className="inline-flex items-center px-3 py-1 border border-input text-xs font-medium rounded text-foreground bg-card hover:bg-muted/50"
                   >
                     <ArrowPathIcon className="w-3 h-3 mr-1" />
                     Resend
@@ -624,7 +624,7 @@ export function TeamInvitation({ workspace, mode, pendingInvitations, onInvitati
                   <button
                     onClick={() => cancelInviteMutation.mutate(invitation.id)}
                     disabled={cancelInviteMutation.isPending}
-                    className="inline-flex items-center px-3 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50"
+                    className="inline-flex items-center px-3 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-card hover:bg-red-50"
                   >
                     <XMarkIcon className="w-3 h-3 mr-1" />
                     Cancel

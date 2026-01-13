@@ -17,7 +17,7 @@ const priorityConfig: Record<ApprovalPriority, {
   low: {
     label: 'Low',
     icon: ArrowDown,
-    className: 'bg-slate-500/10 text-slate-600 hover:bg-slate-500/20 border-slate-500/20',
+    className: 'bg-slate-500/10 text-muted-foreground hover:bg-slate-500/20 border-slate-500/20',
   },
   medium: {
     label: 'Medium',

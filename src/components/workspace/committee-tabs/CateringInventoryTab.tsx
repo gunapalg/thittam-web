@@ -154,7 +154,7 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
       'sufficient': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Sufficient' },
       'low': { class: 'bg-amber-500/10 text-amber-600 border-amber-500/20', label: 'Low Stock' },
       'critical': { class: 'bg-red-500/10 text-red-600 border-red-500/20', label: 'Critical' },
-      'out': { class: 'bg-slate-500/10 text-slate-600 border-slate-500/20', label: 'Out of Stock' },
+      'out': { class: 'bg-slate-500/10 text-muted-foreground border-slate-500/20', label: 'Out of Stock' },
     };
     const { class: className, label } = config[status as keyof typeof config] || config.sufficient;
     return <Badge variant="outline" className={className}>{label}</Badge>;
@@ -397,7 +397,7 @@ export function CateringInventoryTab({ workspaceId }: CateringInventoryTabProps)
                   className={cn(
                     'flex items-center justify-between p-4 rounded-lg border transition-colors',
                     item.status === 'critical' && 'bg-red-50/50 border-red-200',
-                    item.status === 'out' && 'bg-slate-50/50 border-slate-200',
+                    item.status === 'out' && 'bg-muted/50/50 border-border',
                     item.status === 'low' && 'bg-amber-50/50 border-amber-200'
                   )}
                 >

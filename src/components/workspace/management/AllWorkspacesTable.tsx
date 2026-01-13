@@ -322,7 +322,7 @@ export function AllWorkspacesTable({
                         variant={ws.status === WorkspaceStatus.ACTIVE ? 'default' : 'secondary'}
                         className={ws.status === WorkspaceStatus.ACTIVE 
                           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                          : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                          : 'bg-muted text-muted-foreground dark:bg-foreground/80 dark:text-muted-foreground'
                         }
                       >
                         {ws.status}

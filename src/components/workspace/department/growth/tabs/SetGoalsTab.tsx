@@ -30,7 +30,7 @@ const statusConfig: Record<string, { color: string; label: string }> = {
   active: { color: 'bg-blue-500/20 text-blue-600', label: 'Active' },
   achieved: { color: 'bg-green-500/20 text-green-600', label: 'Achieved' },
   missed: { color: 'bg-red-500/20 text-red-600', label: 'Missed' },
-  cancelled: { color: 'bg-gray-500/20 text-gray-600', label: 'Cancelled' },
+  cancelled: { color: 'bg-muted-foreground/30/20 text-muted-foreground', label: 'Cancelled' },
 };
 
 const trendIcons: Record<string, React.ElementType> = {

@@ -53,7 +53,7 @@ const REQUIREMENT_TYPES = [
   { value: 'seafood_allergy', label: 'Seafood Allergy', icon: AlertCircle, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
   { value: 'halal', label: 'Halal', icon: Check, color: 'text-teal-500', bgColor: 'bg-teal-500/10' },
   { value: 'kosher', label: 'Kosher', icon: Check, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
-  { value: 'other', label: 'Other', icon: FileText, color: 'text-gray-500', bgColor: 'bg-gray-500/10' },
+  { value: 'other', label: 'Other', icon: FileText, color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/30/10' },
 ];
 
 export function DietaryReportTab({ workspaceId, eventId }: DietaryReportTabProps) {

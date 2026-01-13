@@ -27,7 +27,7 @@ const contactTypeConfig: Record<string, { color: string; label: string }> = {
 const priorityConfig: Record<string, { color: string; icon: React.ElementType }> = {
   high: { color: 'bg-red-500/20 text-red-600', icon: Star },
   medium: { color: 'bg-amber-500/20 text-amber-600', icon: Star },
-  low: { color: 'bg-gray-500/20 text-gray-600', icon: Star },
+  low: { color: 'bg-muted-foreground/30/20 text-muted-foreground', icon: Star },
 };
 
 

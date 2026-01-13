@@ -27,7 +27,7 @@ const statusConfig: Record<string, { color: string }> = {
   active: { color: 'bg-green-500/20 text-green-600' },
   pending: { color: 'bg-amber-500/20 text-amber-600' },
   completed: { color: 'bg-blue-500/20 text-blue-600' },
-  cancelled: { color: 'bg-gray-500/20 text-gray-600' },
+  cancelled: { color: 'bg-muted-foreground/30/20 text-muted-foreground' },
 };
 
 export function ManagePartnersTab({ workspace }: ManagePartnersTabProps) {

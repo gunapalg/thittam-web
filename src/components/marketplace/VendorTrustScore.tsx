@@ -54,7 +54,7 @@ const getTrustLevel = (score: number): { label: string; color: string; bgColor: 
   if (score >= 75) return { label: 'Excellent', color: 'text-blue-600', bgColor: 'bg-blue-500' };
   if (score >= 60) return { label: 'Good', color: 'text-amber-600', bgColor: 'bg-amber-500' };
   if (score >= 40) return { label: 'Fair', color: 'text-orange-600', bgColor: 'bg-orange-500' };
-  return { label: 'New', color: 'text-gray-600', bgColor: 'bg-gray-400' };
+  return { label: 'New', color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/20' };
 };
 
 export const VendorTrustScore: React.FC<VendorTrustScoreProps> = ({

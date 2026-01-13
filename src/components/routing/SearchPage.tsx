@@ -359,7 +359,7 @@ export const SearchPage: React.FC<SearchPageProps> = ({ className = '' }) => {
   const activeFilterCount = Object.values(activeFilters).flat().length;
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${className}`}>
+    <div className={`min-h-screen bg-muted/50 ${className}`}>
       <PageHeader
         title="Search"
         subtitle={query ? `Results for "${query}"` : 'Search across all content'}
@@ -379,21 +379,21 @@ export const SearchPage: React.FC<SearchPageProps> = ({ className = '' }) => {
           {/* Search Sidebar */}
           <div className="lg:w-80 space-y-6">
             {/* Search Input */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="bg-card rounded-lg shadow-sm border border-border p-4">
               <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch(query)}
                   placeholder="Search events, workspaces, organizations..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full pl-10 pr-4 py-3 border border-input rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                 />
               </div>
               <button
                 onClick={() => handleSearch(query)}
-                className="w-full mt-3 bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                className="w-full mt-3 bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus-visible:ring-ring transition-colors"
               >
                 Search
               </button>
@@ -421,17 +421,17 @@ export const SearchPage: React.FC<SearchPageProps> = ({ className = '' }) => {
               <div className="space-y-4">
                 {/* Results Header */}
                 {(query.trim() || activeFilterCount > 0) && (
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                  <div className="bg-card rounded-lg shadow-sm border border-border p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {total} result{total !== 1 ? 's' : ''} 
                           {query && ` for "${query}"`}
                           {activeFilterCount > 0 && ` with ${activeFilterCount} filter${activeFilterCount !== 1 ? 's' : ''}`}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1">
+                        <button className="text-sm text-muted-foreground hover:text-foreground flex items-center space-x-1">
                           <AdjustmentsHorizontalIcon className="h-4 w-4" />
                           <span>Sort</span>
                         </button>
@@ -480,23 +480,23 @@ export const SearchPage: React.FC<SearchPageProps> = ({ className = '' }) => {
 
                 {/* Pagination */}
                 {total > 20 && (
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                  <div className="bg-card rounded-lg shadow-sm border border-border p-4">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         Showing {((currentPage - 1) * 20) + 1} to {Math.min(currentPage * 20, total)} of {total} results
                       </p>
                       <div className="flex space-x-2">
                         <button
                           onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                           disabled={currentPage === 1}
-                          className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1 text-sm border border-input rounded-md hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Previous
                         </button>
                         <button
                           onClick={() => setCurrentPage(prev => prev + 1)}
                           disabled={currentPage * 20 >= total}
-                          className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1 text-sm border border-input rounded-md hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Next
                         </button>

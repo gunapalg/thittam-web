@@ -75,7 +75,7 @@ export function TaskDetailView({
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
       case TaskStatus.NOT_STARTED:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       case TaskStatus.IN_PROGRESS:
         return 'bg-blue-100 text-blue-800';
       case TaskStatus.REVIEW_REQUIRED:
@@ -85,14 +85,14 @@ export function TaskDetailView({
       case TaskStatus.BLOCKED:
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
       case TaskPriority.LOW:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       case TaskPriority.MEDIUM:
         return 'bg-blue-100 text-blue-800';
       case TaskPriority.HIGH:
@@ -100,7 +100,7 @@ export function TaskDetailView({
       case TaskPriority.URGENT:
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -117,9 +117,9 @@ export function TaskDetailView({
       case TaskCategory.REGISTRATION:
         return 'bg-yellow-100 text-yellow-800';
       case TaskCategory.POST_EVENT:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -209,17 +209,17 @@ export function TaskDetailView({
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          className="fixed inset-0 bg-muted-foreground/30 bg-opacity-75 transition-opacity"
           onClick={onClose}
         />
 
         {/* Modal panel */}
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+        <div className="inline-block align-bottom bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-border">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-medium text-gray-900 truncate">
+                <h3 className="text-lg font-medium text-foreground truncate">
                   {task.title}
                 </h3>
                 <div className="flex items-center space-x-3 mt-2">
@@ -241,7 +241,7 @@ export function TaskDetailView({
               </div>
               <button
                 onClick={onClose}
-                className="ml-3 text-gray-400 hover:text-gray-600"
+                className="ml-3 text-muted-foreground hover:text-muted-foreground"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -251,7 +251,7 @@ export function TaskDetailView({
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-gray-200">
+          <div className="border-b border-border">
             <nav className="flex space-x-8 px-6" aria-label="Tabs">
               {tabs.map((tab) => (
                 <button
@@ -259,13 +259,13 @@ export function TaskDetailView({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${activeTab === tab.id
                       ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-input'
                     }`}
                 >
                   <span className="flex items-center space-x-2">
                     <span>{tab.name}</span>
                     {tab.count !== undefined && (
-                      <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${activeTab === tab.id ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-600'
+                      <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${activeTab === tab.id ? 'bg-indigo-100 text-indigo-600' : 'bg-muted text-muted-foreground'
                         }`}>
                         {tab.count}
                       </span>
@@ -282,8 +282,8 @@ export function TaskDetailView({
               <div className="space-y-6">
                 {/* Description */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Description</h4>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                  <h4 className="text-sm font-medium text-foreground mb-2">Description</h4>
+                  <p className="text-sm text-foreground whitespace-pre-wrap">
                     {task.description || 'No description provided.'}
                   </p>
                 </div>
@@ -292,7 +292,7 @@ export function TaskDetailView({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Assignee */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Assignee</h4>
+                    <h4 className="text-sm font-medium text-foreground mb-2">Assignee</h4>
                     {task.assignee ? (
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-8 w-8">
@@ -303,43 +303,43 @@ export function TaskDetailView({
                           </div>
                         </div>
                         <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-foreground">
                             {task.assignee.user.name}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             {task.assignee.role.replace('_', ' ')}
                           </p>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">Unassigned</p>
+                      <p className="text-sm text-muted-foreground">Unassigned</p>
                     )}
                   </div>
 
                   {/* Due Date */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Due Date</h4>
+                    <h4 className="text-sm font-medium text-foreground mb-2">Due Date</h4>
                     {task.dueDate ? (
-                      <p className={`text-sm ${isOverdue(task) ? 'text-red-600 font-medium' : 'text-gray-700'}`}>
+                      <p className={`text-sm ${isOverdue(task) ? 'text-red-600 font-medium' : 'text-foreground'}`}>
                         {formatDate(task.dueDate)}
                       </p>
                     ) : (
-                      <p className="text-sm text-gray-500">No due date set</p>
+                      <p className="text-sm text-muted-foreground">No due date set</p>
                     )}
                   </div>
 
                   {/* Created */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Created</h4>
-                    <p className="text-sm text-gray-700">
+                    <h4 className="text-sm font-medium text-foreground mb-2">Created</h4>
+                    <p className="text-sm text-foreground">
                       {formatDate(task.createdAt)} by {task.creator.user.name}
                     </p>
                   </div>
 
                   {/* Last Updated */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Last Updated</h4>
-                    <p className="text-sm text-gray-700">
+                    <h4 className="text-sm font-medium text-foreground mb-2">Last Updated</h4>
+                    <p className="text-sm text-foreground">
                       {formatDate(task.updatedAt)}
                     </p>
                   </div>
@@ -347,12 +347,12 @@ export function TaskDetailView({
 
                 {/* Role Space (sub workspace) */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Role Space (sub workspace)</h4>
+                  <h4 className="text-sm font-medium text-foreground mb-2">Role Space (sub workspace)</h4>
                   <select
                     value={roleScopeValue}
                     onChange={handleRoleScopeChange}
                     disabled={isSavingRoleScope}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="block w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                   >
                     <option value="">All teams (no specific role)</option>
                     {Array.from(new Set(teamMembers.map((m) => m.role))).map((role) => (
@@ -365,7 +365,7 @@ export function TaskDetailView({
                 {/* Progress */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium text-gray-900">Progress</h4>
+                    <h4 className="text-sm font-medium text-foreground">Progress</h4>
                     <button
                       onClick={() => setIsEditingProgress(!isEditingProgress)}
                       className="text-xs text-indigo-600 hover:text-indigo-500"
@@ -383,7 +383,7 @@ export function TaskDetailView({
                         onChange={(e) => setProgressValue(parseInt(e.target.value))}
                         className="flex-1"
                       />
-                      <span className="text-sm text-gray-700 w-12">{progressValue}%</span>
+                      <span className="text-sm text-foreground w-12">{progressValue}%</span>
                       <button
                         onClick={handleProgressUpdate}
                         className="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700"
@@ -393,13 +393,13 @@ export function TaskDetailView({
                     </div>
                   ) : (
                     <div className="flex items-center space-x-3">
-                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div className="flex-1 bg-muted rounded-full h-2">
                         <div
                           className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
                           style={{ width: `${task.progress}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm text-gray-700 w-12">{task.progress}%</span>
+                      <span className="text-sm text-foreground w-12">{task.progress}%</span>
                     </div>
                   )}
                 </div>
@@ -407,11 +407,11 @@ export function TaskDetailView({
                 {/* Status Update */}
                 {onStatusChange && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Update Status</h4>
+                    <h4 className="text-sm font-medium text-foreground mb-2">Update Status</h4>
                     <select
                       value={task.status}
                       onChange={(e) => onStatusChange(task.id, e.target.value as TaskStatus)}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="block w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                     >
                       {Object.values(TaskStatus).map(status => (
                         <option key={status} value={status}>
@@ -425,12 +425,12 @@ export function TaskDetailView({
                 {/* Tags */}
                 {task.tags.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Tags</h4>
+                    <h4 className="text-sm font-medium text-foreground mb-2">Tags</h4>
                     <div className="flex flex-wrap gap-2">
                       {task.tags.map(tag => (
                         <span
                           key={tag}
-                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+                          className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-foreground"
                         >
                           {tag}
                         </span>
@@ -442,8 +442,8 @@ export function TaskDetailView({
                 {/* Dependencies */}
                 {task.dependencies.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Dependencies</h4>
-                    <p className="text-sm text-gray-700">
+                    <h4 className="text-sm font-medium text-foreground mb-2">Dependencies</h4>
+                    <p className="text-sm text-foreground">
                       This task depends on {task.dependencies.length} other task{task.dependencies.length !== 1 ? 's' : ''}.
                     </p>
                   </div>
@@ -460,7 +460,7 @@ export function TaskDetailView({
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="Add a comment..."
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                   />
                   <div className="flex justify-end">
                     <button
@@ -476,22 +476,22 @@ export function TaskDetailView({
                 {/* Comments List */}
                 <div className="space-y-4">
                   {comments.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-8">
+                    <p className="text-sm text-muted-foreground text-center py-8">
                       No comments yet. Be the first to add one!
                     </p>
                   ) : (
                     comments.map((comment) => (
-                      <div key={comment.id} className="border border-gray-200 rounded-lg p-4">
+                      <div key={comment.id} className="border border-border rounded-lg p-4">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center space-x-2">
-                            <span className="font-medium text-sm text-gray-900">
+                            <span className="font-medium text-sm text-foreground">
                               {comment.userName}
                             </span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-muted-foreground">
                               {formatDate(comment.createdAt)}
                             </span>
                             {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
-                              <span className="text-xs text-gray-400">(edited)</span>
+                              <span className="text-xs text-muted-foreground">(edited)</span>
                             )}
                           </div>
                           <div className="flex items-center space-x-2">
@@ -516,12 +516,12 @@ export function TaskDetailView({
                                 value={editCommentContent}
                                 onChange={(e) => setEditCommentContent(e.target.value)}
                                 rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus-visible:ring-ring focus-visible:border-primary"
                               />
                               <div className="flex justify-end space-x-2">
                                 <button
                                   onClick={() => setEditingComment(null)}
-                                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+                                  className="px-3 py-1 text-sm text-muted-foreground hover:text-foreground"
                                 >
                                   Cancel
                                 </button>
@@ -534,7 +534,7 @@ export function TaskDetailView({
                               </div>
                             </div>
                           ) : (
-                            <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                            <p className="text-sm text-foreground whitespace-pre-wrap">
                               {comment.content}
                             </p>
                           )}
@@ -549,14 +549,14 @@ export function TaskDetailView({
             {activeTab === 'files' && (
               <div className="space-y-4">
                 {/* File Upload */}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                <div className="border-2 border-dashed border-input rounded-lg p-6">
                   <div className="text-center">
-                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <svg className="mx-auto h-12 w-12 text-muted-foreground" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                       <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     <div className="mt-4">
                       <label htmlFor="file-upload" className="cursor-pointer">
-                        <span className="mt-2 block text-sm font-medium text-gray-900">
+                        <span className="mt-2 block text-sm font-medium text-foreground">
                           Upload files
                         </span>
                         <input
@@ -567,7 +567,7 @@ export function TaskDetailView({
                           className="sr-only"
                           onChange={handleFileUpload}
                         />
-                        <span className="mt-1 block text-xs text-gray-500">
+                        <span className="mt-1 block text-xs text-muted-foreground">
                           PNG, JPG, PDF up to 10MB
                         </span>
                       </label>
@@ -578,19 +578,19 @@ export function TaskDetailView({
                 {/* Files List */}
                 <div className="space-y-2">
                   {files.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-8">
+                    <p className="text-sm text-muted-foreground text-center py-8">
                       No files attached yet.
                     </p>
                   ) : (
                     files.map((file) => (
-                      <div key={file.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                      <div key={file.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
                         <div className="flex items-center space-x-3">
-                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-sm font-medium text-foreground">{file.name}</p>
+                            <p className="text-xs text-muted-foreground">
                               {formatFileSize(file.size)} • Uploaded by {file.uploadedBy} on {formatDate(file.uploadedAt)}
                             </p>
                           </div>
@@ -621,7 +621,7 @@ export function TaskDetailView({
             {activeTab === 'activity' && (
               <div className="space-y-4">
                 {activities.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-8">
+                  <p className="text-sm text-muted-foreground text-center py-8">
                     No activity yet.
                   </p>
                 ) : (
@@ -631,11 +631,11 @@ export function TaskDetailView({
                         <li key={activity.id}>
                           <div className="relative pb-8">
                             {activityIdx !== activities.length - 1 ? (
-                              <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
+                              <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-muted" aria-hidden="true" />
                             ) : null}
                             <div className="relative flex space-x-3">
                               <div>
-                                <span className="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white">
+                                <span className="h-8 w-8 rounded-full bg-muted-foreground/20 flex items-center justify-center ring-8 ring-background">
                                   <span className="text-white text-xs font-medium">
                                     {activity.userName.charAt(0).toUpperCase()}
                                   </span>
@@ -643,12 +643,12 @@ export function TaskDetailView({
                               </div>
                               <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                                 <div>
-                                  <p className="text-sm text-gray-500">
-                                    <span className="font-medium text-gray-900">{activity.userName}</span>{' '}
+                                  <p className="text-sm text-muted-foreground">
+                                    <span className="font-medium text-foreground">{activity.userName}</span>{' '}
                                     {activity.description}
                                   </p>
                                 </div>
-                                <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                                <div className="text-right text-sm whitespace-nowrap text-muted-foreground">
                                   {formatDate(activity.createdAt)}
                                 </div>
                               </div>
@@ -664,11 +664,11 @@ export function TaskDetailView({
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div className="px-6 py-4 border-t border-border bg-muted/50">
             <div className="flex justify-end">
               <button
                 onClick={onClose}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="px-4 py-2 border border-input rounded-md text-sm font-medium text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-ring"
               >
                 Close
               </button>

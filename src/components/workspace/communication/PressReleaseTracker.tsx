@@ -57,7 +57,7 @@ const mockPressReleases: PressRelease[] = [
 ];
 
 const statusConfig = {
-  draft: { icon: Edit, color: 'text-gray-500', bgColor: 'bg-gray-500/10', label: 'Draft' },
+  draft: { icon: Edit, color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/30/10', label: 'Draft' },
   review: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'In Review' },
   approved: { icon: CheckCircle2, color: 'text-blue-500', bgColor: 'bg-blue-500/10', label: 'Approved' },
   distributed: { icon: Send, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Distributed' },

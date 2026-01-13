@@ -73,7 +73,7 @@ export function SubmissionAssignments(_props: SubmissionAssignmentsProps) {
   const getStatusConfig = (status: Submission['status']) => {
     switch (status) {
       case 'pending':
-        return { color: 'bg-gray-100 text-gray-800', icon: Clock, label: 'Pending' };
+        return { color: 'bg-muted text-foreground', icon: Clock, label: 'Pending' };
       case 'in_review':
         return { color: 'bg-blue-100 text-blue-800', icon: AlertCircle, label: 'In Review' };
       case 'scored':

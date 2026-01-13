@@ -31,7 +31,7 @@ const categoryIcons: Record<string, React.ElementType> = {
 const categoryColors: Record<string, { icon: string; bg: string }> = {
   event: { icon: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' },
   workspace: { icon: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
-  system: { icon: 'text-slate-600', bg: 'bg-slate-100 dark:bg-slate-800/50' },
+  system: { icon: 'text-muted-foreground', bg: 'bg-muted dark:bg-foreground/80/50' },
   organization: { icon: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
   marketplace: { icon: 'text-amber-600', bg: 'bg-amber-100 dark:bg-amber-900/30' },
 };

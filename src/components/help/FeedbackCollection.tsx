@@ -471,8 +471,8 @@ export const FeedbackCollection: React.FC<FeedbackCollectionProps> = ({
             </div>
 
             {filteredFeedback.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-8 text-muted-foreground">
+                <MessageSquare className="w-12 h-12 mx-auto mb-4 text-muted-foreground/70" />
                 <p>No feedback found matching your criteria.</p>
               </div>
             )}

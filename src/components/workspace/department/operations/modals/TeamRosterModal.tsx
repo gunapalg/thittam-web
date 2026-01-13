@@ -53,7 +53,7 @@ export function TeamRosterModal({ open, onOpenChange }: TeamRosterModalProps) {
       case 'break':
         return <Badge className="bg-amber-500/10 text-amber-600">On Break</Badge>;
       case 'off-duty':
-        return <Badge className="bg-gray-500/10 text-gray-600">Off Duty</Badge>;
+        return <Badge className="bg-muted-foreground/30/10 text-muted-foreground">Off Duty</Badge>;
     }
   };
 

@@ -44,9 +44,9 @@ export const OrganizationDetailPage: React.FC = () => {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4" />
-            <div className="h-4 bg-gray-200 rounded w-2/3 mb-8" />
-            <div className="h-64 bg-gray-200 rounded" />
+            <div className="h-8 bg-muted rounded w-1/3 mb-4" />
+            <div className="h-4 bg-muted rounded w-2/3 mb-8" />
+            <div className="h-64 bg-muted rounded" />
           </div>
         </div>
       </div>
@@ -57,8 +57,8 @@ export const OrganizationDetailPage: React.FC = () => {
     return (
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Organization Not Found</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Organization Not Found</h2>
+          <p className="text-muted-foreground mb-4">
             The organization you are looking for does not exist or you do not have access.
           </p>
           <Link
@@ -89,7 +89,7 @@ export const OrganizationDetailPage: React.FC = () => {
       badge: 0,
       component: () => (
         <div className="p-6">
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Member management interface is available on the Member Management page.
           </p>
           <Link
@@ -107,7 +107,7 @@ export const OrganizationDetailPage: React.FC = () => {
       label: 'Settings',
       component: () => (
         <div className="p-6">
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Organization settings interface is available on the Settings page.
           </p>
           <Link
@@ -125,30 +125,30 @@ export const OrganizationDetailPage: React.FC = () => {
       label: 'Analytics',
       component: () => (
         <div className="p-6 space-y-4">
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             View high-level analytics for this organization or open the full analytics dashboard.
           </p>
           {analytics ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <p className="text-xs font-medium text-gray-500">Total Events</p>
-                <p className="mt-1 text-xl font-semibold text-gray-900">{analytics.totalEvents}</p>
+              <div className="bg-card rounded-lg border border-border p-4">
+                <p className="text-xs font-medium text-muted-foreground">Total Events</p>
+                <p className="mt-1 text-xl font-semibold text-foreground">{analytics.totalEvents}</p>
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <p className="text-xs font-medium text-gray-500">Published</p>
-                <p className="mt-1 text-xl font-semibold text-gray-900">{analytics.publishedEvents}</p>
+              <div className="bg-card rounded-lg border border-border p-4">
+                <p className="text-xs font-medium text-muted-foreground">Published</p>
+                <p className="mt-1 text-xl font-semibold text-foreground">{analytics.publishedEvents}</p>
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <p className="text-xs font-medium text-gray-500">Ongoing</p>
-                <p className="mt-1 text-xl font-semibold text-gray-900">{analytics.ongoingEvents}</p>
+              <div className="bg-card rounded-lg border border-border p-4">
+                <p className="text-xs font-medium text-muted-foreground">Ongoing</p>
+                <p className="mt-1 text-xl font-semibold text-foreground">{analytics.ongoingEvents}</p>
               </div>
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <p className="text-xs font-medium text-gray-500">Completed</p>
-                <p className="mt-1 text-xl font-semibold text-gray-900">{analytics.completedEvents}</p>
+              <div className="bg-card rounded-lg border border-border p-4">
+                <p className="text-xs font-medium text-muted-foreground">Completed</p>
+                <p className="mt-1 text-xl font-semibold text-foreground">{analytics.completedEvents}</p>
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No analytics data available yet.</p>
+            <p className="text-sm text-muted-foreground">No analytics data available yet.</p>
           )}
           <Link
             to={`/dashboard/organizations/${organization.id}/analytics`}

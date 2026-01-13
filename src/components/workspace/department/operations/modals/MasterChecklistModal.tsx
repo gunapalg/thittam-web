@@ -95,7 +95,7 @@ export function MasterChecklistModal({ open, onOpenChange }: MasterChecklistModa
       case 'medium':
         return <Badge className="bg-amber-500/10 text-amber-600 text-[10px]">Med</Badge>;
       case 'low':
-        return <Badge className="bg-gray-500/10 text-gray-600 text-[10px]">Low</Badge>;
+        return <Badge className="bg-muted-foreground/30/10 text-muted-foreground text-[10px]">Low</Badge>;
     }
   };
 

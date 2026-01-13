@@ -430,9 +430,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       case 'marketplace':
         return <ShoppingBagIcon className="h-5 w-5 text-purple-500" />;
       case 'system':
-        return <Cog6ToothIcon className="h-5 w-5 text-gray-500" />;
+        return <Cog6ToothIcon className="h-5 w-5 text-muted-foreground" />;
       default:
-        return <InformationCircleIcon className="h-5 w-5 text-gray-400" />;
+        return <InformationCircleIcon className="h-5 w-5 text-muted-foreground" />;
     }
   };
 

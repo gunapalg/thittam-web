@@ -37,7 +37,7 @@ const mockPerformanceData: VolunteerPerformance[] = [
 const getRankIcon = (rank: number) => {
   switch (rank) {
     case 1: return <Trophy className="h-5 w-5 text-yellow-500" />;
-    case 2: return <Medal className="h-5 w-5 text-slate-400" />;
+    case 2: return <Medal className="h-5 w-5 text-muted-foreground" />;
     case 3: return <Medal className="h-5 w-5 text-amber-600" />;
     default: return <span className="text-sm font-bold text-muted-foreground">#{rank}</span>;
   }
@@ -120,11 +120,11 @@ export function PerformanceReviewTab({ workspace: _workspace }: PerformanceRevie
                 {/* 2nd Place */}
                 <div className="flex flex-col items-center">
                   <Avatar className="h-16 w-16 border-4 border-slate-400">
-                    <AvatarFallback className="bg-slate-400/20 text-slate-600">
+                    <AvatarFallback className="bg-slate-400/20 text-muted-foreground">
                       {mockPerformanceData[1]?.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
-                  <Medal className="h-6 w-6 text-slate-400 mt-2" />
+                  <Medal className="h-6 w-6 text-muted-foreground mt-2" />
                   <p className="font-medium text-sm mt-1">{mockPerformanceData[1]?.name}</p>
                   <p className="text-xs text-muted-foreground">{mockPerformanceData[1]?.hoursLogged}h</p>
                   <div className="h-20 w-20 bg-slate-400/20 rounded-t-lg mt-2" />

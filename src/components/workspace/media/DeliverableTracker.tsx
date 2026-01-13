@@ -68,7 +68,7 @@ export function DeliverableTracker() {
       case 'in_progress':
         return { icon: Clock, color: 'bg-blue-100 text-blue-800', label: 'In Progress' };
       case 'pending':
-        return { icon: Clock, color: 'bg-gray-100 text-gray-800', label: 'Pending' };
+        return { icon: Clock, color: 'bg-muted text-foreground', label: 'Pending' };
       case 'overdue':
         return { icon: AlertCircle, color: 'bg-red-100 text-red-800', label: 'Overdue' };
     }

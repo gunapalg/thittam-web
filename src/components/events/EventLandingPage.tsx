@@ -274,7 +274,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 <button
                   onClick={() => setShowRegistrationModal(true)}
                   disabled={registrationMutation.isPending}
-                  className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  className="bg-card text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   {registrationMutation.isPending
                     ? 'Registering...'
@@ -283,7 +283,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               ) : (
                 <button
                   onClick={() => navigate('/register')}
-                  className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                  className="bg-card text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-muted transition-colors"
                 >
                   Sign Up to Register
                 </button>
@@ -294,7 +294,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 <span className="text-sm">Share:</span>
                 <button
                   onClick={() => shareEvent('twitter')}
-                  className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                  className="p-2 bg-card bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
                   title="Share on Twitter"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -303,7 +303,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </button>
                 <button
                   onClick={() => shareEvent('facebook')}
-                  className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                  className="p-2 bg-card bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
                   title="Share on Facebook"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -312,7 +312,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </button>
                 <button
                   onClick={() => shareEvent('linkedin')}
-                  className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                  className="p-2 bg-card bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
                   title="Share on LinkedIn"
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -321,7 +321,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </button>
                 <button
                   onClick={() => shareEvent('copy')}
-                  className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
+                  className="p-2 bg-card bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors"
                   title="Copy Link"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -379,30 +379,30 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               )}
 
               {/* Event Details */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Event Details</h3>
+              <div className="bg-card rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Event Details</h3>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <svg className="h-5 w-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-muted-foreground mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <div>
-                      <p className="font-medium text-gray-900">Date & Time</p>
-                      <p className="text-gray-600">
+                      <p className="font-medium text-foreground">Date & Time</p>
+                      <p className="text-muted-foreground">
                         {formatDate(event.startDate)} - {formatDate(event.endDate)}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-3">
-                    <svg className="h-5 w-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-muted-foreground mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <div>
-                      <p className="font-medium text-gray-900">Location</p>
+                      <p className="font-medium text-foreground">Location</p>
                       {event.mode === EventMode.OFFLINE && event.venue && (
-                        <div className="text-gray-600">
+                        <div className="text-muted-foreground">
                           <p>{event.venue.name}</p>
                           <p>{event.venue.address}</p>
                           <p>{event.venue.city}, {event.venue.state} {event.venue.postalCode}</p>
@@ -410,10 +410,10 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                         </div>
                       )}
                       {event.mode === EventMode.ONLINE && (
-                        <p className="text-gray-600">Virtual Event</p>
+                        <p className="text-muted-foreground">Virtual Event</p>
                       )}
                       {event.mode === EventMode.HYBRID && event.venue && (
-                        <div className="text-gray-600">
+                        <div className="text-muted-foreground">
                           <p>{event.venue.name} + Virtual</p>
                           <p>{event.venue.address}</p>
                           <p>{event.venue.city}, {event.venue.state}</p>
@@ -424,24 +424,24 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
                   {event.capacity && (
                     <div className="flex items-start space-x-3">
-                      <svg className="h-5 w-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 text-muted-foreground mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                       <div>
-                        <p className="font-medium text-gray-900">Capacity</p>
-                        <p className="text-gray-600">{event.capacity} participants</p>
+                        <p className="font-medium text-foreground">Capacity</p>
+                        <p className="text-muted-foreground">{event.capacity} participants</p>
                       </div>
                     </div>
                   )}
 
                   {event.registrationDeadline && (
                     <div className="flex items-start space-x-3">
-                      <svg className="h-5 w-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 text-muted-foreground mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <div>
-                        <p className="font-medium text-gray-900">Registration Deadline</p>
-                        <p className="text-gray-600">{formatDate(event.registrationDeadline)}</p>
+                        <p className="font-medium text-foreground">Registration Deadline</p>
+                        <p className="text-muted-foreground">{formatDate(event.registrationDeadline)}</p>
                       </div>
                     </div>
                   )}
@@ -452,8 +452,8 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Registration Card */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Registration</h3>
+              <div className="bg-card rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Registration</h3>
                 {isAuthenticated ? (
                   <button
                     onClick={() => setShowRegistrationModal(true)}
@@ -481,24 +481,24 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
               </div>
 
               {/* Quick Info */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Info</h3>
+              <div className="bg-card rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Quick Info</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Event Type:</span>
+                    <span className="text-muted-foreground">Event Type:</span>
                     <span className="font-medium">{event.mode}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Status:</span>
+                    <span className="text-muted-foreground">Status:</span>
                     <span className={`font-medium capitalize ${event.status === 'PUBLISHED' ? 'text-green-600' :
-                        event.status === 'DRAFT' ? 'text-yellow-600' : 'text-gray-600'
+                        event.status === 'DRAFT' ? 'text-yellow-600' : 'text-muted-foreground'
                       }`}>
                       {event.status.toLowerCase()}
                     </span>
                   </div>
                   {event.capacity && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Capacity:</span>
+                      <span className="text-muted-foreground">Capacity:</span>
                       <span className="font-medium">{event.capacity}</span>
                     </div>
                   )}
@@ -510,18 +510,18 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
         {/* Schedule Tab (Requirements 10.3) */}
         {activeTab === 'schedule' && (
-          <div className="bg-white rounded-lg shadow">
+          <div className="bg-card rounded-lg shadow">
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Event Schedule</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-6">Event Schedule</h2>
               {event.timeline && event.timeline.length > 0 ? (
                 <div className="space-y-6">
                   {event.timeline.map((item: TimelineItem, index: number) => (
                     <div key={item.id || index} className="flex space-x-4">
                       <div className="flex-shrink-0 w-24 text-right">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-foreground">
                           {formatTime(item.startTime)}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-muted-foreground">
                           {formatTime(item.endTime)}
                         </div>
                       </div>
@@ -532,19 +532,19 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
+                          <h3 className="text-lg font-medium text-foreground">{item.title}</h3>
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.type === 'session' ? 'bg-blue-100 text-blue-800' :
                               item.type === 'break' ? 'bg-green-100 text-green-800' :
                                 item.type === 'networking' ? 'bg-purple-100 text-purple-800' :
-                                  'bg-gray-100 text-gray-800'
+                                  'bg-muted text-foreground'
                             }`}>
                             {item.type}
                           </span>
                         </div>
                         {item.description && (
-                          <p className="text-gray-600 mb-2">{item.description}</p>
+                          <p className="text-muted-foreground mb-2">{item.description}</p>
                         )}
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                           {item.speaker && (
                             <div className="flex items-center space-x-1">
                               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -569,11 +569,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <svg className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-12 w-12 text-muted-foreground mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Schedule Available</h3>
-                  <p className="text-gray-600">The event schedule will be updated soon.</p>
+                  <h3 className="text-lg font-medium text-foreground mb-2">No Schedule Available</h3>
+                  <p className="text-muted-foreground">The event schedule will be updated soon.</p>
                 </div>
               )}
             </div>
@@ -582,30 +582,30 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
         {/* Prizes Tab (Requirements 10.3) */}
         {activeTab === 'prizes' && (
-          <div className="bg-white rounded-lg shadow">
+          <div className="bg-card rounded-lg shadow">
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Prizes & Awards</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-6">Prizes & Awards</h2>
               {event.prizes && event.prizes.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {event.prizes
                     .sort((a: PrizeInfo, b: PrizeInfo) => a.position - b.position)
                     .map((prize: PrizeInfo, index: number) => (
-                      <div key={prize.id || index} className="border border-gray-200 rounded-lg p-6">
+                      <div key={prize.id || index} className="border border-border rounded-lg p-6">
                         <div className="text-center">
                           <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${prize.position === 1 ? 'bg-yellow-100 text-yellow-600' :
-                              prize.position === 2 ? 'bg-gray-100 text-gray-600' :
+                              prize.position === 2 ? 'bg-muted text-muted-foreground' :
                                 prize.position === 3 ? 'bg-orange-100 text-orange-600' :
                                   'bg-blue-100 text-blue-600'
                             }`}>
                             <span className="text-lg font-bold">#{prize.position}</span>
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">{prize.title}</h3>
+                          <h3 className="text-lg font-semibold text-foreground mb-2">{prize.title}</h3>
                           {prize.value && (
                             <p className="text-2xl font-bold text-indigo-600 mb-3">{prize.value}</p>
                           )}
-                          <p className="text-gray-600 text-sm">{prize.description}</p>
+                          <p className="text-muted-foreground text-sm">{prize.description}</p>
                           {prize.category && (
-                            <span className="inline-block mt-3 px-3 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
+                            <span className="inline-block mt-3 px-3 py-1 bg-muted text-foreground text-xs rounded-full">
                               {prize.category}
                             </span>
                           )}
@@ -615,11 +615,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <svg className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-12 w-12 text-muted-foreground mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                   </svg>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Prizes Listed</h3>
-                  <p className="text-gray-600">Prize information will be announced soon.</p>
+                  <h3 className="text-lg font-medium text-foreground mb-2">No Prizes Listed</h3>
+                  <p className="text-muted-foreground">Prize information will be announced soon.</p>
                 </div>
               )}
             </div>
@@ -628,9 +628,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
         {/* Sponsors Tab (Requirements 10.3) */}
         {activeTab === 'sponsors' && (
-          <div className="bg-white rounded-lg shadow">
+          <div className="bg-card rounded-lg shadow">
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Sponsors</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-6">Our Sponsors</h2>
               {event.sponsors && event.sponsors.length > 0 ? (
                 <div className="space-y-8">
                   {['title', 'platinum', 'gold', 'silver', 'bronze'].map((tier) => {
@@ -640,9 +640,9 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                     return (
                       <div key={tier}>
                         <h3 className={`text-xl font-semibold mb-4 ${tier === 'title' ? 'text-purple-600' :
-                            tier === 'platinum' ? 'text-gray-600' :
+                            tier === 'platinum' ? 'text-muted-foreground' :
                               tier === 'gold' ? 'text-yellow-600' :
-                                tier === 'silver' ? 'text-gray-500' :
+                                tier === 'silver' ? 'text-muted-foreground' :
                                   'text-orange-600'
                           }`}>
                           {tier.charAt(0).toUpperCase() + tier.slice(1)} Sponsors
@@ -653,7 +653,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                           }`}>
                           {tierSponsors.map((sponsor: SponsorInfo, index: number) => (
                             <div key={sponsor.id || index} className="text-center">
-                              <div className={`bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow ${tier === 'title' ? 'p-8' :
+                              <div className={`bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow ${tier === 'title' ? 'p-8' :
                                   tier === 'platinum' ? 'p-6' :
                                     'p-4'
                                 }`}>
@@ -673,7 +673,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                                               'h-10'
                                         }`}
                                     />
-                                    <p className="mt-2 text-sm font-medium text-gray-900">{sponsor.name}</p>
+                                    <p className="mt-2 text-sm font-medium text-foreground">{sponsor.name}</p>
                                   </a>
                                 ) : (
                                   <>
@@ -686,11 +686,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                                               'h-10'
                                         }`}
                                     />
-                                    <p className="mt-2 text-sm font-medium text-gray-900">{sponsor.name}</p>
+                                    <p className="mt-2 text-sm font-medium text-foreground">{sponsor.name}</p>
                                   </>
                                 )}
                                 {sponsor.description && (
-                                  <p className="mt-1 text-xs text-gray-600">{sponsor.description}</p>
+                                  <p className="mt-1 text-xs text-muted-foreground">{sponsor.description}</p>
                                 )}
                               </div>
                             </div>
@@ -702,11 +702,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <svg className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="h-12 w-12 text-muted-foreground mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Sponsors Listed</h3>
-                  <p className="text-gray-600">Sponsor information will be updated soon.</p>
+                  <h3 className="text-lg font-medium text-foreground mb-2">No Sponsors Listed</h3>
+                  <p className="text-muted-foreground">Sponsor information will be updated soon.</p>
                 </div>
               )}
             </div>
@@ -717,15 +717,15 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
       {/* Registration Modal */}
       {showRegistrationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirm Registration</h3>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-card rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Confirm Registration</h3>
+            <p className="text-muted-foreground mb-6">
               Are you sure you want to register for "{event.name}"?
             </p>
             <div className="flex space-x-4">
               <button
                 onClick={() => setShowRegistrationModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-input rounded-md text-foreground hover:bg-muted/50 transition-colors"
               >
                 Cancel
               </button>

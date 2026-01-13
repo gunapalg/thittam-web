@@ -82,21 +82,21 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-muted/50 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Certificate Verification</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Certificate Verification</h1>
+          <p className="text-muted-foreground">
             Verify the authenticity of certificates issued through Thittam1Hub
           </p>
         </div>
 
         {/* Verification Form */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-card rounded-lg shadow-md p-6 mb-8">
           <form onSubmit={handleVerify} className="space-y-4">
             <div>
-              <label htmlFor="certificateId" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="certificateId" className="block text-sm font-medium text-foreground mb-2">
                 Certificate ID
               </label>
               <div className="flex space-x-4">
@@ -106,7 +106,7 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                   value={inputCertificateId}
                   onChange={(e) => setInputCertificateId(e.target.value)}
                   placeholder="Enter certificate ID (e.g., CERT-2024-ABC123)"
-                  className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 border border-input rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus-visible:ring-ring focus:border-transparent"
                   required
                 />
                 <button
@@ -118,7 +118,7 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                 </button>
               </div>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Enter the certificate ID found on your certificate or scan the QR code to be redirected here automatically.
             </p>
           </form>
@@ -126,7 +126,7 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
 
         {/* Verification Results */}
         {verificationResult && (
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-card rounded-lg shadow-md p-6">
             {verificationResult.valid && verificationResult.certificate ? (
               // Valid Certificate Display
               <div className="text-center">
@@ -137,22 +137,22 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                     </svg>
                   </div>
                   <h2 className="text-2xl font-bold text-green-600 mb-2">Certificate Verified</h2>
-                  <p className="text-gray-600">This certificate is authentic and valid.</p>
+                  <p className="text-muted-foreground">This certificate is authentic and valid.</p>
                 </div>
 
                 {/* Certificate Details */}
-                <div className="bg-gray-50 rounded-lg p-6 text-left">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Certificate Details</h3>
+                <div className="bg-muted/50 rounded-lg p-6 text-left">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Certificate Details</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Certificate ID</dt>
-                      <dd className="text-sm text-gray-900 font-mono">{verificationResult.certificate.certificateId}</dd>
+                      <dt className="text-sm font-medium text-muted-foreground">Certificate ID</dt>
+                      <dd className="text-sm text-foreground font-mono">{verificationResult.certificate.certificateId}</dd>
                     </div>
                     
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Certificate Type</dt>
-                      <dd className="text-sm text-gray-900">
+                      <dt className="text-sm font-medium text-muted-foreground">Certificate Type</dt>
+                      <dd className="text-sm text-foreground">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           verificationResult.certificate.type === 'MERIT' ? 'bg-yellow-100 text-yellow-800' :
                           verificationResult.certificate.type === 'COMPLETION' ? 'bg-green-100 text-green-800' :
@@ -164,25 +164,25 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                     </div>
                     
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Recipient Name</dt>
-                      <dd className="text-sm text-gray-900 font-medium">{verificationResult.certificate.recipientName}</dd>
+                      <dt className="text-sm font-medium text-muted-foreground">Recipient Name</dt>
+                      <dd className="text-sm text-foreground font-medium">{verificationResult.certificate.recipientName}</dd>
                     </div>
                     
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Event Name</dt>
-                      <dd className="text-sm text-gray-900">{verificationResult.certificate.eventName}</dd>
+                      <dt className="text-sm font-medium text-muted-foreground">Event Name</dt>
+                      <dd className="text-sm text-foreground">{verificationResult.certificate.eventName}</dd>
                     </div>
                     
                     {verificationResult.certificate.eventOrganization && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Organization</dt>
-                        <dd className="text-sm text-gray-900">{verificationResult.certificate.eventOrganization}</dd>
+                        <dt className="text-sm font-medium text-muted-foreground">Organization</dt>
+                        <dd className="text-sm text-foreground">{verificationResult.certificate.eventOrganization}</dd>
                       </div>
                     )}
                     
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Issued Date</dt>
-                      <dd className="text-sm text-gray-900">
+                      <dt className="text-sm font-medium text-muted-foreground">Issued Date</dt>
+                      <dd className="text-sm text-foreground">
                         {new Date(verificationResult.certificate.issuedAt).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'long',
@@ -192,8 +192,8 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                     </div>
                     
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Issued By</dt>
-                      <dd className="text-sm text-gray-900">{verificationResult.certificate.issuerName}</dd>
+                      <dt className="text-sm font-medium text-muted-foreground">Issued By</dt>
+                      <dd className="text-sm text-foreground">{verificationResult.certificate.issuerName}</dd>
                     </div>
                   </div>
                 </div>
@@ -226,29 +226,29 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                     </svg>
                   </div>
                   <h2 className="text-2xl font-bold text-red-600 mb-2">Certificate Not Verified</h2>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-muted-foreground mb-4">
                     {verificationResult.error || 'This certificate could not be verified.'}
                   </p>
                 </div>
 
                 {/* Troubleshooting */}
-                <div className="bg-gray-50 rounded-lg p-6 text-left">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Troubleshooting</h3>
-                  <ul className="text-sm text-gray-600 space-y-2">
+                <div className="bg-muted/50 rounded-lg p-6 text-left">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Troubleshooting</h3>
+                  <ul className="text-sm text-muted-foreground space-y-2">
                     <li className="flex items-start">
-                      <span className="text-gray-400 mr-2">•</span>
+                      <span className="text-muted-foreground mr-2">•</span>
                       Double-check the certificate ID for any typos
                     </li>
                     <li className="flex items-start">
-                      <span className="text-gray-400 mr-2">•</span>
+                      <span className="text-muted-foreground mr-2">•</span>
                       Ensure you're entering the complete certificate ID
                     </li>
                     <li className="flex items-start">
-                      <span className="text-gray-400 mr-2">•</span>
+                      <span className="text-muted-foreground mr-2">•</span>
                       Try scanning the QR code on the certificate instead
                     </li>
                     <li className="flex items-start">
-                      <span className="text-gray-400 mr-2">•</span>
+                      <span className="text-muted-foreground mr-2">•</span>
                       Contact the certificate issuer if you believe this is an error
                     </li>
                   </ul>
@@ -260,7 +260,7 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
             <div className="mt-6 flex justify-center space-x-4">
               <button
                 onClick={handleReset}
-                className="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-colors"
+                className="bg-muted-foreground/40 text-white px-6 py-2 rounded-md hover:bg-muted-foreground/50 transition-colors"
               >
                 Verify Another Certificate
               </button>
@@ -278,7 +278,7 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
 
         {/* Error Display */}
         {error && !verificationResult && (
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-card rounded-lg shadow-md p-6">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
                 <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,7 +286,7 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-red-600 mb-2">Verification Error</h2>
-              <p className="text-gray-600 mb-4">
+              <p className="text-muted-foreground mb-4">
                 An error occurred while verifying the certificate. Please try again.
               </p>
               <button
@@ -300,9 +300,9 @@ export function CertificateVerification({ certificateId: propCertificateId }: Ce
         )}
 
         {/* Information Section */}
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">About Certificate Verification</h3>
-          <div className="prose text-sm text-gray-600">
+        <div className="mt-8 bg-card rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">About Certificate Verification</h3>
+          <div className="prose text-sm text-muted-foreground">
             <p className="mb-3">
               This verification portal allows you to confirm the authenticity of certificates issued through the Thittam1Hub platform. 
               Each certificate contains a unique ID and QR code that can be verified against our secure database.

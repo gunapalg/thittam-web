@@ -19,12 +19,12 @@ const CATEGORY_CONFIG: Record<string, { icon: LucideIcon; bg: string }> = {
   'DECORATION': { icon: Sparkles, bg: 'bg-pink-100 text-pink-700' },
   'AUDIO_VISUAL': { icon: Mic2, bg: 'bg-cyan-100 text-cyan-700' },
   'TRANSPORTATION': { icon: Truck, bg: 'bg-blue-100 text-blue-700' },
-  'SECURITY': { icon: Shield, bg: 'bg-slate-100 text-slate-700' },
+  'SECURITY': { icon: Shield, bg: 'bg-muted text-foreground' },
   'CLEANING': { icon: Paintbrush, bg: 'bg-teal-100 text-teal-700' },
   'EQUIPMENT_RENTAL': { icon: Box, bg: 'bg-orange-100 text-orange-700' },
   'PRINTING': { icon: Printer, bg: 'bg-indigo-100 text-indigo-700' },
   'MARKETING': { icon: Megaphone, bg: 'bg-purple-100 text-purple-700' },
-  'OTHER': { icon: MoreHorizontal, bg: 'bg-gray-100 text-gray-700' },
+  'OTHER': { icon: MoreHorizontal, bg: 'bg-muted text-foreground' },
 };
 
 const formatCategory = (category: string) => {

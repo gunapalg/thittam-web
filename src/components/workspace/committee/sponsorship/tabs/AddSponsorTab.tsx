@@ -36,9 +36,9 @@ interface AddSponsorTabProps {
 }
 
 const tierColors: Record<string, string> = {
-  platinum: 'bg-slate-200 text-slate-800 border-slate-300',
+  platinum: 'bg-muted text-foreground border-input',
   gold: 'bg-amber-100 text-amber-800 border-amber-300',
-  silver: 'bg-gray-100 text-gray-800 border-gray-300',
+  silver: 'bg-muted text-foreground border-input',
   bronze: 'bg-orange-100 text-orange-800 border-orange-300',
 };
 

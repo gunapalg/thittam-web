@@ -39,7 +39,7 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
   winner: <Trophy className="h-4 w-4 text-yellow-500" />,
 };
 
-const MEDAL_COLORS = ['text-yellow-500', 'text-gray-400', 'text-amber-600'];
+const MEDAL_COLORS = ['text-yellow-500', 'text-muted-foreground', 'text-amber-600'];
 
 export function ViewScoresTab({ workspaceId }: ViewScoresTabProps) {
   const [searchTerm, setSearchTerm] = useState('');

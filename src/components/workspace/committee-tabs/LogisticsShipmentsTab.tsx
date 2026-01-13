@@ -121,7 +121,7 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
 
   const getStatusBadge = (status: string) => {
     const config = {
-      'pending': { class: 'bg-slate-500/10 text-slate-600 border-slate-500/20', label: 'Pending', icon: Clock },
+      'pending': { class: 'bg-slate-500/10 text-muted-foreground border-slate-500/20', label: 'Pending', icon: Clock },
       'in-transit': { class: 'bg-blue-500/10 text-blue-600 border-blue-500/20', label: 'In Transit', icon: Truck },
       'out-for-delivery': { class: 'bg-purple-500/10 text-purple-600 border-purple-500/20', label: 'Out for Delivery', icon: Package },
       'delivered': { class: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', label: 'Delivered', icon: CheckCircle2 },
@@ -138,7 +138,7 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
 
   const getPriorityBadge = (priority: string) => {
     const config = {
-      'low': { class: 'bg-slate-100 text-slate-600', label: 'Low' },
+      'low': { class: 'bg-muted text-muted-foreground', label: 'Low' },
       'normal': { class: 'bg-blue-100 text-blue-600', label: 'Normal' },
       'high': { class: 'bg-amber-100 text-amber-600', label: 'High' },
       'urgent': { class: 'bg-red-100 text-red-600', label: 'Urgent' },
@@ -247,7 +247,7 @@ export function LogisticsShipmentsTab({ workspaceId: _workspaceId }: LogisticsSh
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-slate-500/10">
-                <Clock className="h-5 w-5 text-slate-500" />
+                <Clock className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{pendingCount}</p>

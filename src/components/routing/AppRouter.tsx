@@ -85,7 +85,7 @@ const ForgotPasswordPage = () => {
           </p>
         </div>
 
-        <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+        <div className="relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
           <div className="space-y-4 text-center">
             <div>
               <h3 className="text-base font-semibold text-foreground mb-1">Coming soon</h3>
@@ -121,7 +121,7 @@ const ResetPasswordPage = () => {
           </p>
         </div>
 
-        <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+        <div className="relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
           <div className="space-y-4 text-center">
             <p className="text-sm text-muted-foreground">
               Once implemented, this page will let you choose a new password after opening a
@@ -276,7 +276,7 @@ export const ConsoleDashboard = () => {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-4">
             Your Thittam1Hub Dashboard
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Live overview of your events, participants, and marketplace activity in one place.
           </p>
         </div>
@@ -295,14 +295,14 @@ export const ConsoleDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Events Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-coral/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
-                <h3 className="text-xl font-bold text-gray-900">Event Management</h3>
+                <h3 className="text-xl font-bold text-foreground">Event Management</h3>
               </div>
             </div>
-            <p className="text-gray-600 mb-6">Create, publish, and track your events and participants.</p>
-            <div className="space-y-2 text-sm text-gray-500 mb-6">
+            <p className="text-muted-foreground mb-6">Create, publish, and track your events and participants.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
               <div className="flex justify-between">
                 <span>Active Events</span>
                 <span className="font-semibold text-coral">{metrics?.activeEvents ?? 0}</span>
@@ -317,7 +317,7 @@ export const ConsoleDashboard = () => {
               </div>
               <div className="flex justify-between">
                 <span>Total Registrations</span>
-                <span className="font-semibold text-gray-900">{metrics?.totalRegistrations ?? 0}</span>
+                <span className="font-semibold text-foreground">{metrics?.totalRegistrations ?? 0}</span>
               </div>
             </div>
             <button onClick={() => {
@@ -333,14 +333,14 @@ export const ConsoleDashboard = () => {
           </div>
 
           {/* Workspaces Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-teal/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
-                <h3 className="text-xl font-bold text-gray-900">Workspaces</h3>
+                <h3 className="text-xl font-bold text-foreground">Workspaces</h3>
               </div>
             </div>
-            <p className="text-gray-600 mb-6">Collaborate with your team on event prep and execution.</p>
-            <div className="space-y-2 text-sm text-gray-500 mb-6">
+            <p className="text-muted-foreground mb-6">Collaborate with your team on event prep and execution.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
               <div className="flex justify-between">
                 <span>Active Workspaces</span>
                 <span className="font-semibold text-teal">{metrics?.activeWorkspaces ?? 0}</span>
@@ -363,14 +363,14 @@ export const ConsoleDashboard = () => {
           </div>
 
           {/* Marketplace Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl border border-sunny/20 p-8 hover:shadow-doodle transition-all duration-300 hover:scale-105 hover:-translate-y-1 group">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
-                <h3 className="text-xl font-bold text-gray-900">Marketplace</h3>
+                <h3 className="text-xl font-bold text-foreground">Marketplace</h3>
               </div>
             </div>
-            <p className="text-gray-600 mb-6">Discover and book verified vendors for your events.</p>
-            <div className="space-y-2 text-sm text-gray-500 mb-6">
+            <p className="text-muted-foreground mb-6">Discover and book verified vendors for your events.</p>
+            <div className="space-y-2 text-sm text-muted-foreground mb-6">
               <div className="flex justify-between">
                 <span>Available Services</span>
                 <span className="font-semibold text-sunny">{metrics?.availableServices ?? 0}</span>
@@ -381,7 +381,7 @@ export const ConsoleDashboard = () => {
               </div>
               <div className="flex justify-between">
                 <span>Total Revenue</span>
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-foreground">
                   {metrics ? `$${metrics.totalRevenue.toLocaleString()}` : '$0'}
                 </span>
               </div>
@@ -396,17 +396,17 @@ export const ConsoleDashboard = () => {
         </div>
 
         <div className="mt-16 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Quick Actions</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Quick Actions</h2>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="bg-white/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+            <button className="bg-card/80 backdrop-blur-sm border border-coral/20 text-coral font-semibold py-3 px-6 rounded-xl hover:bg-coral hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
               Create Event
             </button>
-            <button className="bg-white/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
+            <button className="bg-card/80 backdrop-blur-sm border border-teal/20 text-teal font-semibold py-3 px-6 rounded-xl hover:bg-teal hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft">
               Join Workspace
             </button>
             <button
               onClick={() => navigate('/marketplace')}
-              className="bg-white/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
+              className="bg-card/80 backdrop-blur-sm border border-sunny/20 text-sunny font-semibold py-3 px-6 rounded-xl hover:bg-sunny hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-soft"
             >
               Browse Services
             </button>

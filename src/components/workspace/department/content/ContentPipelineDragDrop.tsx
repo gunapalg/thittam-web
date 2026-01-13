@@ -30,7 +30,7 @@ const statusColumns: { id: ContentItemStatus; label: string; icon: React.Element
 ];
 
 const priorityConfig = {
-  low: 'bg-slate-500/10 text-slate-500 border-slate-500/20',
+  low: 'bg-slate-500/10 text-muted-foreground border-slate-500/20',
   medium: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
   high: 'bg-red-500/10 text-red-500 border-red-500/20',
 };

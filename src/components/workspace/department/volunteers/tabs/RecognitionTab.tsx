@@ -179,7 +179,7 @@ export function RecognitionTab({ workspace: _workspace }: RecognitionTabProps) {
                       {performer.rank === 1 ? (
                         <Trophy className="h-6 w-6 text-yellow-500" />
                       ) : performer.rank === 2 ? (
-                        <Medal className="h-6 w-6 text-slate-400" />
+                        <Medal className="h-6 w-6 text-muted-foreground" />
                       ) : (
                         <Medal className="h-6 w-6 text-amber-600" />
                       )}

@@ -130,7 +130,7 @@ const getStatusBadge = (status: VendorStatus) => {
       );
     case 'SUSPENDED':
       return (
-        <Badge variant="secondary" className="gap-1.5 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+        <Badge variant="secondary" className="gap-1.5 bg-muted text-foreground dark:bg-foreground/80 dark:text-gray-200">
           <AlertCircle className="w-3 h-3" />
           Suspended
         </Badge>

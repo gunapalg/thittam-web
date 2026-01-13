@@ -219,17 +219,17 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                           value={filter.value}
                           onChange={(e) => filter.onChange(e.target.value)}
                           placeholder={`Search ${filter.label.toLowerCase()}...`}
-                          className="border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                          className="border-input rounded-md text-sm focus-visible:ring-ring focus-visible:border-primary"
                         />
                       )}
                       {filter.type === 'toggle' && (
                         <button
                           onClick={() => filter.onChange(!filter.value)}
-                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${filter.value ? 'bg-indigo-600' : 'bg-gray-200'
+                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus-visible:ring-ring focus:ring-offset-2 ${filter.value ? 'bg-indigo-600' : 'bg-muted'
                             }`}
                         >
                           <span
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${filter.value ? 'translate-x-5' : 'translate-x-0'
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-card shadow ring-0 transition duration-200 ease-in-out ${filter.value ? 'translate-x-5' : 'translate-x-0'
                               }`}
                           />
                         </button>
@@ -241,14 +241,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
               {/* View Controls */}
               {viewControls && viewControls.length > 0 && (
-                <div className="flex items-center space-x-1 bg-gray-100 rounded-md p-1">
+                <div className="flex items-center space-x-1 bg-muted rounded-md p-1">
                   {viewControls.map((control) => (
                     <button
                       key={control.type}
                       onClick={() => control.onChange(control.type)}
                       className={`px-3 py-1 text-sm font-medium rounded ${control.active
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-card text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                       {control.type.charAt(0).toUpperCase() + control.type.slice(1)}

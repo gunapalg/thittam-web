@@ -75,8 +75,8 @@ export const MobileQuickActionChips: React.FC<MobileQuickActionChipsProps> = ({
       id: 'settings',
       label: 'Settings',
       icon: Settings,
-      color: 'text-slate-600',
-      bgColor: 'bg-slate-100 dark:bg-slate-800/50',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted dark:bg-foreground/80/50',
       action: () => navigate(`/${orgSlug}/settings`),
     },
   ];

@@ -108,9 +108,9 @@ export const WorkspaceListPage: React.FC = () => {
       case WorkspaceStatus.WINDING_DOWN:
         return 'bg-blue-100 text-blue-800';
       case WorkspaceStatus.DISSOLVED:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 
@@ -122,9 +122,9 @@ export const WorkspaceListPage: React.FC = () => {
       filterable: true,
       render: (_value: string, workspace: Workspace) => (
         <div>
-          <div className="text-sm font-medium text-gray-900">{workspace.name}</div>
+          <div className="text-sm font-medium text-foreground">{workspace.name}</div>
           {workspace.description && (
-            <div className="text-sm text-gray-500 truncate max-w-xs">
+            <div className="text-sm text-muted-foreground truncate max-w-xs">
               {workspace.description}
             </div>
           )}
@@ -148,7 +148,7 @@ export const WorkspaceListPage: React.FC = () => {
       sortable: true,
       filterable: false,
         render: (_value: any, workspace: Workspace) => (
-          <div className="text-sm text-gray-900">
+          <div className="text-sm text-foreground">
             {workspace.event ? (
               <Link 
                 to={`/dashboard/eventmanagement/${workspace.event.id}`}
@@ -157,7 +157,7 @@ export const WorkspaceListPage: React.FC = () => {
                 {workspace.event.name}
               </Link>
           ) : (
-            <span className="text-gray-400">No event</span>
+            <span className="text-muted-foreground">No event</span>
           )}
         </div>
       ),
@@ -168,8 +168,8 @@ export const WorkspaceListPage: React.FC = () => {
       sortable: true,
       filterable: false,
       render: (_value: any, workspace: Workspace) => (
-        <div className="flex items-center text-sm text-gray-900">
-          <UsersIcon className="w-4 h-4 mr-1 text-gray-400" />
+        <div className="flex items-center text-sm text-foreground">
+          <UsersIcon className="w-4 h-4 mr-1 text-muted-foreground" />
           {workspace.teamMembers?.length || 0} members
         </div>
       ),
@@ -180,7 +180,7 @@ export const WorkspaceListPage: React.FC = () => {
       sortable: true,
       filterable: false,
       render: (_value: any, workspace: Workspace) => (
-        <div className="text-sm text-gray-900">
+        <div className="text-sm text-foreground">
           {workspace.taskSummary?.total || 0} tasks
         </div>
       ),
@@ -191,8 +191,8 @@ export const WorkspaceListPage: React.FC = () => {
       sortable: true,
       filterable: false,
       render: (value: string) => (
-        <div className="flex items-center text-sm text-gray-900">
-          <ClockIcon className="w-4 h-4 mr-1 text-gray-400" />
+        <div className="flex items-center text-sm text-foreground">
+          <ClockIcon className="w-4 h-4 mr-1 text-muted-foreground" />
           {new Date(value).toLocaleDateString()}
         </div>
       ),
@@ -215,7 +215,7 @@ export const WorkspaceListPage: React.FC = () => {
             <>
               <Link
                 to={`${baseWorkspacePath}/${workspace.id}/edit`}
-                className="text-gray-600 hover:text-gray-500 p-1"
+                className="text-muted-foreground hover:text-muted-foreground p-1"
                 title="Edit workspace"
               >
                 <PencilIcon className="w-4 h-4" />
@@ -318,23 +318,23 @@ export const WorkspaceListPage: React.FC = () => {
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search workspaces..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
               />
             </div>
           </div>
           
           <div className="flex items-center space-x-2">
-            <FunnelIcon className="w-5 h-5 text-gray-400" />
+            <FunnelIcon className="w-5 h-5 text-muted-foreground" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as WorkspaceStatus | 'all')}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              className="border border-input rounded-md px-3 py-2 focus-visible:ring-ring focus-visible:border-primary"
             >
               <option value="all">All Statuses</option>
               <option value={WorkspaceStatus.ACTIVE}>Active</option>
@@ -346,7 +346,7 @@ export const WorkspaceListPage: React.FC = () => {
         </div>
 
         {/* Workspace Table or Empty States */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
           {isLoading ? (
             <div className="py-12 flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
@@ -372,13 +372,13 @@ export const WorkspaceListPage: React.FC = () => {
             />
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted/50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       <input
                         type="checkbox"
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-input text-blue-600 focus-visible:ring-ring"
                         onChange={(e) => {
                           if (e.target.checked) {
                             setSelectedWorkspaces(filteredWorkspaces.map((w) => w.id));
@@ -395,23 +395,23 @@ export const WorkspaceListPage: React.FC = () => {
                     {columns.slice(0, -1).map((column) => (
                       <th
                         key={column.key}
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                       >
                         {column.label}
                       </th>
                     ))}
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-card divide-y divide-border">
                   {filteredWorkspaces.map((workspace) => (
-                    <tr key={workspace.id} className="hover:bg-gray-50">
+                    <tr key={workspace.id} className="hover:bg-muted/50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
                           type="checkbox"
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded border-input text-blue-600 focus-visible:ring-ring"
                           checked={selectedWorkspaces.includes(workspace.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
@@ -475,7 +475,7 @@ export const WorkspaceListPage: React.FC = () => {
                         setSelectedWorkspaces([]);
                       }
                     }}
-                    className="px-3 py-1 text-sm font-medium text-blue-700 bg-white border border-blue-300 rounded-md hover:bg-blue-50"
+                    className="px-3 py-1 text-sm font-medium text-blue-700 bg-card border border-blue-300 rounded-md hover:bg-blue-50"
                   >
                     {action.label}
                   </button>

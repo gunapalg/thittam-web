@@ -23,7 +23,7 @@ const mockProposals: Proposal[] = [
 ];
 
 const stages = [
-  { key: 'draft', label: 'Draft', icon: FileText, color: 'text-gray-500', bgColor: 'bg-gray-500/10' },
+  { key: 'draft', label: 'Draft', icon: FileText, color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/30/10' },
   { key: 'sent', label: 'Sent', icon: Send, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
   { key: 'negotiation', label: 'Negotiation', icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10' },
   { key: 'closed-won', label: 'Won', icon: CheckCircle, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },

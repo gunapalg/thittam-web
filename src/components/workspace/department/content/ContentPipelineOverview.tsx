@@ -76,7 +76,7 @@ const statusConfig = {
 };
 
 const priorityConfig = {
-  low: 'bg-slate-500/10 text-slate-500',
+  low: 'bg-slate-500/10 text-muted-foreground',
   medium: 'bg-amber-500/10 text-amber-500',
   high: 'bg-red-500/10 text-red-500',
 };

@@ -276,7 +276,7 @@ export const RolesDiagramPage: React.FC = () => {
             </p>
           </div>
 
-          <Card className="shadow-soft border-teal/20 bg-white/90 backdrop-blur-sm">
+          <Card className="shadow-soft border-teal/20 bg-card/90 backdrop-blur-sm">
             <CardContent className="overflow-x-auto">
               <Table>
                 <TableHeader>

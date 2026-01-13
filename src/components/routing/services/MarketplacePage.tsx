@@ -77,7 +77,7 @@ export const MarketplacePage: React.FC = () => {
                   placeholder="Search for services, vendors, categories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-9 sm:h-10 pl-10 pr-4 bg-white border-0 rounded-sm text-sm focus-visible:ring-2 focus-visible:ring-primary-foreground/20"
+                  className="w-full h-9 sm:h-10 pl-10 pr-4 bg-card border-0 rounded-sm text-sm focus-visible:ring-2 focus-visible:ring-primary-foreground/20"
                 />
               </div>
             </form>

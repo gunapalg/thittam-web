@@ -42,7 +42,7 @@ export function LogisticsStatusModal({ open, onOpenChange }: LogisticsStatusModa
       case 'in-transit':
         return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/30">In Transit</Badge>;
       case 'pending':
-        return <Badge className="bg-gray-500/10 text-gray-600 border-gray-500/30">Pending</Badge>;
+        return <Badge className="bg-muted-foreground/30/10 text-muted-foreground border-gray-500/30">Pending</Badge>;
       case 'delayed':
         return <Badge className="bg-red-500/10 text-red-600 border-red-500/30">Delayed</Badge>;
     }
@@ -52,7 +52,7 @@ export function LogisticsStatusModal({ open, onOpenChange }: LogisticsStatusModa
     switch (status) {
       case 'delivered': return 'bg-green-500';
       case 'in-transit': return 'bg-blue-500';
-      case 'pending': return 'bg-gray-400';
+      case 'pending': return 'bg-muted-foreground/20';
       case 'delayed': return 'bg-red-500';
     }
   };

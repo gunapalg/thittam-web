@@ -17,7 +17,7 @@ export function SocialMediaSummary() {
     { platform: 'Instagram', icon: '📷', followers: 28500, growth: 12, engagement: 7.2, postsThisWeek: 12, color: 'bg-pink-500' },
     { platform: 'Twitter/X', icon: '𝕏', followers: 12450, growth: 8, engagement: 4.8, postsThisWeek: 18, color: 'bg-sky-500' },
     { platform: 'LinkedIn', icon: '💼', followers: 8200, growth: 5, engagement: 3.1, postsThisWeek: 6, color: 'bg-blue-600' },
-    { platform: 'TikTok', icon: '🎵', followers: 5400, growth: 24, engagement: 9.5, postsThisWeek: 4, color: 'bg-slate-800' },
+    { platform: 'TikTok', icon: '🎵', followers: 5400, growth: 24, engagement: 9.5, postsThisWeek: 4, color: 'bg-foreground/80' },
   ];
 
   const totalFollowers = platforms.reduce((sum, p) => sum + p.followers, 0);

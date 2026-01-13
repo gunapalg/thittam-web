@@ -38,7 +38,7 @@ const platformColors: Record<Platform, string> = {
   slack: 'bg-purple-500/10 text-purple-500',
   discord: 'bg-indigo-500/10 text-indigo-500',
   teams: 'bg-blue-500/10 text-blue-500',
-  webhook: 'bg-gray-500/10 text-gray-500',
+  webhook: 'bg-muted-foreground/30/10 text-muted-foreground',
 };
 
 const platformNames: Record<Platform, string> = {

@@ -33,7 +33,7 @@ const POST_TYPES = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-gray-500/20 text-gray-600',
+  draft: 'bg-muted-foreground/30/20 text-muted-foreground',
   scheduled: 'bg-blue-500/20 text-blue-600',
   published: 'bg-emerald-500/20 text-emerald-600',
   failed: 'bg-red-500/20 text-red-600',

@@ -83,7 +83,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event not found or access denied</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Event not found or access denied</h1>
           <Link to="/console/events/list" className="text-indigo-600 hover:text-indigo-800">
             Back to events
           </Link>
@@ -97,7 +97,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       [EventStatus.DRAFT]: { color: 'bg-yellow-100 text-yellow-800', label: 'Draft' },
       [EventStatus.PUBLISHED]: { color: 'bg-green-100 text-green-800', label: 'Published' },
       [EventStatus.ONGOING]: { color: 'bg-blue-100 text-blue-800', label: 'Ongoing' },
-      [EventStatus.COMPLETED]: { color: 'bg-gray-100 text-gray-800', label: 'Completed' },
+      [EventStatus.COMPLETED]: { color: 'bg-muted text-foreground', label: 'Completed' },
       [EventStatus.CANCELLED]: { color: 'bg-red-100 text-red-800', label: 'Cancelled' },
     };
 
@@ -444,8 +444,8 @@ const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <p className="text-sm text-gray-600">Loading attendance data...</p>
+      <div className="bg-card rounded-lg border border-border p-6">
+        <p className="text-sm text-muted-foreground">Loading attendance data...</p>
       </div>
     );
   }
@@ -458,9 +458,9 @@ const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
 
   if (!hasAccess) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Restricted Access</h3>
-        <p className="text-sm text-gray-600">
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h3 className="text-lg font-medium text-foreground mb-2">Restricted Access</h3>
+        <p className="text-sm text-muted-foreground">
           Attendance analytics are only available to organizers and volunteers for this event.
         </p>
       </div>
@@ -468,11 +468,11 @@ const AttendanceTab: React.FC<{ event: Event }> = ({ event }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
+    <div className="bg-card rounded-lg border border-border p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-medium text-gray-900">Attendance</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="text-lg font-medium text-foreground">Attendance</h3>
+          <p className="text-sm text-muted-foreground">
             Live check-in data for participants attending this event.
           </p>
         </div>

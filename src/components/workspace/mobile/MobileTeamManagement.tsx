@@ -93,7 +93,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
         );
       case 'INACTIVE':
         return (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground">
             <XCircleIcon className="w-3 h-3 mr-1" />
             Inactive
           </span>
@@ -141,7 +141,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       if (r.endsWith('_MANAGER')) return 'bg-violet-100 text-violet-800';
       if (r.endsWith('_LEAD')) return 'bg-blue-100 text-blue-800';
       if (r.endsWith('_COORDINATOR')) return 'bg-indigo-100 text-indigo-800';
-      return 'bg-gray-100 text-gray-800';
+      return 'bg-muted text-foreground';
     };
 
     return (
@@ -185,8 +185,8 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Team Members</h2>
-          <p className="text-sm text-gray-600">{filteredMembers.length} members</p>
+          <h2 className="text-lg font-semibold text-foreground">Team Members</h2>
+          <p className="text-sm text-muted-foreground">{filteredMembers.length} members</p>
         </div>
         <button
           onClick={onInviteMember}
@@ -198,23 +198,23 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 space-y-3">
+      <div className="bg-card rounded-lg shadow-sm p-4 space-y-3">
         {/* Search */}
         <div className="relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search members..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full pl-10 pr-4 py-2 border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
           />
         </div>
 
         {/* Filter Toggle */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center text-sm text-gray-600 hover:text-gray-900"
+          className="flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
           <FunnelIcon className="w-4 h-4 mr-2" />
           Filters
@@ -222,13 +222,13 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
 
         {/* Filter Options */}
         {showFilters && (
-          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-200">
+          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Role</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Role</label>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value as WorkspaceRole | 'all')}
-                className="w-full text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full text-sm border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
               >
                 <option value="all">All Roles</option>
                 <option value={WorkspaceRole.WORKSPACE_OWNER}>Owner</option>
@@ -241,11 +241,11 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
+              <label className="block text-xs font-medium text-foreground mb-1">Status</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="w-full text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full text-sm border border-input rounded-md focus-visible:ring-ring focus-visible:border-primary"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -286,7 +286,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
           filteredMembers.map((member) => (
             <div
               key={member.id}
-              className="bg-white rounded-lg shadow-sm p-4"
+              className="bg-card rounded-lg shadow-sm p-4"
             >
               <div className="flex items-center space-x-3">
                 {/* Avatar */}
@@ -299,18 +299,18 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
                 {/* Member Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                    <h3 className="text-sm font-medium text-foreground truncate">
                       {member.user.name}
                     </h3>
                     <button
                       onClick={() => setSelectedMember(selectedMember?.id === member.id ? null : member)}
-                      className="p-1 rounded-md hover:bg-gray-100 transition-colors"
+                      className="p-1 rounded-md hover:bg-muted transition-colors"
                     >
-                      <EllipsisVerticalIcon className="w-4 h-4 text-gray-400" />
+                      <EllipsisVerticalIcon className="w-4 h-4 text-muted-foreground" />
                     </button>
                   </div>
                   
-                  <p className="text-xs text-gray-500 truncate">{member.user.email}</p>
+                  <p className="text-xs text-muted-foreground truncate">{member.user.email}</p>
                   
                   <div className="flex items-center space-x-2 mt-2">
                     {getRoleBadge(member.role)}
@@ -321,14 +321,14 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
 
               {/* Member Actions */}
               {selectedMember?.id === member.id && (
-                <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
+                <div className="mt-4 pt-4 border-t border-border space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => {
                         // Handle edit role
                         console.log('Edit role for', member.id);
                       }}
-                      className="flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      className="flex items-center justify-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                     >
                       <PencilIcon className="w-4 h-4 mr-2" />
                       Edit Role
@@ -338,7 +338,7 @@ export function MobileTeamManagement({ workspace, onInviteMember }: MobileTeamMa
                         // Handle send message
                         console.log('Send message to', member.id);
                       }}
-                      className="flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      className="flex items-center justify-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                     >
                       <EnvelopeIcon className="w-4 h-4 mr-2" />
                       Message

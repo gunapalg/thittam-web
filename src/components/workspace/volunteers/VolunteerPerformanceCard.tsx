@@ -183,7 +183,7 @@ export function VolunteerPerformanceCard({ workspaceId }: VolunteerPerformanceCa
                 >
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                     index === 0 ? 'bg-amber-100 text-amber-700' :
-                    index === 1 ? 'bg-slate-100 text-slate-700' :
+                    index === 1 ? 'bg-muted text-foreground' :
                     index === 2 ? 'bg-orange-100 text-orange-700' :
                     'bg-muted text-muted-foreground'
                   }`}>

@@ -62,7 +62,7 @@ const mockAnnouncements: Announcement[] = [
 ];
 
 const statusConfig = {
-  draft: { icon: Edit, color: 'text-gray-500', bgColor: 'bg-gray-500/10', label: 'Draft' },
+  draft: { icon: Edit, color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/30/10', label: 'Draft' },
   scheduled: { icon: Clock, color: 'text-amber-500', bgColor: 'bg-amber-500/10', label: 'Scheduled' },
   sent: { icon: CheckCircle2, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', label: 'Sent' },
 };

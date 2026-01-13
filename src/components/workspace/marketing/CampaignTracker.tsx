@@ -72,7 +72,7 @@ const mockCampaigns: Campaign[] = [
 const statusColors: Record<Campaign['status'], string> = {
   active: 'bg-emerald-100 text-emerald-700 border-emerald-200',
   scheduled: 'bg-blue-100 text-blue-700 border-blue-200',
-  completed: 'bg-slate-100 text-slate-700 border-slate-200',
+  completed: 'bg-muted text-foreground border-border',
   paused: 'bg-amber-100 text-amber-700 border-amber-200',
 };
 

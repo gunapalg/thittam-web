@@ -55,7 +55,7 @@ const mockCampaigns: EmailCampaign[] = [
 ];
 
 const statusColors = {
-  draft: 'text-gray-500 bg-gray-500/10',
+  draft: 'text-muted-foreground bg-muted-foreground/30/10',
   scheduled: 'text-amber-500 bg-amber-500/10',
   sent: 'text-blue-500 bg-blue-500/10',
   completed: 'text-emerald-500 bg-emerald-500/10',

@@ -72,7 +72,7 @@ export function PhotographerRoster() {
       case 'on_duty':
         return 'bg-green-100 text-green-800';
       case 'off_duty':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       case 'break':
         return 'bg-amber-100 text-amber-800';
     }

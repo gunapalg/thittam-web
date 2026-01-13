@@ -39,7 +39,7 @@ interface SendProposalTabProps {
 }
 
 const stages = [
-  { id: 'lead', label: 'Lead', icon: Building2, color: 'bg-gray-500' },
+  { id: 'lead', label: 'Lead', icon: Building2, color: 'bg-muted-foreground/30' },
   { id: 'contacted', label: 'Contacted', icon: Send, color: 'bg-blue-500' },
   { id: 'proposal_sent', label: 'Proposal Sent', icon: ArrowRight, color: 'bg-purple-500' },
   { id: 'negotiation', label: 'Negotiation', icon: Clock, color: 'bg-amber-500' },
@@ -48,9 +48,9 @@ const stages = [
 ];
 
 const tierColors: Record<string, string> = {
-  platinum: 'bg-slate-200 text-slate-800',
+  platinum: 'bg-muted text-foreground',
   gold: 'bg-amber-100 text-amber-800',
-  silver: 'bg-gray-100 text-gray-800',
+  silver: 'bg-muted text-foreground',
   bronze: 'bg-orange-100 text-orange-800',
 };
 

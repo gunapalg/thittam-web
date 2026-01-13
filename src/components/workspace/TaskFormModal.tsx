@@ -34,12 +34,12 @@ export function TaskFormModal({
 
         {/* Background overlay */}
         <div 
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          className="fixed inset-0 bg-muted-foreground/30 bg-opacity-75 transition-opacity"
           onClick={onClose}
         />
 
         {/* Modal panel */}
-        <div className="bg-white rounded-lg text-left shadow-xl transform transition-all w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="bg-card rounded-lg text-left shadow-xl transform transition-all w-full max-w-4xl max-h-[90vh] overflow-y-auto">
 
           <TaskForm
             task={task}

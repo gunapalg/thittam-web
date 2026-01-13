@@ -67,7 +67,7 @@ export function JudgeRoster(_props: JudgeRosterProps) {
       case 'active':
         return 'bg-green-100 text-green-800';
       case 'inactive':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
       case 'on_break':
         return 'bg-amber-100 text-amber-800';
     }

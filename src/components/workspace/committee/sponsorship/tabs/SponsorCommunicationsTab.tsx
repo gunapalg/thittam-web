@@ -48,7 +48,7 @@ const typeConfig: Record<string, { icon: React.ElementType; color: string; bgCol
 };
 
 const statusConfig: Record<string, { color: string; bgColor: string; label: string }> = {
-  draft: { color: 'text-gray-600', bgColor: 'bg-gray-500/10', label: 'Draft' },
+  draft: { color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/30/10', label: 'Draft' },
   sent: { color: 'text-emerald-600', bgColor: 'bg-emerald-500/10', label: 'Sent' },
   received: { color: 'text-blue-600', bgColor: 'bg-blue-500/10', label: 'Received' },
   scheduled: { color: 'text-purple-600', bgColor: 'bg-purple-500/10', label: 'Scheduled' },
@@ -333,8 +333,8 @@ export function SponsorCommunicationsTab({ workspace }: SponsorCommunicationsTab
         <Card className="border-border/50">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-gray-500/10">
-                <Clock className="h-5 w-5 text-gray-500" />
+              <div className="p-2.5 rounded-lg bg-muted-foreground/30/10">
+                <Clock className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{draftCommunications.length}</p>

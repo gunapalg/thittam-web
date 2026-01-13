@@ -89,7 +89,7 @@ export function PlatformManager() {
       trend: 'up',
       postsThisWeek: 4,
       postsGoal: 7,
-      color: 'bg-slate-800',
+      color: 'bg-foreground/80',
       connected: true,
     },
     {

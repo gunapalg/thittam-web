@@ -70,7 +70,7 @@ const categoryConfig: Record<EventCategory, { icon: typeof Code; label: string; 
   [EventCategory.HIRING_CHALLENGE]: { icon: Trophy, label: 'Hiring Challenge', color: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20' },
   [EventCategory.WEBINAR]: { icon: Video, label: 'Webinar', color: 'bg-pink-500/10 text-pink-600 border-pink-500/20' },
   [EventCategory.COMPETITION]: { icon: Award, label: 'Competition', color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20' },
-  [EventCategory.OTHER]: { icon: LayoutGrid, label: 'Other', color: 'bg-gray-500/10 text-gray-600 border-gray-500/20' },
+  [EventCategory.OTHER]: { icon: LayoutGrid, label: 'Other', color: 'bg-muted-foreground/30/10 text-muted-foreground border-gray-500/20' },
   // College/University
   [EventCategory.SEMINAR]: { icon: BookOpen, label: 'Seminar', color: 'bg-teal-500/10 text-teal-600 border-teal-500/20' },
   [EventCategory.SYMPOSIUM]: { icon: Landmark, label: 'Symposium', color: 'bg-purple-500/10 text-purple-600 border-purple-500/20' },
@@ -79,7 +79,7 @@ const categoryConfig: Record<EventCategory, { icon: typeof Code; label: string; 
   [EventCategory.ORIENTATION]: { icon: UserCheck, label: 'Orientation', color: 'bg-sky-500/10 text-sky-600 border-sky-500/20' },
   [EventCategory.ALUMNI_MEET]: { icon: UsersRound, label: 'Alumni Meet', color: 'bg-lime-500/10 text-lime-600 border-lime-500/20' },
   [EventCategory.CAREER_FAIR]: { icon: School, label: 'Career Fair', color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' },
-  [EventCategory.LECTURE]: { icon: MessageSquare, label: 'Lecture', color: 'bg-slate-500/10 text-slate-600 border-slate-500/20' },
+  [EventCategory.LECTURE]: { icon: MessageSquare, label: 'Lecture', color: 'bg-slate-500/10 text-muted-foreground border-slate-500/20' },
   [EventCategory.QUIZ]: { icon: ShieldQuestion, label: 'Quiz', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
   [EventCategory.DEBATE]: { icon: Megaphone, label: 'Debate', color: 'bg-orange-500/10 text-orange-600 border-orange-500/20' },
   // Company

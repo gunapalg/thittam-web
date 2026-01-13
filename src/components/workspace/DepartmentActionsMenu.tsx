@@ -94,7 +94,7 @@ const departmentActions: Record<string, DepartmentAction[]> = {
     { id: 'network-status', label: 'Network Status', icon: Wifi, color: 'text-cyan-500', isTab: true },
     { id: 'security-audit', label: 'Security Audit', icon: Shield, color: 'text-red-500', isTab: true },
     { id: 'equipment-report', label: 'Equipment Report', icon: Monitor, color: 'text-purple-500', isTab: true },
-    { id: 'backup-status', label: 'Backup Status', icon: HardDrive, color: 'text-gray-500', isTab: true },
+    { id: 'backup-status', label: 'Backup Status', icon: HardDrive, color: 'text-muted-foreground', isTab: true },
     { id: 'report-incident', label: 'Report Incident', icon: AlertTriangle, color: 'text-amber-500', isTab: true },
     { id: 'config-review', label: 'Config Review', icon: Settings, color: 'text-emerald-500', isTab: true },
     { id: 'documentation', label: 'Documentation', icon: FileText, color: 'text-indigo-500', isTab: true },

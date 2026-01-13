@@ -23,7 +23,7 @@ interface BriefTeamsTabProps {
 }
 
 const BRIEFING_TYPES = [
-  { value: 'general', label: 'General', color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200' },
+  { value: 'general', label: 'General', color: 'bg-muted text-foreground dark:bg-foreground/80 dark:text-gray-200' },
   { value: 'pre-event', label: 'Pre-Event', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
   { value: 'daily', label: 'Daily', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
   { value: 'emergency', label: 'Emergency', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' },

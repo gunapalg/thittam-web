@@ -144,7 +144,7 @@ const committeeActions: Record<string, CommitteeAction[]> = {
   ],
   facility: [
     { id: 'safety-check-facility', label: 'Safety Check', icon: Shield, color: 'text-red-500', tab: 'safety-check-facility' },
-    { id: 'venue-walkthrough-facility', label: 'Venue Walkthrough', icon: Building, color: 'text-slate-500', tab: 'venue-walkthrough-facility' },
+    { id: 'venue-walkthrough-facility', label: 'Venue Walkthrough', icon: Building, color: 'text-muted-foreground', tab: 'venue-walkthrough-facility' },
     { id: 'report-issue-facility', label: 'Report Issue', icon: AlertTriangle, color: 'text-amber-500', tab: 'report-issue-facility' },
     { id: 'room-status-facility', label: 'Room Status', icon: Map, color: 'text-blue-500', tab: 'room-status-facility' },
   ],

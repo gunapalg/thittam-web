@@ -92,7 +92,7 @@ const categoryConfig = {
 const priorityColors = {
   high: 'text-red-500',
   medium: 'text-amber-500',
-  low: 'text-gray-500',
+  low: 'text-muted-foreground',
 };
 
 export function StakeholderDirectory() {

@@ -70,8 +70,8 @@ const mockSponsors: Sponsor[] = [
 
 const tierColors = {
   platinum: 'bg-gradient-to-r from-slate-400 to-slate-600 text-white',
-  gold: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black',
-  silver: 'bg-gradient-to-r from-gray-300 to-gray-400 text-black',
+  gold: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-foreground',
+  silver: 'bg-gradient-to-r from-gray-300 to-gray-400 text-foreground',
   bronze: 'bg-gradient-to-r from-orange-400 to-orange-600 text-white',
 };
 

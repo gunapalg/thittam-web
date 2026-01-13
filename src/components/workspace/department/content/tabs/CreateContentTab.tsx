@@ -34,13 +34,13 @@ const CONTENT_TYPES: { value: ContentItemType; label: string }[] = [
 ];
 
 const PRIORITY_OPTIONS: { value: ContentItemPriority; label: string; color: string }[] = [
-  { value: 'low', label: 'Low', color: 'text-gray-500' },
+  { value: 'low', label: 'Low', color: 'text-muted-foreground' },
   { value: 'medium', label: 'Medium', color: 'text-amber-500' },
   { value: 'high', label: 'High', color: 'text-red-500' },
 ];
 
 const STATUS_OPTIONS: { value: ContentItemStatus; label: string; icon: React.ReactNode; color: string }[] = [
-  { value: 'draft', label: 'Draft', icon: <Edit2 className="h-3 w-3" />, color: 'bg-gray-500/10 text-gray-600 border-gray-500/30' },
+  { value: 'draft', label: 'Draft', icon: <Edit2 className="h-3 w-3" />, color: 'bg-muted-foreground/30/10 text-muted-foreground border-gray-500/30' },
   { value: 'review', label: 'In Review', icon: <Clock className="h-3 w-3" />, color: 'bg-amber-500/10 text-amber-600 border-amber-500/30' },
   { value: 'approved', label: 'Approved', icon: <FileCheck className="h-3 w-3" />, color: 'bg-blue-500/10 text-blue-600 border-blue-500/30' },
   { value: 'published', label: 'Published', icon: <CheckCircle className="h-3 w-3" />, color: 'bg-green-500/10 text-green-600 border-green-500/30' },
@@ -158,7 +158,7 @@ export function CreateContentTab({ workspace }: CreateContentTabProps) {
         </Card>
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setStatusFilter('draft')}>
           <CardContent className="pt-4">
-            <div className="text-2xl font-bold text-gray-600">{stats.draft}</div>
+            <div className="text-2xl font-bold text-muted-foreground">{stats.draft}</div>
             <p className="text-xs text-muted-foreground">Drafts</p>
           </CardContent>
         </Card>

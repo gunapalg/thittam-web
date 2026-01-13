@@ -165,7 +165,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                       'p-2 rounded-full backdrop-blur-sm transition-colors',
                       isComparing 
                         ? 'bg-primary text-primary-foreground' 
-                        : 'bg-white/20 text-white hover:bg-white/30'
+                        : 'bg-card/20 text-white hover:bg-card/30'
                     )}
                     title="Compare"
                   >
@@ -178,7 +178,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
                     'p-2 rounded-full backdrop-blur-sm transition-colors',
                     isFavorited 
                       ? 'bg-rose-500 text-white' 
-                      : 'bg-white/20 text-white hover:bg-white/30'
+                      : 'bg-card/20 text-white hover:bg-card/30'
                   )}
                   title="Save to favorites"
                 >

@@ -55,7 +55,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ service, onBookService
         {/* Favorite Button */}
         <button
           onClick={(e) => { e.preventDefault(); setIsFavorited(!isFavorited); }}
-          className="absolute top-2 right-2 p-2 rounded-full bg-white/90 shadow-sm hover:bg-white transition-colors"
+          className="absolute top-2 right-2 p-2 rounded-full bg-card/90 shadow-sm hover:bg-card transition-colors"
         >
           <Heart className={cn('w-4 h-4', isFavorited ? 'fill-rose-500 text-rose-500' : 'text-muted-foreground')} />
         </button>

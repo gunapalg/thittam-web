@@ -100,7 +100,7 @@ export function OperationsOverview({ workspaceId }: OperationsOverviewProps) {
       case 'logistics': return 'text-green-500 bg-green-500/10';
       case 'catering': return 'text-amber-500 bg-amber-500/10';
       case 'facility': return 'text-purple-500 bg-purple-500/10';
-      default: return 'text-gray-500 bg-gray-500/10';
+      default: return 'text-muted-foreground bg-muted-foreground/30/10';
     }
   };
 

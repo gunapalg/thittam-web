@@ -81,8 +81,8 @@ export const MobileRecentWorkspaces: React.FC<MobileRecentWorkspacesProps> = ({
         {workspaces.slice(0, 4).map((workspace) => {
           const Icon = workspaceTypeIcons[workspace.workspace_type] || Briefcase;
           const colors = workspaceTypeColors[workspace.workspace_type] || { 
-            icon: 'text-slate-600', 
-            bg: 'bg-slate-100 dark:bg-slate-800/50' 
+            icon: 'text-muted-foreground', 
+            bg: 'bg-muted dark:bg-foreground/80/50' 
           };
 
           return (

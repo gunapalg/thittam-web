@@ -82,7 +82,7 @@ export function PressCredentialManager() {
       case 'online':
         return 'bg-cyan-100 text-cyan-800';
       case 'freelance':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-foreground';
     }
   };
 

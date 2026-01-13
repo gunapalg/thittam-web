@@ -222,17 +222,17 @@ export function TeamRosterManagement({
   return (
     <div className="space-y-6 overflow-visible">
       {/* Search and Filters */}
-      <div className="bg-white shadow rounded-lg p-4">
+      <div className="bg-card shadow rounded-lg p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex-1 max-w-lg">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search team members..."
                 value={searchTerm}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                className="block w-full pl-10 pr-3 py-2 border border-input rounded-md leading-5 bg-card placeholder:text-muted-foreground focus:outline-none focus:placeholder:text-muted-foreground focus:ring-1 focus-visible:ring-ring focus-visible:border-primary"
               />
             </div>
           </div>
@@ -240,7 +240,7 @@ export function TeamRosterManagement({
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              className="inline-flex items-center px-3 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
             >
               <FunnelIcon className="w-4 h-4 mr-2" />
               Filters
@@ -254,16 +254,16 @@ export function TeamRosterManagement({
         </div>
 
         {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-4 pt-4 border-t border-border">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Filter by Role
                 </label>
                 <select
                   value={roleFilter}
                   onChange={(e) => onRoleFilterChange(e.target.value as WorkspaceRole | 'all')}
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary text-sm"
                 >
                   {roleOptions.map(option => (
                     <option key={option.value} value={option.value}>
@@ -274,13 +274,13 @@ export function TeamRosterManagement({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Filter by Status
                 </label>
                 <select
                   value={statusFilter}
                   onChange={(e) => onStatusFilterChange(e.target.value as 'all' | 'active' | 'pending' | 'inactive')}
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary text-sm"
                 >
                   {statusOptions.map(option => (
                     <option key={option.value} value={option.value}>
@@ -295,20 +295,20 @@ export function TeamRosterManagement({
       </div>
 
       {/* Team Members List */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+      <div className="bg-card shadow rounded-lg">
+        <div className="px-6 py-4 border-b border-border">
+          <h3 className="text-lg font-medium text-foreground">
             Team Members ({sortedMembers.length})
           </h3>
         </div>
 
         {/* Table Header */}
-        <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-          <div className="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <div className="bg-muted/50 px-6 py-3 border-b border-border">
+          <div className="grid grid-cols-12 gap-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
             <div className="col-span-4">
               <button
                 onClick={() => handleSort('name')}
-                className="flex items-center space-x-1 hover:text-gray-700"
+                className="flex items-center space-x-1 hover:text-foreground"
               >
                 <span>Member</span>
                 {sortBy === 'name' && (
@@ -319,7 +319,7 @@ export function TeamRosterManagement({
             <div className="col-span-2">
               <button
                 onClick={() => handleSort('role')}
-                className="flex items-center space-x-1 hover:text-gray-700"
+                className="flex items-center space-x-1 hover:text-foreground"
               >
                 <span>Role</span>
                 {sortBy === 'role' && (
@@ -331,7 +331,7 @@ export function TeamRosterManagement({
             <div className="col-span-2">
               <button
                 onClick={() => handleSort('joinedAt')}
-                className="flex items-center space-x-1 hover:text-gray-700"
+                className="flex items-center space-x-1 hover:text-foreground"
               >
                 <span>Joined</span>
                 {sortBy === 'joinedAt' && (
@@ -342,7 +342,7 @@ export function TeamRosterManagement({
             <div className="col-span-1">
               <button
                 onClick={() => handleSort('activity')}
-                className="flex items-center space-x-1 hover:text-gray-700"
+                className="flex items-center space-x-1 hover:text-foreground"
               >
                 <span>Activity</span>
                 {sortBy === 'activity' && (
@@ -355,11 +355,11 @@ export function TeamRosterManagement({
         </div>
 
         {/* Team Members */}
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-border">
           {sortedMembers.map((member) => {
             const activity = getMemberActivity(member.id);
             return (
-              <div key={member.id} className="px-6 py-4 hover:bg-gray-50">
+              <div key={member.id} className="px-6 py-4 hover:bg-muted/50">
                 <div className="grid grid-cols-12 gap-4 items-center">
                   {/* Member Info */}
                   <div className="col-span-4">
@@ -370,8 +370,8 @@ export function TeamRosterManagement({
                         </div>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{member.user.name}</p>
-                        <p className="text-sm text-gray-500">{member.user.email}</p>
+                        <p className="text-sm font-medium text-foreground">{member.user.name}</p>
+                        <p className="text-sm text-muted-foreground">{member.user.email}</p>
                       </div>
                     </div>
                   </div>
@@ -388,7 +388,7 @@ export function TeamRosterManagement({
                           value={member.role}
                           onChange={(e) => handleRoleUpdate(member.id, e.target.value as WorkspaceRole)}
                           onBlur={() => setEditingRole(null)}
-                          className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                          className="block w-full border-input rounded-md shadow-sm focus-visible:ring-ring focus-visible:border-primary text-sm"
                           autoFocus
                         >
                           {roleOptions.slice(1).map(option => (
@@ -397,7 +397,7 @@ export function TeamRosterManagement({
                             </option>
                           ))}
                         </select>
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           Permissions: {getPermissionPreview(member.role).join(', ')}
                         </p>
                       </div>
@@ -408,7 +408,7 @@ export function TeamRosterManagement({
                           <button
                             type="button"
                             onClick={() => setEditingRole(member.id)}
-                            className="p-1 text-gray-400 hover:text-gray-600"
+                            className="p-1 text-muted-foreground hover:text-muted-foreground"
                             aria-label={`Edit role for ${member.user.name}`}
                           >
                             <PencilIcon className="w-3 h-3" />
@@ -425,7 +425,7 @@ export function TeamRosterManagement({
 
                   {/* Joined Date */}
                   <div className="col-span-2">
-                    <div className="flex items-center text-sm text-gray-500">
+                    <div className="flex items-center text-sm text-muted-foreground">
                       <CalendarIcon className="w-4 h-4 mr-1" />
                       {new Date(member.joinedAt).toLocaleDateString()}
                     </div>
@@ -434,13 +434,13 @@ export function TeamRosterManagement({
                   {/* Activity Score */}
                   <div className="col-span-1">
                     <div className="flex items-center">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-muted rounded-full h-2">
                         <div
                           className="bg-indigo-600 h-2 rounded-full"
                           style={{ width: `${activity.contributionScore}%` }}
                         ></div>
                       </div>
-                      <span className="ml-2 text-xs text-gray-500">{activity.contributionScore}%</span>
+                      <span className="ml-2 text-xs text-muted-foreground">{activity.contributionScore}%</span>
                     </div>
                   </div>
 
@@ -452,7 +452,7 @@ export function TeamRosterManagement({
                           setSelectedMember(member);
                           setShowMemberProfile(true);
                         }}
-                        className="p-1 text-gray-400 hover:text-gray-600"
+                        className="p-1 text-muted-foreground hover:text-muted-foreground"
                         title="View Profile"
                       >
                         <EyeIcon className="w-4 h-4" />
@@ -477,9 +477,9 @@ export function TeamRosterManagement({
 
         {sortedMembers.length === 0 && (
           <div className="px-6 py-12 text-center">
-            <UserIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No team members found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <UserIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h3 className="mt-2 text-sm font-medium text-foreground">No team members found</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
               {teamMembers.length === 0 
                 ? "No team members have been added to this workspace yet."
                 : "No team members match your current search and filter criteria."
@@ -491,14 +491,14 @@ export function TeamRosterManagement({
 
       {/* Member Profile Modal */}
       {showMemberProfile && selectedMember && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto p-5 border shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-muted-foreground/40 bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto p-5 border shadow-lg rounded-md bg-card">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Member Profile</h3>
+                <h3 className="text-lg font-medium text-foreground">Member Profile</h3>
                 <button
                   onClick={() => setShowMemberProfile(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-muted-foreground hover:text-muted-foreground"
                 >
                   <span className="sr-only">Close</span>
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -513,25 +513,25 @@ export function TeamRosterManagement({
                     <UserIcon className="h-6 w-6 text-indigo-600" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-medium text-gray-900">{selectedMember.user.name}</h4>
-                    <p className="text-sm text-gray-500">{selectedMember.user.email}</p>
+                    <h4 className="text-lg font-medium text-foreground">{selectedMember.user.name}</h4>
+                    <p className="text-sm text-muted-foreground">{selectedMember.user.email}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Role</label>
+                    <label className="block text-sm font-medium text-foreground">Role</label>
                     <div className="mt-1">{getRoleBadge(selectedMember.role)}</div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Status</label>
+                    <label className="block text-sm font-medium text-foreground">Status</label>
                     <div className="mt-1">{getStatusBadge(selectedMember.status)}</div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Joined</label>
-                  <p className="mt-1 text-sm text-gray-900">
+                  <label className="block text-sm font-medium text-foreground">Joined</label>
+                  <p className="mt-1 text-sm text-foreground">
                     {new Date(selectedMember.joinedAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -542,35 +542,35 @@ export function TeamRosterManagement({
 
                 {selectedMember.invitedBy && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Invited By</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedMember.invitedBy.name}</p>
+                    <label className="block text-sm font-medium text-foreground">Invited By</label>
+                    <p className="mt-1 text-sm text-foreground">{selectedMember.invitedBy.name}</p>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Activity Summary</label>
+                  <label className="block text-sm font-medium text-foreground">Activity Summary</label>
                   <div className="mt-2 space-y-2">
                     {(() => {
                       const activity = getMemberActivity(selectedMember.id);
                       return (
                         <>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Tasks Assigned:</span>
-                            <span className="text-gray-900">{activity.tasksAssigned}</span>
+                            <span className="text-muted-foreground">Tasks Assigned:</span>
+                            <span className="text-foreground">{activity.tasksAssigned}</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Tasks Completed:</span>
-                            <span className="text-gray-900">{activity.tasksCompleted}</span>
+                            <span className="text-muted-foreground">Tasks Completed:</span>
+                            <span className="text-foreground">{activity.tasksCompleted}</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Last Activity:</span>
-                            <span className="text-gray-900">
+                            <span className="text-muted-foreground">Last Activity:</span>
+                            <span className="text-foreground">
                               {new Date(activity.lastActivity).toLocaleDateString()}
                             </span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Contribution Score:</span>
-                            <span className="text-gray-900">{activity.contributionScore}%</span>
+                            <span className="text-muted-foreground">Contribution Score:</span>
+                            <span className="text-foreground">{activity.contributionScore}%</span>
                           </div>
                         </>
                       );
@@ -579,9 +579,9 @@ export function TeamRosterManagement({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Permissions</label>
+                  <label className="block text-sm font-medium text-foreground">Permissions</label>
                   <div className="mt-2">
-                    <ul className="text-sm text-gray-600 space-y-1">
+                    <ul className="text-sm text-muted-foreground space-y-1">
                       {getPermissionPreview(selectedMember.role).map((permission: string, index: number) => (
                         <li key={index} className="flex items-center">
                           <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
@@ -596,7 +596,7 @@ export function TeamRosterManagement({
               <div className="mt-6 flex justify-end space-x-3">
                 <button
                   onClick={() => setShowMemberProfile(false)}
-                  className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  className="px-4 py-2 border border-input text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted/50"
                 >
                   Close
                 </button>

@@ -24,7 +24,7 @@ interface DelegationProgressDashboardProps {
 }
 
 const statusConfig: Record<DelegationStatus, { label: string; icon: React.ElementType; color: string }> = {
-  pending: { label: 'Pending', icon: Clock, color: 'text-slate-500' },
+  pending: { label: 'Pending', icon: Clock, color: 'text-muted-foreground' },
   in_progress: { label: 'In Progress', icon: Timer, color: 'text-blue-500' },
   completed: { label: 'Completed', icon: CheckCircle, color: 'text-green-500' },
   overdue: { label: 'Overdue', icon: AlertTriangle, color: 'text-red-500' },
@@ -196,7 +196,7 @@ export function DelegationProgressDashboard({ workspaceId }: DelegationProgressD
           label="Total"
           value={stats.total}
           icon={Send}
-          color="text-slate-600"
+          color="text-muted-foreground"
           onClick={() => setStatusFilter('all')}
           active={statusFilter === 'all'}
         />
@@ -204,7 +204,7 @@ export function DelegationProgressDashboard({ workspaceId }: DelegationProgressD
           label="Pending"
           value={stats.pending}
           icon={Clock}
-          color="text-slate-500"
+          color="text-muted-foreground"
           onClick={() => setStatusFilter('pending')}
           active={statusFilter === 'pending'}
         />

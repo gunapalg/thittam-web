@@ -110,12 +110,12 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-card rounded-lg shadow-md p-6">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded mb-4"></div>
-          <div className="h-64 bg-gray-200 rounded mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-6 bg-muted rounded mb-4"></div>
+          <div className="h-64 bg-muted rounded mb-4"></div>
+          <div className="h-4 bg-muted rounded mb-2"></div>
+          <div className="h-4 bg-muted rounded w-3/4"></div>
         </div>
       </div>
     );
@@ -123,13 +123,13 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
   if (error || !qrCodeData) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-card rounded-lg shadow-md p-6">
         <div className="text-center">
           <svg className="mx-auto h-12 w-12 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">QR Code Unavailable</h3>
-          <p className="text-gray-600">
+          <h3 className="text-lg font-medium text-foreground mb-2">QR Code Unavailable</h3>
+          <p className="text-muted-foreground">
             Unable to load your QR code. Please contact support if this issue persists.
           </p>
         </div>
@@ -138,14 +138,14 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 max-w-md w-full mx-auto max-h-[90vh] flex flex-col">
+    <div className="bg-card rounded-2xl shadow-lg p-4 sm:p-6 max-w-md w-full mx-auto max-h-[90vh] flex flex-col">
       <div className="flex-1 overflow-y-auto space-y-6">
         <div className="text-center">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Your Event QR Code</h3>
-          <p className="text-gray-600 text-sm mb-2">
+          <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Your Event QR Code</h3>
+          <p className="text-muted-foreground text-sm mb-2">
             Show this QR code at the event for quick check-in.
           </p>
-          <p className="text-gray-500 text-[11px] sm:text-xs mb-4">
+          <p className="text-muted-foreground text-[11px] sm:text-xs mb-4">
             This is your personal check-in QR from your profile and stays the same across all events you join.
           </p>
 
@@ -183,7 +183,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
           )}
 
           {/* QR Code Image */}
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 inline-block">
+          <div className="bg-card border-2 border-border rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 inline-block">
             <img
               src={qrImageUrl}
               alt="Event QR Code"
@@ -193,27 +193,27 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
         </div>
 
         {/* QR Code Details */}
-        <div className="bg-gray-50 rounded-xl p-3 sm:p-4 text-left">
-          <h4 className="font-medium text-gray-900 text-sm sm:text-base mb-2 sm:mb-3">QR Code Details</h4>
+        <div className="bg-muted/50 rounded-xl p-3 sm:p-4 text-left">
+          <h4 className="font-medium text-foreground text-sm sm:text-base mb-2 sm:mb-3">QR Code Details</h4>
           <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
             <div className="flex items-start justify-between gap-3">
-              <span className="text-gray-600">Event:</span>
-              <span className="font-medium text-gray-900 text-right line-clamp-2">{eventName}</span>
+              <span className="text-muted-foreground">Event:</span>
+              <span className="font-medium text-foreground text-right line-clamp-2">{eventName}</span>
             </div>
             <div className="flex items-start justify-between gap-3">
-              <span className="text-gray-600">Registration ID:</span>
-              <span className="font-mono text-[11px] sm:text-xs text-gray-900 break-all text-right">
+              <span className="text-muted-foreground">Registration ID:</span>
+              <span className="font-mono text-[11px] sm:text-xs text-foreground break-all text-right">
                 {registration.id}
               </span>
             </div>
             <div className="flex items-start justify-between gap-3">
-              <span className="text-gray-600">QR Code:</span>
-              <span className="font-mono text-[11px] sm:text-xs text-gray-900 break-all text-right">
+              <span className="text-muted-foreground">QR Code:</span>
+              <span className="font-mono text-[11px] sm:text-xs text-foreground break-all text-right">
                 {qrCodeData.qrCode}
               </span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-gray-600">Status:</span>
+              <span className="text-muted-foreground">Status:</span>
               <span
                 className={`inline-flex px-2 py-0.5 text-[11px] sm:text-xs font-semibold rounded-full ${
                   registration.status === 'CONFIRMED'
@@ -231,10 +231,10 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
         {/* Instructions */}
         <div className="text-left">
-          <h4 className="font-medium text-gray-900 text-sm sm:text-base mb-2 sm:mb-3">
+          <h4 className="font-medium text-foreground text-sm sm:text-base mb-2 sm:mb-3">
             How to Use Your QR Code
           </h4>
-          <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+          <div className="space-y-2 text-xs sm:text-sm text-muted-foreground">
             <div className="flex items-start">
               <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-indigo-100 text-indigo-600 rounded-full text-[10px] sm:text-xs font-medium mr-2.5 sm:mr-3 mt-0.5">
                 1
@@ -263,9 +263,9 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
         </div>
 
         {/* Troubleshooting */}
-        <div className="bg-gray-50 rounded-xl p-3 sm:p-4 text-left mb-2">
-          <h4 className="font-medium text-gray-900 text-sm sm:text-base mb-1.5 sm:mb-2">Troubleshooting</h4>
-          <div className="text-xs sm:text-sm text-gray-600 space-y-1">
+        <div className="bg-muted/50 rounded-xl p-3 sm:p-4 text-left mb-2">
+          <h4 className="font-medium text-foreground text-sm sm:text-base mb-1.5 sm:mb-2">Troubleshooting</h4>
+          <div className="text-xs sm:text-sm text-muted-foreground space-y-1">
             <p>• If the QR code won&apos;t scan, show your registration ID to volunteers.</p>
             <p>• Make sure your phone screen brightness is at maximum.</p>
             <p>• Clean your phone screen for better scanning.</p>
@@ -275,10 +275,10 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
       </div>
 
       {/* Action Buttons (sticky at bottom on mobile) */}
-      <div className="pt-3 sm:pt-4 mt-2 border-t border-gray-200 flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <div className="pt-3 sm:pt-4 mt-2 border-t border-border flex flex-col sm:flex-row gap-2 sm:gap-3">
         <button
           onClick={handleDownload}
-          className="w-full sm:flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors flex items-center justify-center"
+          className="w-full sm:flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus-visible:ring-ring focus:ring-offset-2 transition-colors flex items-center justify-center"
         >
           <svg className="h-5 w-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -288,7 +288,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
         <button
           onClick={handleShare}
-          className="w-full sm:flex-none bg-gray-200 text-gray-800 px-4 py-2.5 rounded-md text-sm font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors flex items-center justify-center"
+          className="w-full sm:flex-none bg-muted text-foreground px-4 py-2.5 rounded-md text-sm font-medium hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors flex items-center justify-center"
         >
           <svg className="h-5 w-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />

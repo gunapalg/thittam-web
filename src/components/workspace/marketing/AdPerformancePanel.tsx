@@ -171,7 +171,7 @@ export function AdPerformancePanel() {
                       </Badge>
                     )}
                     {channel.trend === 'stable' && (
-                      <Badge className="bg-slate-100 text-slate-700 border-slate-200">
+                      <Badge className="bg-muted text-foreground border-border">
                         Stable
                       </Badge>
                     )}

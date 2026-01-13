@@ -176,7 +176,7 @@ export function VolunteerPerformanceTab({ workspaceId }: VolunteerPerformanceTab
 
   const getMedalColor = (index: number) => {
     if (index === 0) return 'text-amber-500';
-    if (index === 1) return 'text-slate-400';
+    if (index === 1) return 'text-muted-foreground';
     if (index === 2) return 'text-amber-700';
     return 'text-muted-foreground';
   };

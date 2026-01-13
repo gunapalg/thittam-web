@@ -90,7 +90,7 @@ export function SendBriefTab({ workspace: _workspace }: SendBriefTabProps) {
         </Card>
         <Card className="bg-gradient-to-br from-slate-500/10 to-slate-600/5 border-slate-500/20">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-slate-600">
+            <div className="text-2xl font-bold text-muted-foreground">
               {mockBriefs.filter(b => b.status === 'draft').length}
             </div>
             <div className="text-xs text-muted-foreground">Drafts</div>
@@ -190,7 +190,7 @@ export function SendBriefTab({ workspace: _workspace }: SendBriefTabProps) {
                   ) : brief.status === 'scheduled' ? (
                     <Clock className="h-4 w-4 text-amber-500" />
                   ) : (
-                    <FileText className="h-4 w-4 text-slate-500" />
+                    <FileText className="h-4 w-4 text-muted-foreground" />
                   )}
                 </div>
                 <div>
@@ -206,7 +206,7 @@ export function SendBriefTab({ workspace: _workspace }: SendBriefTabProps) {
                 className={
                   brief.status === 'sent' ? 'border-emerald-500/30 text-emerald-600' :
                   brief.status === 'scheduled' ? 'border-amber-500/30 text-amber-600' :
-                  'border-slate-500/30 text-slate-600'
+                  'border-slate-500/30 text-muted-foreground'
                 }
               >
                 {brief.status === 'sent' ? 'Sent' :
