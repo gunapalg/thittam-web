@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DollarSign, Package, UserPlus, Clock } from 'lucide-react';
+import { DollarSign, Package, UserPlus, Clock, Rocket } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ApprovalRequest } from '@/hooks/useWorkspaceApprovals';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,10 @@ export function UnifiedApprovalsList({ requests, isLoading, onSelectRequest }: U
         return <Package className="h-4 w-4" />;
       case 'access':
         return <UserPlus className="h-4 w-4" />;
+      case 'event-publish':
+        return <Rocket className="h-4 w-4" />;
+      default:
+        return <Clock className="h-4 w-4" />;
     }
   };
 
@@ -32,6 +36,10 @@ export function UnifiedApprovalsList({ requests, isLoading, onSelectRequest }: U
         return 'bg-blue-500/10 text-blue-600';
       case 'access':
         return 'bg-amber-500/10 text-amber-600';
+      case 'event-publish':
+        return 'bg-purple-500/10 text-purple-600';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -43,6 +51,10 @@ export function UnifiedApprovalsList({ requests, isLoading, onSelectRequest }: U
         return 'Resource';
       case 'access':
         return 'Access';
+      case 'event-publish':
+        return 'Event Publish';
+      default:
+        return 'Request';
     }
   };
 
@@ -54,6 +66,10 @@ export function UnifiedApprovalsList({ requests, isLoading, onSelectRequest }: U
         return request.resourceName;
       case 'access':
         return request.userName || 'Unknown User';
+      case 'event-publish':
+        return request.eventName;
+      default:
+        return 'Unknown Request';
     }
   };
 
@@ -69,6 +85,10 @@ export function UnifiedApprovalsList({ requests, isLoading, onSelectRequest }: U
         return `Qty: ${request.quantity} from ${request.requestingWorkspaceName}`;
       case 'access':
         return request.requestedRole ? `Requesting ${request.requestedRole} role` : 'Requesting access';
+      case 'event-publish':
+        return `Requested by ${request.requesterName || 'Unknown'}`;
+      default:
+        return '';
     }
   };
 

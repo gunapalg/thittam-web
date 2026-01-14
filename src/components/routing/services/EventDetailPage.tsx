@@ -22,6 +22,7 @@ import { AttendanceList } from '@/components/attendance';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { slugify } from '@/lib/workspaceNavigation';
 import { EventSettingsTab } from '@/components/events/settings';
+import { EventStatusActions } from '@/components/events/publish';
 
 // Extended event type for internal use
 interface EventWithSlug extends Event {
@@ -91,24 +92,6 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
       </div>
     );
   }
-
-  const getStatusBadge = (status: EventStatus) => {
-    const statusConfig = {
-      [EventStatus.DRAFT]: { color: 'bg-yellow-100 text-yellow-800', label: 'Draft' },
-      [EventStatus.PUBLISHED]: { color: 'bg-green-100 text-green-800', label: 'Published' },
-      [EventStatus.ONGOING]: { color: 'bg-blue-100 text-blue-800', label: 'Ongoing' },
-      [EventStatus.COMPLETED]: { color: 'bg-muted text-foreground', label: 'Completed' },
-      [EventStatus.CANCELLED]: { color: 'bg-red-100 text-red-800', label: 'Cancelled' },
-    };
-
-    const config = statusConfig[status];
-    return (
-      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${config.color}`}>
-        {config.label}
-      </span>
-    );
-  };
-
   const getModeBadge = (mode: EventMode) => {
     const modeConfig = {
       [EventMode.ONLINE]: { color: 'bg-blue-100 text-blue-800', label: 'Online', icon: GlobeAltIcon },
@@ -249,15 +232,23 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({ defaultTab = '
           </div>
         )}
 
-        {/* Event Status and Quick Info */}
         <div className="mt-4 sm:mt-6 rounded-xl bg-card border border-border p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
             <div className="flex flex-wrap items-center gap-2">
-              {getStatusBadge(event.status)}
               {getModeBadge(event.mode)}
             </div>
-            <div className="text-xs sm:text-sm text-muted-foreground">
-              Last updated: {new Date(event.updatedAt).toLocaleDateString()}
+            <div className="flex items-center gap-3">
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                Last updated: {new Date(event.updatedAt).toLocaleDateString()}
+              </div>
+              {eventId && (
+                <EventStatusActions
+                  eventId={eventId}
+                  currentStatus={event.status}
+                  canManage={canManage}
+                  onStatusChange={() => queryClient.invalidateQueries({ queryKey: ['organizer-event', eventId] })}
+                />
+              )}
             </div>
           </div>
 

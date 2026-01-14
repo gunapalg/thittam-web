@@ -26,14 +26,14 @@ export function useEventStatusHistory(eventId: string) {
       if (!data || data.length === 0) return [];
 
       // Fetch user names
-      const userIds = [...new Set(data.map(r => r.changed_by).filter(Boolean))];
+      const userIds = [...new Set(data.map((r: any) => r.changed_by).filter(Boolean))] as string[];
       const { data: profiles } = userIds.length > 0
         ? await supabase.from('user_profiles').select('id, full_name').in('id', userIds)
-        : { data: [] };
+        : { data: [] as { id: string; full_name: string | null }[] };
 
-      const profileMap = new Map((profiles || []).map(p => [p.id, p.full_name]));
+      const profileMap = new Map((profiles || []).map((p: any) => [p.id, p.full_name]));
 
-      return data.map(r => ({
+      return data.map((r: any) => ({
         id: r.id,
         eventId: r.event_id,
         previousStatus: r.previous_status,
