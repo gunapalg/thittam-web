@@ -7,13 +7,15 @@ import { IDCardToolbar } from './designer/IDCardToolbar';
 import { IDCardTemplateGallery } from './designer/IDCardTemplateGallery';
 import { IDCardPreviewPanel } from './designer/IDCardPreviewPanel';
 import { PropertiesPanel } from '@/components/certificates/designer/PropertiesPanel';
-import { IDCardTemplatePreset } from './templates';
+import { IDCardTemplatePreset, IDCardOrientation } from './templates';
 import { toast } from 'sonner';
 import {
   Save,
   X,
   Loader2,
   Eye,
+  RectangleHorizontal,
+  RectangleVertical,
 } from 'lucide-react';
 
 interface IDCardDesignStudioProps {
@@ -38,7 +40,7 @@ export function IDCardDesignStudio({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [name, setName] = useState(templateName);
-
+  const [orientation, setOrientation] = useState<IDCardOrientation>('landscape');
   const handleCanvasReady = useCallback((canvas: FabricCanvas) => {
     setFabricCanvas(canvas);
     if (initialData) {
@@ -70,6 +72,12 @@ export function IDCardDesignStudio({
     fabricCanvas?.renderAll();
   };
 
+  const handleOrientationChange = (newOrientation: IDCardOrientation) => {
+    if (newOrientation === orientation) return;
+    setOrientation(newOrientation);
+    canvasRef.current?.setOrientation(newOrientation);
+    toast.info(`Switched to ${newOrientation} orientation`);
+  };
   const studioContent = (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
       {/* Header */}
@@ -87,6 +95,31 @@ export function IDCardDesignStudio({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Orientation toggle */}
+          <div className="flex items-center gap-2 border-r border-border pr-3 mr-1">
+            <span className="text-xs text-muted-foreground hidden sm:inline">Orientation:</span>
+            <div className="flex border border-border rounded-md overflow-hidden">
+              <Button 
+                variant={orientation === 'landscape' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => handleOrientationChange('landscape')}
+                className="rounded-none h-8 px-2"
+                title="Landscape"
+              >
+                <RectangleHorizontal className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant={orientation === 'portrait' ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => handleOrientationChange('portrait')}
+                className="rounded-none h-8 px-2"
+                title="Portrait"
+              >
+                <RectangleVertical className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
           <Button variant="outline" size="sm" onClick={() => setPreviewOpen(true)}>
             <Eye className="h-4 w-4 mr-2" />
             Preview
@@ -122,10 +155,11 @@ export function IDCardDesignStudio({
           onClearCanvas={() => canvasRef.current?.clearCanvas()}
         />
 
-        {/* Canvas area */}
-        <div className="flex-1 overflow-auto flex items-center justify-center">
+        {/* Canvas area - responsive container */}
+        <div className="flex-1 flex items-center justify-center overflow-hidden min-h-0">
           <IDCardCanvas
             ref={canvasRef}
+            orientation={orientation}
             onSelectionChange={setSelectedObject}
             onCanvasReady={handleCanvasReady}
           />

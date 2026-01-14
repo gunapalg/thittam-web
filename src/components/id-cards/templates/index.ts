@@ -19,6 +19,16 @@ export interface IDCardTemplatePreset {
 export const ID_CARD_WIDTH = 324; // ~85.6mm at 96 DPI
 export const ID_CARD_HEIGHT = 204; // ~53.98mm at 96 DPI
 
+// Orientation types
+export type IDCardOrientation = 'landscape' | 'portrait';
+
+// Get dimensions based on orientation
+export function getIDCardDimensions(orientation: IDCardOrientation = 'landscape') {
+  return orientation === 'landscape'
+    ? { width: ID_CARD_WIDTH, height: ID_CARD_HEIGHT }
+    : { width: ID_CARD_HEIGHT, height: ID_CARD_WIDTH };
+}
+
 // ID card placeholders
 export interface IDCardPlaceholder {
   key: string;
