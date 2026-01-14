@@ -50,7 +50,22 @@ export interface AccessApprovalRequest {
   type: 'access';
 }
 
-export type ApprovalRequest = BudgetApprovalRequest | ResourceApprovalRequest | AccessApprovalRequest;
+export interface EventPublishApprovalRequest {
+  id: string;
+  eventId: string;
+  eventName: string;
+  workspaceId: string;
+  requestedBy: string;
+  requesterName: string | null;
+  status: string;
+  priority: ApprovalPriority;
+  checklistSnapshot: Record<string, any> | null;
+  createdAt: string;
+  reviewedAt: string | null;
+  type: 'event-publish';
+}
+
+export type ApprovalRequest = BudgetApprovalRequest | ResourceApprovalRequest | AccessApprovalRequest | EventPublishApprovalRequest;
 
 export function useWorkspaceApprovals(workspaceId: string, workspaceType?: WorkspaceType) {
   const isTeam = workspaceType === WorkspaceType.TEAM;

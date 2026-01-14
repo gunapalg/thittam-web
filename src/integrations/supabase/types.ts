@@ -1018,6 +1018,104 @@ export type Database = {
           },
         ]
       }
+      event_publish_requests: {
+        Row: {
+          checklist_snapshot: Json | null
+          created_at: string
+          event_id: string
+          id: string
+          priority: string | null
+          requested_at: string
+          requested_by: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewer_id: string | null
+          status: string
+          workspace_id: string
+        }
+        Insert: {
+          checklist_snapshot?: Json | null
+          created_at?: string
+          event_id: string
+          id?: string
+          priority?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          workspace_id: string
+        }
+        Update: {
+          checklist_snapshot?: Json | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          priority?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_publish_requests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_publish_requests_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          event_id: string
+          id: string
+          new_status: string
+          previous_status: string
+          reason: string | null
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          new_status: string
+          previous_status: string
+          reason?: string | null
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          new_status?: string
+          previous_status?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_status_history_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           branding: Json | null
@@ -7031,6 +7129,7 @@ export type Database = {
           name: string
           organizer_id: string
           parent_workspace_id: string | null
+          settings: Json | null
           slug: string | null
           status: string
           updated_at: string
@@ -7044,6 +7143,7 @@ export type Database = {
           name: string
           organizer_id: string
           parent_workspace_id?: string | null
+          settings?: Json | null
           slug?: string | null
           status?: string
           updated_at?: string
@@ -7057,6 +7157,7 @@ export type Database = {
           name?: string
           organizer_id?: string
           parent_workspace_id?: string | null
+          settings?: Json | null
           slug?: string | null
           status?: string
           updated_at?: string

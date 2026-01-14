@@ -45,20 +45,20 @@ export function useEventPublishApprovals(workspaceId: string) {
       if (!data || data.length === 0) return [];
 
       // Fetch event names
-      const eventIds = [...new Set(data.map(r => r.event_id))];
-      const userIds = [...new Set(data.map(r => r.requested_by).filter(Boolean))];
+      const eventIds = [...new Set(data.map((r: any) => r.event_id))];
+      const userIds = [...new Set(data.map((r: any) => r.requested_by).filter(Boolean))] as string[];
 
       const [eventsRes, profilesRes] = await Promise.all([
         supabase.from('events').select('id, name').in('id', eventIds),
         userIds.length > 0 
           ? supabase.from('user_profiles').select('id, full_name').in('id', userIds)
-          : Promise.resolve({ data: [] }),
+          : Promise.resolve({ data: [] as { id: string; full_name: string | null }[] }),
       ]);
 
-      const eventMap = new Map((eventsRes.data || []).map(e => [e.id, e.name]));
-      const profileMap = new Map((profilesRes.data || []).map(p => [p.id, p.full_name]));
+      const eventMap = new Map((eventsRes.data || []).map((e: any) => [e.id, e.name]));
+      const profileMap = new Map((profilesRes.data || []).map((p: any) => [p.id, p.full_name]));
 
-      return data.map(r => ({
+      return data.map((r: any) => ({
         id: r.id,
         eventId: r.event_id,
         eventName: eventMap.get(r.event_id) || 'Unknown Event',
