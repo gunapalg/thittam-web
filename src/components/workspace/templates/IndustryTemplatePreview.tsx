@@ -24,10 +24,10 @@ export function IndustryTemplatePreview({ template, onClose, onImport }: Industr
 
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
-      case TaskPriority.URGENT: return 'bg-red-100 text-red-800';
-      case TaskPriority.HIGH: return 'bg-orange-100 text-orange-800';
-      case TaskPriority.MEDIUM: return 'bg-blue-100 text-blue-800';
-      case TaskPriority.LOW: return 'bg-gray-100 text-gray-800';
+      case 'CRITICAL': return 'bg-red-100 text-red-800';
+      case 'HIGH': return 'bg-orange-100 text-orange-800';
+      case 'MEDIUM': return 'bg-blue-100 text-blue-800';
+      case 'LOW': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -90,8 +90,7 @@ export function IndustryTemplatePreview({ template, onClose, onImport }: Industr
               <div key={phase}>
                 <div className="flex items-center gap-2 mb-3">
                   <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: PHASE_CONFIG[phase].color }}
+                    className={`w-3 h-3 rounded-full ${PHASE_CONFIG[phase].color}`}
                   />
                   <h3 className="font-semibold text-foreground">
                     {PHASE_CONFIG[phase].label}
