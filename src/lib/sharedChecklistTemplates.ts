@@ -443,8 +443,8 @@ export const EVENT_CATEGORY_TEMPLATES: Partial<Record<EventCategory, ChecklistTe
 };
 
 export function getTemplatesForCategory(category: EventCategory | null): ChecklistTemplate[] {
-  if (!category) return [];
-  return EVENT_CATEGORY_TEMPLATES[category] || [];
+  if (!category) return getDefaultTemplates();
+  return EVENT_CATEGORY_TEMPLATES[category] || getDefaultTemplates();
 }
 
 export function getDefaultTemplates(): ChecklistTemplate[] {
