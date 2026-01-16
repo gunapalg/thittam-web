@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Trash2, Bell, Shield, Palette, Settings2, Archive } from 'lucide-react';
+import { Save, Trash2, Bell, Shield, Palette, Settings2, Archive, Zap, Clock } from 'lucide-react';
 import { MemberRoleManagement } from './settings/MemberRoleManagement';
 import { Workspace, WorkspaceRole } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,10 @@ import { useWorkspaceSettings } from '@/hooks/useWorkspaceSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { AutomationRulesPanel } from './AutomationRulesPanel';
+import { TimeLogsView } from './TimeLogsView';
+import { WeeklyTimeReport } from './WeeklyTimeReport';
+import { useAuth } from '@/hooks/useAuth';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,8 +27,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-type SettingsTab = 'general' | 'notifications' | 'permissions' | 'danger';
+type SettingsTab = 'general' | 'notifications' | 'permissions' | 'automations' | 'time-tracking' | 'danger';
 
 interface WorkspaceSettingsContentProps {
   workspace: Workspace;
@@ -40,6 +45,7 @@ export function WorkspaceSettingsContent({
   currentUserRole,
 }: WorkspaceSettingsContentProps) {
   const { settings, updateSetting } = useWorkspaceSettings(workspace.id);
+  const { user } = useAuth();
   
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
   const [isSaving, setIsSaving] = useState(false);
@@ -133,6 +139,8 @@ export function WorkspaceSettingsContent({
     { id: 'general' as const, label: 'General', icon: Palette },
     { id: 'notifications' as const, label: 'Notifications', icon: Bell },
     { id: 'permissions' as const, label: 'Permissions', icon: Shield },
+    { id: 'automations' as const, label: 'Automations', icon: Zap },
+    { id: 'time-tracking' as const, label: 'Time Tracking', icon: Clock },
     { id: 'danger' as const, label: 'Danger Zone', icon: Trash2 },
   ];
 
@@ -418,6 +426,39 @@ export function WorkspaceSettingsContent({
                 teamMembers={teamMembers}
                 currentUserRole={currentUserRole ?? null}
               />
+            </div>
+          )}
+
+          {activeTab === 'automations' && (
+            <div className="space-y-6">
+              <div className="rounded-xl border border-border bg-card p-6">
+                <AutomationRulesPanel workspaceId={workspace.id} />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'time-tracking' && user && (
+            <div className="space-y-6">
+              <Tabs defaultValue="logs" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="logs">Time Logs</TabsTrigger>
+                  <TabsTrigger value="reports">Weekly Reports</TabsTrigger>
+                </TabsList>
+                <TabsContent value="logs">
+                  <div className="rounded-xl border border-border bg-card p-6">
+                    <TimeLogsView 
+                      workspaceId={workspace.id} 
+                      userId={user.id} 
+                      isManager={Boolean(currentUserRole && (currentUserRole.includes('LEAD') || currentUserRole.includes('MANAGER') || currentUserRole.includes('OWNER')))}
+                    />
+                  </div>
+                </TabsContent>
+                <TabsContent value="reports">
+                  <div className="rounded-xl border border-border bg-card p-6">
+                    <WeeklyTimeReport workspaceId={workspace.id} />
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
           )}
 

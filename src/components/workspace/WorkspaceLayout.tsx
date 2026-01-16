@@ -1,10 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { SidebarInset, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { WorkspaceSidebar } from './WorkspaceSidebar';
 import { ConsoleHeader } from '@/components/routing/ConsoleHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { Workspace } from '@/types';
 import { WorkspaceTab } from './WorkspaceSidebar';
+import { GlobalTimerWidget } from './GlobalTimerWidget';
 
 /**
  * Thin wrapper that reuses the global ConsoleHeader but
@@ -58,6 +59,7 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
   children,
 }) => {
   const { user, logout } = useAuth();
+  const [activeTaskTitle, _setActiveTaskTitle] = useState<string | undefined>();
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -90,6 +92,15 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
             </div>
           </SidebarInset>
         </div>
+        
+        {/* Global Timer Widget */}
+        {user && (
+          <GlobalTimerWidget 
+            workspaceId={workspace.id} 
+            userId={user.id} 
+            taskTitle={activeTaskTitle}
+          />
+        )}
       </div>
     </SidebarProvider>
   );
