@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import type { Json } from '@/integrations/supabase/types';
 import {
   AutomationRule,
   AutomationExecutionLog,
@@ -105,10 +106,10 @@ export function useAutomationRules(workspaceId: string | undefined) {
           name: input.name,
           description: input.description,
           trigger_type: input.triggerType,
-          trigger_config: input.triggerConfig,
+          trigger_config: JSON.parse(JSON.stringify(input.triggerConfig)) as Json,
           action_type: input.actionType,
-          action_config: input.actionConfig,
-          conditions: input.conditions || {},
+          action_config: JSON.parse(JSON.stringify(input.actionConfig)) as Json,
+          conditions: JSON.parse(JSON.stringify(input.conditions || {})) as Json,
           is_enabled: input.isEnabled ?? true,
           created_by: user.id,
         }])
