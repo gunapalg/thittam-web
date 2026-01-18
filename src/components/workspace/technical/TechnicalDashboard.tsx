@@ -32,7 +32,7 @@ export function TechnicalDashboard({
         <div className="lg:col-span-3 space-y-6">
           {/* Network Status & Support Tickets */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <NetworkStatus />
+            <NetworkStatus workspaceId={workspace.id} />
             <SupportTicketQueue />
           </div>
 
