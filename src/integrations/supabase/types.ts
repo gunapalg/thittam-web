@@ -8827,6 +8827,111 @@ export type Database = {
           },
         ]
       }
+      workspace_software_licenses: {
+        Row: {
+          assigned_to_department: string | null
+          auto_renew: boolean | null
+          cost_per_seat: number | null
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          documentation_url: string | null
+          event_id: string | null
+          expiry_alert_days: number | null
+          expiry_date: string | null
+          id: string
+          license_key: string | null
+          license_type: string | null
+          name: string
+          notes: string | null
+          primary_contact_name: string | null
+          purchase_date: string | null
+          renewal_date: string | null
+          seat_alert_threshold: number | null
+          status: string | null
+          total_cost: number | null
+          total_seats: number | null
+          updated_at: string | null
+          used_seats: number | null
+          vendor: string | null
+          version: string | null
+          workspace_id: string
+        }
+        Insert: {
+          assigned_to_department?: string | null
+          auto_renew?: boolean | null
+          cost_per_seat?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          documentation_url?: string | null
+          event_id?: string | null
+          expiry_alert_days?: number | null
+          expiry_date?: string | null
+          id?: string
+          license_key?: string | null
+          license_type?: string | null
+          name: string
+          notes?: string | null
+          primary_contact_name?: string | null
+          purchase_date?: string | null
+          renewal_date?: string | null
+          seat_alert_threshold?: number | null
+          status?: string | null
+          total_cost?: number | null
+          total_seats?: number | null
+          updated_at?: string | null
+          used_seats?: number | null
+          vendor?: string | null
+          version?: string | null
+          workspace_id: string
+        }
+        Update: {
+          assigned_to_department?: string | null
+          auto_renew?: boolean | null
+          cost_per_seat?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          documentation_url?: string | null
+          event_id?: string | null
+          expiry_alert_days?: number | null
+          expiry_date?: string | null
+          id?: string
+          license_key?: string | null
+          license_type?: string | null
+          name?: string
+          notes?: string | null
+          primary_contact_name?: string | null
+          purchase_date?: string | null
+          renewal_date?: string | null
+          seat_alert_threshold?: number | null
+          status?: string | null
+          total_cost?: number | null
+          total_seats?: number | null
+          updated_at?: string | null
+          used_seats?: number | null
+          vendor?: string | null
+          version?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_software_licenses_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workspace_software_licenses_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_speakers: {
         Row: {
           accommodation_arranged: boolean | null
