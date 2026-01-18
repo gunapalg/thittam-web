@@ -20,6 +20,10 @@ export { TestEquipmentTab } from './TestEquipmentTab';
 export { UpdateRunsheetTab } from './UpdateRunsheetTab';
 export { TechCheckTab } from './TechCheckTab';
 export { IssueReportTab } from './IssueReportTab';
+export { TechIncidentLogTab } from './TechIncidentLogTab';
+export { EquipmentCheckoutTab } from './EquipmentCheckoutTab';
+export { PowerDistributionTab } from './PowerDistributionTab';
+export { ContingencyChecklistTab } from './ContingencyChecklistTab';
 // Registration Committee tabs
 export { ScanCheckInTab } from './ScanCheckInTab';
 export { AddAttendeeTab } from './AddAttendeeTab';

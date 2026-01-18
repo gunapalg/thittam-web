@@ -44,6 +44,10 @@ import {
   UpdateRunsheetTab,
   TechCheckTab,
   IssueReportTab,
+  TechIncidentLogTab,
+  EquipmentCheckoutTab,
+  PowerDistributionTab,
+  ContingencyChecklistTab,
   // Registration Committee tabs
   ScanCheckInTab,
   AddAttendeeTab,
@@ -582,6 +586,22 @@ export function WorkspaceDashboard({ workspaceId, orgSlug }: WorkspaceDashboardP
 
         {activeTab === 'issue-report' && (
           <IssueReportTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'incident-log' && (
+          <TechIncidentLogTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'equipment-checkout' && (
+          <EquipmentCheckoutTab workspaceId={workspace.id} eventId={workspace.eventId} />
+        )}
+
+        {activeTab === 'power-distribution' && (
+          <PowerDistributionTab workspaceId={workspace.id} />
+        )}
+
+        {activeTab === 'contingency' && (
+          <ContingencyChecklistTab workspaceId={workspace.id} />
         )}
 
         {/* Registration Committee tabs */}

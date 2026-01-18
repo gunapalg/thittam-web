@@ -222,6 +222,10 @@ const committeeActions: Record<string, CommitteeAction[]> = {
     { id: 'update-runsheet', label: 'Update Runsheet', icon: ClipboardList, color: 'text-blue-500', tab: 'update-runsheet' },
     { id: 'tech-check', label: 'Tech Check', icon: Settings, color: 'text-amber-500', tab: 'tech-check' },
     { id: 'issue-report', label: 'Issue Report', icon: AlertCircle, color: 'text-red-500', tab: 'issue-report' },
+    { id: 'incident-log', label: 'Incident Log', icon: AlertCircle, color: 'text-orange-500', tab: 'incident-log' },
+    { id: 'equipment-checkout', label: 'Equipment Checkout', icon: Package, color: 'text-teal-500', tab: 'equipment-checkout' },
+    { id: 'power-distribution', label: 'Power Distribution', icon: Zap, color: 'text-yellow-500', tab: 'power-distribution' },
+    { id: 'contingency', label: 'Contingency', icon: Shield, color: 'text-indigo-500', tab: 'contingency' },
   ],
   it: [
     { id: 'check-systems', label: 'Check Systems', icon: Server, color: 'text-violet-500', tab: 'check-systems' },

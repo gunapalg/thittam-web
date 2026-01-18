@@ -99,6 +99,10 @@ export type WorkspaceTab =
   | 'update-runsheet'
   | 'tech-check'
   | 'issue-report'
+  | 'incident-log'
+  | 'equipment-checkout'
+  | 'power-distribution'
+  | 'contingency'
   // Registration Committee tabs
   | 'scan-checkin'
   | 'add-attendee'
