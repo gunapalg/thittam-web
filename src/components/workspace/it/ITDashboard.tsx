@@ -59,7 +59,7 @@ export function ITDashboard({
             orientation="vertical"
             showLabels={false}
           />
-          <SoftwareLicenses />
+          <SoftwareLicenses workspaceId={workspace.id} eventId={workspace.eventId} />
         </div>
       </div>
 
