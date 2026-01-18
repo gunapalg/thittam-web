@@ -82,7 +82,6 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
     attendees,
     printJobs,
     stats,
-    isLoadingAttendees,
     isLoadingJobs,
     generationProgress,
     setGenerationProgress,
@@ -787,9 +786,9 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
         open={showAttendeeSelection}
         onOpenChange={setShowAttendeeSelection}
         attendees={attendees}
-        selectedAttendees={manuallySelectedAttendees.map(a => a.id)}
+        selectedIds={manuallySelectedAttendees.map(a => a.id)}
         onSelectionChange={(ids) => setManuallySelectedAttendees(attendees.filter(a => ids.includes(a.id)))}
-        isLoading={isLoadingAttendees}
+        ticketTypes={templates?.map(t => t.name) || []}
       />
 
       {/* Generation Progress */}
