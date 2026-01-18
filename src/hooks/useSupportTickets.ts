@@ -227,6 +227,7 @@ export function useSupportTickets(workspaceId: string, eventId?: string) {
           reporter_name: input.reporterName || userName,
           reporter_email: input.reporterEmail || null,
           tags: input.tags || null,
+          ticket_number: '', // Placeholder - overwritten by database trigger
         }])
         .select()
         .single();
