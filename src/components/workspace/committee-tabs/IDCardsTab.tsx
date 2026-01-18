@@ -1,12 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   CreditCard, 
   Plus, 
@@ -19,7 +19,9 @@ import {
   Trash2,
   CheckCircle,
   Clock,
-  History
+  History,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react';
 import { Workspace } from '@/types';
 import { useQuery } from '@tanstack/react-query';
@@ -28,7 +30,7 @@ import { IDCardDesignStudio } from '@/components/id-cards/IDCardDesignStudio';
 import { IDCardPreview } from '@/components/id-cards/IDCardPreview';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { useIDCardGeneration, GenerateParams } from '@/hooks/useIDCardGeneration';
+import { useIDCardGeneration, AttendeeForCard } from '@/hooks/useIDCardGeneration';
 import { generateIDCardsPDF, downloadPDF } from '@/lib/id-card-pdf-generator';
 import { AttendeeSelectionModal } from '@/components/id-cards/AttendeeSelectionModal';
 import { CardGenerationProgress } from '@/components/id-cards/CardGenerationProgress';
@@ -61,6 +63,35 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<IDCardTemplate | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<IDCardTemplate | null>(null);
+  const [showAttendeeSelection, setShowAttendeeSelection] = useState(false);
+  const [showGenerationProgress, setShowGenerationProgress] = useState(false);
+  const [generatedPdfBlob, setGeneratedPdfBlob] = useState<Blob | null>(null);
+
+  // Generation form state
+  const [generateTemplateId, setGenerateTemplateId] = useState<string>('');
+  const [attendeeFilter, setAttendeeFilter] = useState<'all' | 'confirmed' | 'checked_in' | 'not_checked_in'>('all');
+  const [selectedTicketType, setSelectedTicketType] = useState<string>('all');
+  const [cardsPerPage, setCardsPerPage] = useState<1 | 2 | 4 | 8 | 9>(4);
+  const [pageSize, setPageSize] = useState<'a4' | 'letter'>('a4');
+  const [includeCutMarks, setIncludeCutMarks] = useState(true);
+  const [manuallySelectedAttendees, setManuallySelectedAttendees] = useState<AttendeeForCard[]>([]);
+  const [selectionMode, setSelectionMode] = useState<'filter' | 'manual'>('filter');
+
+  // Use the ID card generation hook
+  const {
+    attendees,
+    printJobs,
+    stats,
+    isLoadingAttendees,
+    isLoadingJobs,
+    generationProgress,
+    setGenerationProgress,
+    isGenerating,
+    filterAttendees,
+    createPrintJob,
+    updatePrintJob,
+    deletePrintJob,
+  } = useIDCardGeneration(workspace.id, workspace.eventId);
 
   // Fetch templates for this workspace
   const { data: templates, isLoading, refetch } = useQuery({
@@ -85,26 +116,40 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
     },
   });
 
-  // Fetch attendee stats
-  const { data: attendeeStats } = useQuery({
-    queryKey: ['attendee-stats', workspace.eventId],
+  // Fetch event data for card generation
+  const { data: eventData } = useQuery({
+    queryKey: ['event-for-cards', workspace.eventId],
     queryFn: async () => {
-      if (!workspace.eventId) return { total: 0, checkedIn: 0 };
-      
-      const { count: total } = await supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', workspace.eventId);
-      
-      const { count: checkedIn } = await supabase
-        .from('attendance_records')
-        .select('*', { count: 'exact', head: true })
-        .eq('event_id', workspace.eventId);
-      
-      return { total: total || 0, checkedIn: checkedIn || 0 };
+      if (!workspace.eventId) return null;
+      const { data, error } = await supabase
+        .from('events')
+        .select('name, start_date')
+        .eq('id', workspace.eventId)
+        .maybeSingle();
+      if (error) throw error;
+      return data ? { name: data.name, date: format(new Date(data.start_date), 'PPP') } : null;
     },
     enabled: !!workspace.eventId,
   });
+
+  // Get filtered attendees based on current selection
+  const getFilteredAttendees = (): AttendeeForCard[] => {
+    if (selectionMode === 'manual') {
+      return manuallySelectedAttendees;
+    }
+
+    let filtered = filterAttendees(attendees, {
+      status: attendeeFilter,
+      ticketTierId: selectedTicketType !== 'all' ? selectedTicketType : undefined,
+    });
+
+    return filtered;
+  };
+
+  const filteredAttendeesCount = getFilteredAttendees().length;
+
+  // Get unique ticket types for filter dropdown
+  const ticketTypes = Object.keys(stats.byTicketType);
 
   const handleCreateTemplate = () => {
     setSelectedTemplate(null);
@@ -182,6 +227,85 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
     }
   };
 
+  const handleGenerateCards = async () => {
+    if (!generateTemplateId) {
+      toast.error('Please select a template');
+      return;
+    }
+
+    const attendeesToGenerate = getFilteredAttendees();
+    if (attendeesToGenerate.length === 0) {
+      toast.error('No attendees match the selected criteria');
+      return;
+    }
+
+    const template = templates?.find(t => t.id === generateTemplateId);
+    if (!template) {
+      toast.error('Template not found');
+      return;
+    }
+
+    setShowGenerationProgress(true);
+    setGeneratedPdfBlob(null);
+
+    try {
+      // Create a print job record
+      const printJob = await createPrintJob({
+        name: `${template.name} - ${format(new Date(), 'PPp')}`,
+        templateId: generateTemplateId,
+        totalCards: attendeesToGenerate.length,
+        attendeeFilter: selectionMode === 'filter' ? { status: attendeeFilter, ticketTierId: selectedTicketType !== 'all' ? selectedTicketType : undefined } : undefined,
+        attendeeIds: selectionMode === 'manual' ? manuallySelectedAttendees.map(a => a.id) : undefined,
+      });
+
+      // Generate PDF
+      const pdfBlob = await generateIDCardsPDF(
+        template.design as any,
+        attendeesToGenerate,
+        {
+          cardsPerPage,
+          pageSize,
+          includeCutMarks,
+        },
+        eventData || undefined,
+        setGenerationProgress
+      );
+
+      setGeneratedPdfBlob(pdfBlob);
+
+      // Update print job status
+      await updatePrintJob({
+        jobId: printJob.id,
+        status: 'completed',
+        generatedCards: attendeesToGenerate.length,
+      });
+
+      toast.success(`Generated ${attendeesToGenerate.length} ID cards successfully!`);
+    } catch (error) {
+      console.error('Failed to generate cards:', error);
+      setGenerationProgress({
+        current: 0,
+        total: 0,
+        status: 'error',
+        message: 'Failed to generate cards. Please try again.',
+      });
+      toast.error('Failed to generate cards');
+    }
+  };
+
+  const handleDownloadPdf = () => {
+    if (generatedPdfBlob) {
+      const template = templates?.find(t => t.id === generateTemplateId);
+      const filename = `ID_Cards_${template?.name || 'export'}_${format(new Date(), 'yyyy-MM-dd_HHmm')}.pdf`;
+      downloadPDF(generatedPdfBlob, filename);
+    }
+  };
+
+  const handleCancelGeneration = () => {
+    setGenerationProgress({ current: 0, total: 0, status: 'idle' });
+    setShowGenerationProgress(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -224,7 +348,7 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
                 <Users className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{attendeeStats?.total || 0}</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
                 <p className="text-xs text-muted-foreground">Total Attendees</p>
               </div>
             </div>
@@ -238,7 +362,7 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
                 <CheckCircle className="h-5 w-5 text-amber-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{attendeeStats?.checkedIn || 0}</p>
+                <p className="text-2xl font-bold">{stats.checkedIn}</p>
                 <p className="text-xs text-muted-foreground">Checked In</p>
               </div>
             </div>
@@ -252,9 +376,7 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
                 <Clock className="h-5 w-5 text-purple-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">
-                  {(attendeeStats?.total || 0) - (attendeeStats?.checkedIn || 0)}
-                </p>
+                <p className="text-2xl font-bold">{stats.notCheckedIn}</p>
                 <p className="text-xs text-muted-foreground">Pending</p>
               </div>
             </div>
@@ -272,6 +394,10 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
           <TabsTrigger value="generate" className="gap-2">
             <Printer className="h-4 w-4" />
             Generate & Print
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="h-4 w-4" />
+            Print History
           </TabsTrigger>
         </TabsList>
 
@@ -368,10 +494,10 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
             <CardHeader>
               <CardTitle className="text-lg">Batch Generate ID Cards</CardTitle>
               <CardDescription>
-                Select attendees and generate ID cards for printing
+                Select a template and attendees to generate printable ID cards
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               {templates?.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">
@@ -383,24 +509,240 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="p-4 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      Select a template and attendee group to generate ID cards in batch.
-                      Cards can be downloaded as PDF for printing.
-                    </p>
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Left Column: Template & Layout Options */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="template-select">Template</Label>
+                        <Select value={generateTemplateId} onValueChange={setGenerateTemplateId}>
+                          <SelectTrigger id="template-select">
+                            <SelectValue placeholder="Select a template" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {templates?.map((template) => (
+                              <SelectItem key={template.id} value={template.id}>
+                                {template.name} ({template.card_type})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="cards-per-page">Cards Per Page</Label>
+                        <Select value={String(cardsPerPage)} onValueChange={(v) => setCardsPerPage(Number(v) as any)}>
+                          <SelectTrigger id="cards-per-page">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">1 card per page</SelectItem>
+                            <SelectItem value="2">2 cards per page</SelectItem>
+                            <SelectItem value="4">4 cards per page</SelectItem>
+                            <SelectItem value="8">8 cards per page</SelectItem>
+                            <SelectItem value="9">9 cards per page</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Page Size</Label>
+                        <RadioGroup value={pageSize} onValueChange={(v) => setPageSize(v as 'a4' | 'letter')} className="flex gap-4">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="a4" id="a4" />
+                            <Label htmlFor="a4" className="font-normal">A4</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="letter" id="letter" />
+                            <Label htmlFor="letter" className="font-normal">Letter</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="cut-marks" 
+                          checked={includeCutMarks}
+                          onCheckedChange={(checked) => setIncludeCutMarks(checked === true)}
+                        />
+                        <Label htmlFor="cut-marks" className="font-normal">Include cut marks</Label>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Attendee Selection */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Attendee Selection</Label>
+                        <RadioGroup value={selectionMode} onValueChange={(v) => setSelectionMode(v as 'filter' | 'manual')} className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="filter" id="filter-mode" />
+                            <Label htmlFor="filter-mode" className="font-normal">Filter by criteria</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="manual" id="manual-mode" />
+                            <Label htmlFor="manual-mode" className="font-normal">Select specific attendees</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+
+                      {selectionMode === 'filter' ? (
+                        <>
+                          <div className="space-y-2">
+                            <Label>Status Filter</Label>
+                            <RadioGroup value={attendeeFilter} onValueChange={(v) => setAttendeeFilter(v as any)} className="space-y-1">
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="all" id="all-attendees" />
+                                <Label htmlFor="all-attendees" className="font-normal">All ({stats.total})</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="confirmed" id="confirmed-attendees" />
+                                <Label htmlFor="confirmed-attendees" className="font-normal">Confirmed ({stats.confirmed})</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="checked_in" id="checked-in-attendees" />
+                                <Label htmlFor="checked-in-attendees" className="font-normal">Checked In ({stats.checkedIn})</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="not_checked_in" id="not-checked-in-attendees" />
+                                <Label htmlFor="not-checked-in-attendees" className="font-normal">Not Checked In ({stats.notCheckedIn})</Label>
+                              </div>
+                            </RadioGroup>
+                          </div>
+
+                          {ticketTypes.length > 0 && (
+                            <div className="space-y-2">
+                              <Label htmlFor="ticket-type">Ticket Type</Label>
+                              <Select value={selectedTicketType} onValueChange={setSelectedTicketType}>
+                                <SelectTrigger id="ticket-type">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="all">All Types</SelectItem>
+                                  {ticketTypes.map((type) => (
+                                    <SelectItem key={type} value={type}>
+                                      {type} ({stats.byTicketType[type]})
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="space-y-2">
+                          <Button 
+                            variant="outline" 
+                            onClick={() => setShowAttendeeSelection(true)}
+                            className="w-full gap-2"
+                          >
+                            <Users className="h-4 w-4" />
+                            Select Attendees ({manuallySelectedAttendees.length} selected)
+                          </Button>
+                        </div>
+                      )}
+
+                      <div className="p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Cards to generate:</span>
+                          <span className="font-semibold">{filteredAttendeesCount}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <div className="flex gap-3">
-                    <Button className="gap-2">
-                      <Printer className="h-4 w-4" />
-                      Generate All Cards
-                    </Button>
-                    <Button variant="outline" className="gap-2">
-                      <Download className="h-4 w-4" />
-                      Download PDF
+
+                  {/* Generate Button */}
+                  <div className="flex gap-3 pt-4 border-t">
+                    <Button 
+                      onClick={handleGenerateCards} 
+                      disabled={!generateTemplateId || filteredAttendeesCount === 0 || isGenerating}
+                      className="gap-2"
+                    >
+                      {isGenerating ? (
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Printer className="h-4 w-4" />
+                      )}
+                      Generate {filteredAttendeesCount} Cards
                     </Button>
                   </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <History className="h-5 w-5" />
+                Print Job History
+              </CardTitle>
+              <CardDescription>
+                View and re-download previous print jobs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingJobs ? (
+                <div className="flex items-center justify-center py-8">
+                  <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : printJobs.length === 0 ? (
+                <div className="text-center py-8">
+                  <History className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                  <p className="text-muted-foreground">No print jobs yet</p>
+                  <p className="text-sm text-muted-foreground">Generate some ID cards to see them here</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {printJobs.map((job) => (
+                    <div 
+                      key={job.id} 
+                      className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/30 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${
+                          job.status === 'completed' ? 'bg-emerald-500/10' :
+                          job.status === 'failed' ? 'bg-red-500/10' :
+                          'bg-amber-500/10'
+                        }`}>
+                          {job.status === 'completed' ? (
+                            <CheckCircle className="h-4 w-4 text-emerald-500" />
+                          ) : job.status === 'failed' ? (
+                            <AlertCircle className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <RefreshCw className="h-4 w-4 text-amber-500 animate-spin" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{job.name}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>{job.template_name}</span>
+                            <span>•</span>
+                            <span>{job.total_cards} cards</span>
+                            <span>•</span>
+                            <span>{format(new Date(job.created_at), 'PPp')}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {job.status === 'completed' && job.pdf_url && (
+                          <Button variant="outline" size="sm" className="gap-1">
+                            <Download className="h-3.5 w-3.5" />
+                            Download
+                          </Button>
+                        )}
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => deletePrintJob(job.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
@@ -439,6 +781,25 @@ export function IDCardsTab({ workspace }: IDCardsTabProps) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Attendee Selection Modal */}
+      <AttendeeSelectionModal
+        open={showAttendeeSelection}
+        onOpenChange={setShowAttendeeSelection}
+        attendees={attendees}
+        selectedAttendees={manuallySelectedAttendees.map(a => a.id)}
+        onSelectionChange={(ids) => setManuallySelectedAttendees(attendees.filter(a => ids.includes(a.id)))}
+        isLoading={isLoadingAttendees}
+      />
+
+      {/* Generation Progress */}
+      <CardGenerationProgress
+        open={showGenerationProgress}
+        onOpenChange={setShowGenerationProgress}
+        progress={generationProgress}
+        onCancel={handleCancelGeneration}
+        onDownload={handleDownloadPdf}
+      />
     </div>
   );
 }
