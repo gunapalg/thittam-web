@@ -83,7 +83,9 @@ export function useEventSettingsAccess(
     const isDepartment = workspace.workspaceType === WorkspaceType.DEPARTMENT;
     
     // Root workspace owner gets full access to all settings
-    const isRootOwner = isRootWorkspace && userRole === WorkspaceRole.WORKSPACE_OWNER;
+    // Handle both legacy 'OWNER' and current 'WORKSPACE_OWNER' role values
+    const isRootOwner = isRootWorkspace && 
+      (userRole === WorkspaceRole.WORKSPACE_OWNER || (userRole as string) === 'OWNER');
     
     // Root workspace members can also access if there are no committees created yet (fallback)
     const isRootMember = isRootWorkspace && !!userRole;

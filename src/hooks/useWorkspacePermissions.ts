@@ -20,6 +20,11 @@ export function useWorkspacePermissions({ teamMembers, eventId, workspaceType }:
       !!user && (user.role === UserRole.ORGANIZER || user.role === UserRole.SUPER_ADMIN);
 
     const currentMember = teamMembers?.find((member) => member.userId === user?.id);
+    
+    // Normalize legacy 'OWNER' role to 'WORKSPACE_OWNER' for permission checks
+    const effectiveRole = (currentMember?.role as string) === 'OWNER' 
+      ? WorkspaceRole.WORKSPACE_OWNER 
+      : currentMember?.role;
 
     const managerWorkspaceRoles: WorkspaceRole[] = [
       WorkspaceRole.WORKSPACE_OWNER,
@@ -31,8 +36,8 @@ export function useWorkspacePermissions({ teamMembers, eventId, workspaceType }:
       WorkspaceRole.EVENT_COORDINATOR,
     ];
 
-    const isWorkspaceRoleManager = currentMember
-      ? managerWorkspaceRoles.includes(currentMember.role as WorkspaceRole)
+    const isWorkspaceRoleManager = effectiveRole
+      ? managerWorkspaceRoles.includes(effectiveRole as WorkspaceRole)
       : false;
 
     const isRootWorkspace = workspaceType === 'ROOT';
