@@ -111,7 +111,7 @@ export function ContentDashboard({
       {/* Blog Articles and Media Library */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <BlogArticleTracker workspaceId={workspace.id} />
-        <MediaAssetsLibrary />
+        <MediaAssetsLibrary workspaceId={workspace.id} />
       </div>
 
       {/* Team Members */}
