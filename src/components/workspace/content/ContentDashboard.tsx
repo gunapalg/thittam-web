@@ -92,7 +92,7 @@ export function ContentDashboard({
       <ContentCalendar />
 
       {/* Publication Pipeline */}
-      <PublicationPipeline />
+      <PublicationPipeline workspaceId={workspace.id} />
 
       {/* Task Summary with Mini-Map */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
