@@ -4269,6 +4269,57 @@ export type Database = {
           },
         ]
       }
+      role_change_audit: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          new_value: string | null
+          old_value: string | null
+          reason: string | null
+          resource_id: string | null
+          resource_type: string | null
+          role_type: string
+          target_user_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          reason?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
+          role_type: string
+          target_user_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          reason?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
+          role_type?: string
+          target_user_id?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       rubrics: {
         Row: {
           created_at: string
@@ -12412,6 +12463,21 @@ export type Database = {
         Args: { _user_id?: string; _workspace_id: string }
         Returns: boolean
       }
+      log_role_change: {
+        Args: {
+          p_action: string
+          p_metadata?: Json
+          p_new_value?: string
+          p_old_value?: string
+          p_reason?: string
+          p_resource_id?: string
+          p_resource_type?: string
+          p_role_type: string
+          p_target_user_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       record_organization_product_metrics: {
         Args: { _event_type: string; _product_ids: string[] }
         Returns: undefined
@@ -12423,7 +12489,7 @@ export type Database = {
       update_user_streak: { Args: { user_uuid: string }; Returns: undefined }
     }
     Enums: {
-      app_role: "admin" | "organizer" | "participant"
+      app_role: "admin" | "organizer" | "participant" | "vendor"
       event_category:
         | "HACKATHON"
         | "BOOTCAMP"
@@ -12639,7 +12705,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "organizer", "participant"],
+      app_role: ["admin", "organizer", "participant", "vendor"],
       event_category: [
         "HACKATHON",
         "BOOTCAMP",
