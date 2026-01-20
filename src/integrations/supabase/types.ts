@@ -4269,6 +4269,24 @@ export type Database = {
           },
         ]
       }
+      reserved_usernames: {
+        Row: {
+          created_at: string | null
+          reason: string
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          reason: string
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          reason?: string
+          username?: string
+        }
+        Relationships: []
+      }
       role_change_audit: {
         Row: {
           action: string
@@ -5774,6 +5792,8 @@ export type Database = {
           qr_code: string
           twitter_url: string | null
           updated_at: string | null
+          username: string | null
+          username_changed_at: string | null
           website: string | null
         }
         Insert: {
@@ -5795,6 +5815,8 @@ export type Database = {
           qr_code: string
           twitter_url?: string | null
           updated_at?: string | null
+          username?: string | null
+          username_changed_at?: string | null
           website?: string | null
         }
         Update: {
@@ -5816,6 +5838,8 @@ export type Database = {
           qr_code?: string
           twitter_url?: string | null
           updated_at?: string | null
+          username?: string | null
+          username_changed_at?: string | null
           website?: string | null
         }
         Relationships: []
@@ -12275,6 +12299,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_username_availability: {
+        Args: { _user_id?: string; _username: string }
+        Returns: Json
+      }
       count_not_checked_in: { Args: { p_event_id: string }; Returns: number }
       decrement_poll_vote: { Args: { p_option_id: string }; Returns: undefined }
       decrement_ticket_sold_count: {
