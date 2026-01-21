@@ -2,6 +2,14 @@ import { CheckCircleIcon, ClockIcon, XCircleIcon } from '@heroicons/react/24/out
 import { Badge } from '@/components/ui/badge';
 import { WorkspaceRole } from '../../types';
 
+// Legacy role values that may exist in database
+const LEGACY_ROLE_MAP: Record<string, WorkspaceRole> = {
+  'OWNER': WorkspaceRole.WORKSPACE_OWNER,
+  'LEAD': WorkspaceRole.EVENT_LEAD,
+  'COORDINATOR': WorkspaceRole.VOLUNTEER_COORDINATOR,
+  'member': WorkspaceRole.VOLUNTEER_COORDINATOR,
+};
+
 interface WorkspaceRoleBadgeProps {
   role: WorkspaceRole;
 }
@@ -68,8 +76,10 @@ export function WorkspaceRoleBadge({ role }: WorkspaceRoleBadgeProps) {
     return 'outline';
   };
 
-  const label = roleLabels[role] ?? 'Member';
-  const tone = getRoleTone(role);
+  // Normalize legacy roles to current enum values
+  const normalizedRole = LEGACY_ROLE_MAP[role as string] ?? role;
+  const label = roleLabels[normalizedRole] ?? 'Member';
+  const tone = getRoleTone(normalizedRole);
 
   return (
     <Badge
