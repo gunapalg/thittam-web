@@ -7,7 +7,7 @@ import {
   DEPARTMENT_DEFINITIONS 
 } from '@/lib/workspaceTemplates';
 import { COMMITTEE_CHECKLIST_TEMPLATES } from './useCommitteeDashboard';
-
+import { WorkspaceRole } from '@/types';
 interface ProvisionWorkspaceParams {
   name: string;
   eventId: string;
@@ -50,7 +50,7 @@ export function useWorkspaceProvisioning() {
         );
       }
 
-      // 1. Create ROOT workspace
+      // 1. Create ROOT workspace with default publish requirements
       const { data: rootWorkspace, error: rootError } = await supabase
         .from('workspaces')
         .insert({
@@ -60,6 +60,16 @@ export function useWorkspaceProvisioning() {
           status: 'ACTIVE',
           workspace_type: 'ROOT',
           parent_workspace_id: null,
+          settings: {
+            publishRequirements: {
+              requireLandingPage: false,
+              requireTicketingConfig: false,
+              requireSEO: false,
+              requireAccessibility: false,
+            },
+            requireEventPublishApproval: false,
+            publishApproverRoles: [WorkspaceRole.WORKSPACE_OWNER],
+          },
         })
         .select('id, name')
         .single();
@@ -70,7 +80,7 @@ export function useWorkspaceProvisioning() {
       await supabase.from('workspace_team_members').insert({
         workspace_id: rootWorkspace.id,
         user_id: userId,
-        role: 'OWNER',
+        role: WorkspaceRole.WORKSPACE_OWNER,
         status: 'ACTIVE',
       });
 
@@ -118,7 +128,7 @@ export function useWorkspaceProvisioning() {
         await supabase.from('workspace_team_members').insert({
           workspace_id: dept.id,
           user_id: userId,
-          role: 'LEAD',
+          role: WorkspaceRole.EVENT_LEAD,
           status: 'ACTIVE',
         });
 
@@ -151,7 +161,7 @@ export function useWorkspaceProvisioning() {
           await supabase.from('workspace_team_members').insert({
             workspace_id: committee.id,
             user_id: userId,
-            role: 'COORDINATOR',
+            role: WorkspaceRole.VOLUNTEER_COORDINATOR,
             status: 'ACTIVE',
           });
 
