@@ -26,6 +26,7 @@ import { SectionProgressIndicator, type SectionProgress, calculateSectionStatus 
 import { DraftStatusIndicator } from '@/components/events/form/DraftStatusIndicator';
 import { DraftRestorationPrompt } from '@/components/events/form/DraftRestorationPrompt';
 import { UnsavedChangesDialog } from '@/components/events/form/UnsavedChangesDialog';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 import {
   Form,
@@ -2077,17 +2078,20 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       name="logoUrl"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Logo URL</FormLabel>
+                          <FormLabel>Event logo</FormLabel>
                           <FormControl>
-                            <Input
-                              type="url"
+                            <ImageUpload
+                              value={field.value}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
                               placeholder="https://example.com/logo.png"
-                              className="h-11"
-                              {...field}
+                              folder="logos"
+                              aspectRatio="square"
+                              maxSizeMB={2}
                             />
                           </FormControl>
                           <FormDescription>
-                            Optional: paste a direct image URL for the header.
+                            Square image works best. Upload or paste a URL.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -2099,17 +2103,20 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       name="bannerUrl"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Hero banner image URL</FormLabel>
+                          <FormLabel>Hero banner image</FormLabel>
                           <FormControl>
-                            <Input
-                              type="url"
+                            <ImageUpload
+                              value={field.value}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
                               placeholder="https://example.com/hero-banner.jpg"
-                              className="h-11"
-                              {...field}
+                              folder="banners"
+                              aspectRatio="banner"
+                              maxSizeMB={5}
                             />
                           </FormControl>
                           <FormDescription>
-                            Optional: wide image for the top of your landing page.
+                            Wide image (3:1 ratio) for the top of your landing page.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
