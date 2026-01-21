@@ -1,5 +1,4 @@
-import { useEffect, useCallback } from 'react';
-import { useBlocker } from 'react-router-dom';
+import { useEffect, useCallback, useState } from 'react';
 
 interface UseUnsavedChangesWarningOptions {
   isDirty: boolean;
@@ -9,7 +8,12 @@ interface UseUnsavedChangesWarningOptions {
 
 /**
  * Hook to warn users before leaving a page with unsaved changes.
- * Handles both browser navigation (refresh, close tab) and React Router navigation.
+ * Handles browser navigation (refresh, close tab) via beforeunload.
+ * 
+ * Note: React Router navigation blocking (useBlocker) requires data router APIs
+ * (createBrowserRouter + RouterProvider). Since we use BrowserRouter, this hook
+ * only provides browser-level protection. For in-app navigation, use the
+ * showManualDialog state and handle Cancel/Back buttons in the form component.
  */
 export function useUnsavedChangesWarning({
   isDirty,
@@ -17,12 +21,8 @@ export function useUnsavedChangesWarning({
   enabled = true,
 }: UseUnsavedChangesWarningOptions) {
   const shouldBlock = isDirty && enabled;
-
-  // Block React Router navigation
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      shouldBlock && currentLocation.pathname !== nextLocation.pathname
-  );
+  const [showManualDialog, setShowManualDialog] = useState(false);
+  const [pendingNavCallback, setPendingNavCallback] = useState<(() => void) | null>(null);
 
   // Handle browser navigation (refresh, close tab, back button)
   useEffect(() => {
@@ -42,22 +42,34 @@ export function useUnsavedChangesWarning({
     };
   }, [shouldBlock, message]);
 
+  // Request navigation (for use by Cancel/Back buttons)
+  const requestNavigation = useCallback((callback: () => void) => {
+    if (shouldBlock) {
+      setPendingNavCallback(() => callback);
+      setShowManualDialog(true);
+    } else {
+      callback();
+    }
+  }, [shouldBlock]);
+
   // Confirm navigation with user
   const confirmNavigation = useCallback(() => {
-    if (blocker.state === 'blocked') {
-      blocker.proceed();
+    setShowManualDialog(false);
+    if (pendingNavCallback) {
+      pendingNavCallback();
+      setPendingNavCallback(null);
     }
-  }, [blocker]);
+  }, [pendingNavCallback]);
 
   // Cancel navigation
   const cancelNavigation = useCallback(() => {
-    if (blocker.state === 'blocked') {
-      blocker.reset();
-    }
-  }, [blocker]);
+    setShowManualDialog(false);
+    setPendingNavCallback(null);
+  }, []);
 
   return {
-    isBlocked: blocker.state === 'blocked',
+    isBlocked: showManualDialog,
+    requestNavigation,
     confirmNavigation,
     cancelNavigation,
     message,

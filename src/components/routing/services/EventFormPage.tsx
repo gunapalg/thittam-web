@@ -393,11 +393,16 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
     }
   }, [formValues, organizationId, mode, formState.isDirty, saveDraft]);
 
-  // Unsaved changes warning
-  const { isBlocked, confirmNavigation, cancelNavigation } = useUnsavedChangesWarning({
+  // Unsaved changes warning - uses manual dialog since BrowserRouter doesn't support useBlocker
+  const { isBlocked, requestNavigation, confirmNavigation, cancelNavigation } = useUnsavedChangesWarning({
     isDirty: formState.isDirty && !isSubmitting,
     enabled: mode === 'create',
   });
+
+  // Safe navigation helper - shows confirmation if there are unsaved changes
+  const safeNavigate = useCallback((path: string) => {
+    requestNavigation(() => navigate(path));
+  }, [requestNavigation, navigate]);
 
   // Keyboard shortcuts
   useEventFormKeyboard({
@@ -411,7 +416,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         toast({ title: 'Draft saved', description: 'Your progress has been saved.' });
       }
     },
-    onCancel: () => navigate(listPath),
+    onCancel: () => safeNavigate(listPath),
     disabled: isSubmitting,
   });
 
@@ -846,7 +851,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => navigate(listPath)}
+                onClick={() => safeNavigate(listPath)}
                 className="gap-2"
               >
                 <XMarkIcon className="h-4 w-4" />
@@ -2200,7 +2205,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
                       : 'Changes save immediately'}
                   </p>
                   <div className="flex items-center gap-3 ml-auto">
-                    <Button type="button" variant="ghost" onClick={() => navigate(listPath)}>
+                    <Button type="button" variant="ghost" onClick={() => safeNavigate(listPath)}>
                       Cancel
                     </Button>
                     <Button
