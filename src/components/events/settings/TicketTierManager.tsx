@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Reorder } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, TicketIcon, Loader2 } from 'lucide-react';
+import { Plus, TicketIcon, Loader2, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { TicketTierCard } from './TicketTierCard';
@@ -22,6 +23,10 @@ export const TicketTierManager: React.FC<TicketTierManagerProps> = ({ eventId })
   const [duplicatingTier, setDuplicatingTier] = useState<TicketTier | null>(null);
   const { confirm, dialogProps, ConfirmationDialog: DeleteDialog } = useConfirmation();
 
+  // Local state for drag-reorder
+  const [orderedTiers, setOrderedTiers] = useState<TicketTier[]>([]);
+  const [hasOrderChanges, setHasOrderChanges] = useState(false);
+
   // Fetch tiers
   const { data: tiers = [], isLoading } = useQuery({
     queryKey: ['ticket-tiers', eventId],
@@ -36,6 +41,12 @@ export const TicketTierManager: React.FC<TicketTierManagerProps> = ({ eventId })
       return data as TicketTier[];
     },
   });
+
+  // Sync fetched tiers to local state
+  useEffect(() => {
+    setOrderedTiers(tiers);
+    setHasOrderChanges(false);
+  }, [tiers]);
 
   // Create tier mutation
   const createMutation = useMutation({
@@ -94,6 +105,42 @@ export const TicketTierManager: React.FC<TicketTierManagerProps> = ({ eventId })
     },
   });
 
+  // Batch update sort order mutation
+  const reorderMutation = useMutation({
+    mutationFn: async (reorderedTiers: TicketTier[]) => {
+      // Update each tier's sort_order
+      const updates = reorderedTiers.map((tier, index) => 
+        supabase
+          .from('ticket_tiers')
+          .update({ sort_order: index })
+          .eq('id', tier.id)
+      );
+      
+      const results = await Promise.all(updates);
+      const errors = results.filter(r => r.error);
+      if (errors.length > 0) throw errors[0].error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ticket-tiers', eventId] });
+      toast({ title: 'Order saved', description: 'Tier order has been updated.' });
+      setHasOrderChanges(false);
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to save tier order.', variant: 'destructive' });
+    },
+  });
+
+  const handleReorder = useCallback((newOrder: TicketTier[]) => {
+    setOrderedTiers(newOrder);
+    // Check if order actually changed
+    const orderChanged = newOrder.some((tier, index) => tier.id !== tiers[index]?.id);
+    setHasOrderChanges(orderChanged);
+  }, [tiers]);
+
+  const handleSaveOrder = useCallback(() => {
+    reorderMutation.mutate(orderedTiers);
+  }, [orderedTiers, reorderMutation]);
+
   const handleAddClick = () => {
     setEditingTier(null);
     setDuplicatingTier(null);
@@ -150,13 +197,30 @@ export const TicketTierManager: React.FC<TicketTierManagerProps> = ({ eventId })
               </div>
               <div>
                 <CardTitle className="text-lg">Ticket Tiers</CardTitle>
-                <CardDescription>Manage different ticket types and pricing</CardDescription>
+                <CardDescription>Manage different ticket types and pricing. Drag to reorder.</CardDescription>
               </div>
             </div>
-            <Button onClick={handleAddClick} size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Tier
-            </Button>
+            <div className="flex items-center gap-2">
+              {hasOrderChanges && (
+                <Button 
+                  onClick={handleSaveOrder} 
+                  size="sm" 
+                  variant="outline"
+                  disabled={reorderMutation.isPending}
+                >
+                  {reorderMutation.isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
+                  Save Order
+                </Button>
+              )}
+              <Button onClick={handleAddClick} size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Tier
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -164,7 +228,7 @@ export const TicketTierManager: React.FC<TicketTierManagerProps> = ({ eventId })
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : tiers.length === 0 ? (
+          ) : orderedTiers.length === 0 ? (
             <div className="text-center py-8 border-2 border-dashed rounded-lg">
               <TicketIcon className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
               <h3 className="font-medium mb-1">No ticket tiers yet</h3>
@@ -177,17 +241,23 @@ export const TicketTierManager: React.FC<TicketTierManagerProps> = ({ eventId })
               </Button>
             </div>
           ) : (
-            <div className="space-y-3">
-              {tiers.map((tier) => (
-                <TicketTierCard
-                  key={tier.id}
-                  tier={tier}
-                  onEdit={handleEditClick}
-                  onDuplicate={handleDuplicateClick}
-                  onDelete={handleDeleteClick}
-                />
+            <Reorder.Group 
+              axis="y" 
+              values={orderedTiers} 
+              onReorder={handleReorder}
+              className="space-y-3"
+            >
+              {orderedTiers.map((tier) => (
+                <Reorder.Item key={tier.id} value={tier}>
+                  <TicketTierCard
+                    tier={tier}
+                    onEdit={handleEditClick}
+                    onDuplicate={handleDuplicateClick}
+                    onDelete={handleDeleteClick}
+                  />
+                </Reorder.Item>
               ))}
-            </div>
+            </Reorder.Group>
           )}
         </CardContent>
       </Card>
