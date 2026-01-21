@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useSeo } from '@/hooks/useSeo';
 import { usePageViewTracking } from '@/hooks/usePageViewTracking';
-import { Calendar, MapPin, Users, Clock, Globe, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Globe, ExternalLink, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { EventScrollSpy } from './EventScrollSpy';
 import { sanitizeLandingPageHTML, sanitizeLandingPageCSS } from '@/utils/sanitize';
+import { getTierSaleStatus, TicketTier } from '@/types/ticketTier';
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  INR: '₹',
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+};
 
 /**
  * Public Event Page - accessible via /event/:slug
@@ -56,6 +64,43 @@ export function PublicEventPage() {
       return data;
     },
   });
+
+  // Fetch ticket tiers for pricing display
+  const { data: ticketTiers = [] } = useQuery({
+    queryKey: ['public-ticket-tiers', event?.id],
+    enabled: !!event?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ticket_tiers')
+        .select('*')
+        .eq('event_id', event!.id)
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      return data as TicketTier[];
+    },
+  });
+
+  // Calculate starting price for display
+  const pricingInfo = useMemo(() => {
+    if (ticketTiers.length === 0) return null;
+    
+    const availableTiers = ticketTiers.filter(t => getTierSaleStatus(t) === 'on_sale');
+    if (availableTiers.length === 0) return null;
+    
+    const lowestPrice = Math.min(...availableTiers.map(t => t.price));
+    const currency = availableTiers[0]?.currency || 'INR';
+    const symbol = CURRENCY_SYMBOLS[currency] || currency;
+    
+    return {
+      startingPrice: lowestPrice,
+      currency,
+      symbol,
+      tierCount: availableTiers.length,
+      isFree: lowestPrice === 0,
+    };
+  }, [ticketTiers]);
 
   // SEO
   useSeo({
@@ -251,6 +296,18 @@ export function PublicEventPage() {
                 <div className="inline-flex items-center gap-2 rounded-full bg-background/20 backdrop-blur px-4 py-2 text-sm">
                   <Users className="h-4 w-4" />
                   <span>{event.capacity} spots</span>
+                </div>
+              )}
+
+              {/* Pricing badge */}
+              {pricingInfo && (
+                <div className="inline-flex items-center gap-2 rounded-full bg-background/20 backdrop-blur px-4 py-2 text-sm font-semibold">
+                  <Ticket className="h-4 w-4" />
+                  <span>
+                    {pricingInfo.isFree 
+                      ? 'Free' 
+                      : `From ${pricingInfo.symbol}${pricingInfo.startingPrice.toLocaleString()}`}
+                  </span>
                 </div>
               )}
             </div>
