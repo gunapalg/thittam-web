@@ -47,6 +47,7 @@ const VendorPublicProfilePage = lazy(() => import('./services/VendorPublicProfil
 const ParticipantPortfolioPage = lazy(() => import('../portfolio/ParticipantPortfolioPage'));
 const HelpPage = lazy(() => import('../help/HelpPage'));
 const GenerateBackgroundsPage = lazy(() => import('../../pages/admin/GenerateBackgrounds'));
+const PaymentSuccessPage = lazy(() => import('../../pages/PaymentSuccess'));
 
 // Loading fallback for lazy-loaded routes
 const RouteLoadingFallback = () => (
@@ -564,6 +565,18 @@ export const AppRouter: React.FC = () => {
             {/* Public certificate verification */}
             <Route path="/verify" element={<CertificateVerification />} />
             <Route path="/verify/:certificateId" element={<CertificateVerification />} />
+
+            {/* Payment success/callback */}
+            <Route path="/payment-success" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <PaymentSuccessPage />
+              </Suspense>
+            } />
+            <Route path="/registration-success" element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <PaymentSuccessPage />
+              </Suspense>
+            } />
 
             {/* Public event routes */}
             <Route path="/events" element={<ParticipantEventsPage />} />
