@@ -5217,6 +5217,78 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          event_id: string
+          id: string
+          metadata: Json | null
+          payment_method: string | null
+          refund_amount: number | null
+          refund_reason: string | null
+          registration_id: string | null
+          status: string
+          stripe_checkout_session_id: string | null
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          event_id: string
+          id?: string
+          metadata?: Json | null
+          payment_method?: string | null
+          refund_amount?: number | null
+          refund_reason?: string | null
+          registration_id?: string | null
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          event_id?: string
+          id?: string
+          metadata?: Json | null
+          payment_method?: string | null
+          refund_amount?: number | null
+          refund_reason?: string | null
+          registration_id?: string | null
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pinned_conversations: {
         Row: {
           channel_id: string
@@ -5696,9 +5768,11 @@ export type Database = {
           event_id: string
           form_responses: Json
           id: string
+          payment_status: string | null
           promo_code_id: string | null
           quantity: number
           status: Database["public"]["Enums"]["registration_status"]
+          stripe_session_id: string | null
           subtotal: number | null
           ticket_tier_id: string | null
           total_amount: number | null
@@ -5711,9 +5785,11 @@ export type Database = {
           event_id: string
           form_responses?: Json
           id?: string
+          payment_status?: string | null
           promo_code_id?: string | null
           quantity?: number
           status?: Database["public"]["Enums"]["registration_status"]
+          stripe_session_id?: string | null
           subtotal?: number | null
           ticket_tier_id?: string | null
           total_amount?: number | null
@@ -5726,9 +5802,11 @@ export type Database = {
           event_id?: string
           form_responses?: Json
           id?: string
+          payment_status?: string | null
           promo_code_id?: string | null
           quantity?: number
           status?: Database["public"]["Enums"]["registration_status"]
+          stripe_session_id?: string | null
           subtotal?: number | null
           ticket_tier_id?: string | null
           total_amount?: number | null
