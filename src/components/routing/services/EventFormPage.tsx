@@ -510,11 +510,16 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
       if (mode !== 'edit' || !eventId) return;
       try {
         setIsLoadingEvent(true);
+        
+        // Fetch event with new dedicated columns
         const { data, error } = await supabase
           .from('events')
-          .select(
-            'id, name, description, mode, start_date, end_date, capacity, visibility, status, created_at, updated_at, organization_id, branding, canvas_state',
-          )
+          .select(`
+            id, name, description, mode, start_date, end_date, capacity, visibility, status, 
+            created_at, updated_at, organization_id, branding, canvas_state, slug, category,
+            timezone, registration_deadline, registration_type, is_free, allow_waitlist,
+            contact_email, contact_phone, event_website, min_age, max_age, language
+          `)
           .eq('id', eventId)
           .maybeSingle();
 
@@ -529,53 +534,81 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           return;
         }
 
+        // Fetch venue from normalized table
+        const { data: venueData } = await supabase
+          .from('event_venues')
+          .select('*')
+          .eq('event_id', eventId)
+          .maybeSingle();
+
+        // Fetch virtual link from normalized table
+        const { data: virtualData } = await supabase
+          .from('event_virtual_links')
+          .select('*')
+          .eq('event_id', eventId)
+          .eq('is_primary', true)
+          .maybeSingle();
+
         const branding = data.branding as any;
+        
+        // Priority: new columns > normalized tables > branding JSONB (backward compat)
         reset({
           name: data.name ?? '',
           description: data.description ?? '',
           mode: data.mode ?? 'ONLINE',
+          visibility: (data as any).visibility ?? 'PUBLIC',
           category: (data as any).category ?? '',
           organizationId: data.organization_id ?? '',
           capacity: data.capacity != null ? String(data.capacity) : '',
-          // Registration settings - try new location first, fall back to legacy
-          registrationType: branding?.ticketing?.registrationType ?? branding?.registration?.type ?? 'OPEN',
-          isFreeEvent: branding?.ticketing?.isFree ?? branding?.registration?.isFree ?? true,
-          allowWaitlist: branding?.ticketing?.allowWaitlist ?? branding?.registration?.allowWaitlist ?? false,
+          
+          // Registration settings - NEW COLUMNS FIRST, then legacy JSONB
+          registrationType: (data as any).registration_type ?? branding?.ticketing?.registrationType ?? branding?.registration?.type ?? 'OPEN',
+          isFreeEvent: (data as any).is_free ?? branding?.ticketing?.isFree ?? branding?.registration?.isFree ?? true,
+          allowWaitlist: (data as any).allow_waitlist ?? branding?.ticketing?.allowWaitlist ?? branding?.registration?.allowWaitlist ?? false,
+          
           // Tags & SEO - try new location first
           tags: (branding?.seo?.tags ?? branding?.tags ?? []).join(', '),
           metaDescription: branding?.seo?.metaDescription ?? '',
-          customSlug: branding?.seo?.customSlug ?? '',
-          // Accessibility - try new location first, fall back to venue
-          accessibilityLanguage: branding?.accessibility?.language ?? 'en',
-          ageRestrictionEnabled: branding?.accessibility?.ageRestriction?.enabled ?? false,
-          minAge: branding?.accessibility?.ageRestriction?.minAge ?? null,
-          maxAge: branding?.accessibility?.ageRestriction?.maxAge ?? null,
-          // Schedule
+          customSlug: (data as any).slug ?? branding?.seo?.customSlug ?? '',
+          
+          // Accessibility - NEW COLUMNS FIRST
+          accessibilityLanguage: (data as any).language ?? branding?.accessibility?.language ?? 'en',
+          ageRestrictionEnabled: ((data as any).min_age != null) || (branding?.accessibility?.ageRestriction?.enabled ?? false),
+          minAge: (data as any).min_age ?? branding?.accessibility?.ageRestriction?.minAge ?? null,
+          maxAge: (data as any).max_age ?? branding?.accessibility?.ageRestriction?.maxAge ?? null,
+          
+          // Schedule - NEW COLUMNS FIRST
           startDate: data.start_date ? new Date(data.start_date).toISOString().slice(0, 16) : '',
           endDate: data.end_date ? new Date(data.end_date).toISOString().slice(0, 16) : '',
-          registrationDeadline: branding?.registrationDeadline ?? '',
-          timezone: branding?.timezone ?? browserTimezone ?? 'Asia/Kolkata',
-          // Organizer contact
-          contactEmail: branding?.contact?.email ?? '',
-          contactPhone: branding?.contact?.phone ?? '',
+          registrationDeadline: (data as any).registration_deadline 
+            ? new Date((data as any).registration_deadline).toISOString().slice(0, 16) 
+            : branding?.registrationDeadline ?? '',
+          timezone: (data as any).timezone ?? branding?.timezone ?? browserTimezone ?? 'Asia/Kolkata',
+          
+          // Organizer contact - NEW COLUMNS FIRST
+          contactEmail: (data as any).contact_email ?? branding?.contact?.email ?? '',
+          contactPhone: (data as any).contact_phone ?? branding?.contact?.phone ?? '',
           supportUrl: branding?.contact?.supportUrl ?? '',
-          eventWebsite: branding?.contact?.eventWebsite ?? '',
-          // Venue fields
-          venueName: branding?.venue?.name ?? '',
-          venueAddress: branding?.venue?.address ?? '',
-          venueCity: branding?.venue?.city ?? '',
-          venueState: branding?.venue?.state ?? '',
-          venueCountry: branding?.venue?.country ?? '',
-          venuePostalCode: branding?.venue?.postalCode ?? '',
-          venueCapacity: branding?.venue?.capacity != null ? String(branding.venue.capacity) : '',
-          accessibilityFeatures: branding?.accessibility?.features ?? branding?.venue?.accessibilityFeatures ?? [],
-          accessibilityNotes: branding?.accessibility?.notes ?? branding?.venue?.accessibilityNotes ?? '',
-          // Virtual fields
-          virtualPlatform: branding?.virtualLinks?.platform ?? '',
-          virtualMeetingUrl: branding?.virtualLinks?.meetingUrl ?? '',
-          virtualMeetingId: branding?.virtualLinks?.meetingId ?? '',
-          virtualPassword: branding?.virtualLinks?.password ?? '',
-          virtualInstructions: branding?.virtualLinks?.instructions ?? '',
+          eventWebsite: (data as any).event_website ?? branding?.contact?.eventWebsite ?? '',
+          
+          // Venue fields - NORMALIZED TABLE FIRST, then JSONB fallback
+          venueName: venueData?.name ?? branding?.venue?.name ?? '',
+          venueAddress: venueData?.address ?? branding?.venue?.address ?? '',
+          venueCity: venueData?.city ?? branding?.venue?.city ?? '',
+          venueState: venueData?.state ?? branding?.venue?.state ?? '',
+          venueCountry: venueData?.country ?? branding?.venue?.country ?? '',
+          venuePostalCode: venueData?.postal_code ?? branding?.venue?.postalCode ?? '',
+          venueCapacity: venueData?.capacity != null ? String(venueData.capacity) : (branding?.venue?.capacity != null ? String(branding.venue.capacity) : ''),
+          accessibilityFeatures: venueData?.accessibility_features ?? branding?.accessibility?.features ?? branding?.venue?.accessibilityFeatures ?? [],
+          accessibilityNotes: venueData?.accessibility_notes ?? branding?.accessibility?.notes ?? branding?.venue?.accessibilityNotes ?? '',
+          
+          // Virtual fields - NORMALIZED TABLE FIRST, then JSONB fallback
+          virtualPlatform: virtualData?.platform ?? branding?.virtualLinks?.platform ?? '',
+          virtualMeetingUrl: virtualData?.meeting_url ?? branding?.virtualLinks?.meetingUrl ?? '',
+          virtualMeetingId: virtualData?.meeting_id ?? branding?.virtualLinks?.meetingId ?? '',
+          virtualPassword: virtualData?.password ?? branding?.virtualLinks?.password ?? '',
+          virtualInstructions: virtualData?.instructions ?? branding?.virtualLinks?.instructions ?? '',
+          
           // Branding
           primaryColor: branding?.primaryColor ?? '#2563eb',
           logoUrl: branding?.logoUrl ?? '',
@@ -711,6 +744,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         },
       };
 
+      // Build payload with NEW DEDICATED COLUMNS + reduced branding JSONB
       const payload: any = {
         name: values.name.trim(),
         description: values.description.trim(),
@@ -718,11 +752,25 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
         category: values.category || null,
         start_date: values.startDate,
         end_date: values.endDate,
-        capacity:
-          values.capacity && values.capacity.trim() !== '' ? Number(values.capacity) : null,
+        capacity: values.capacity && values.capacity.trim() !== '' ? Number(values.capacity) : null,
         organization_id: values.organizationId,
         visibility: values.visibility || 'PUBLIC',
         slug: values.customSlug?.trim() || null,
+        
+        // NEW DEDICATED COLUMNS (Phase 1 migration)
+        timezone: values.timezone || 'UTC',
+        registration_deadline: values.registrationDeadline || null,
+        registration_type: values.registrationType || 'OPEN',
+        is_free: values.isFreeEvent ?? true,
+        allow_waitlist: values.allowWaitlist ?? false,
+        contact_email: values.contactEmail?.trim() || null,
+        contact_phone: values.contactPhone?.trim() || null,
+        event_website: values.eventWebsite || null,
+        min_age: values.ageRestrictionEnabled ? (values.minAge ?? null) : null,
+        max_age: values.ageRestrictionEnabled ? (values.maxAge ?? null) : null,
+        language: values.accessibilityLanguage || 'en',
+        
+        // REDUCED branding JSONB (visual customization + legacy compatibility)
         branding: {
           primaryColor: values.primaryColor,
           logoUrl: values.logoUrl || undefined,
@@ -730,13 +778,12 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           bannerUrl: values.bannerUrl || undefined,
           primaryCtaLabel: values.primaryCtaLabel?.trim() || undefined,
           secondaryCtaLabel: values.secondaryCtaLabel?.trim() || undefined,
+          // Legacy compatibility (keep for 1 release cycle for backward compat)
           venue: venueData,
           virtualLinks: virtualLinksData,
           contact: contactData,
-          // Legacy location (for backwards compatibility)
           registration: registrationData,
           tags: tagsArray.length > 0 ? tagsArray : undefined,
-          // Canonical locations (for settings panels)
           ticketing: ticketingData,
           seo: seoData,
           accessibility: accessibilityData,
@@ -760,6 +807,37 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
 
         if (error) throw error;
         createdEventId = data?.id as string | undefined;
+
+        // Insert into normalized venue table if physical event
+        if (createdEventId && (values.mode === 'OFFLINE' || values.mode === 'HYBRID') && values.venueName) {
+          const { error: venueError } = await supabase.from('event_venues').insert({
+            event_id: createdEventId,
+            name: values.venueName.trim(),
+            address: values.venueAddress?.trim() || null,
+            city: values.venueCity?.trim() || null,
+            state: values.venueState?.trim() || null,
+            country: values.venueCountry?.trim() || null,
+            postal_code: values.venuePostalCode?.trim() || null,
+            capacity: values.venueCapacity ? Number(values.venueCapacity) : null,
+            accessibility_features: values.accessibilityFeatures || [],
+            accessibility_notes: values.accessibilityNotes?.trim() || null,
+          });
+          if (venueError) console.error('Failed to save venue:', venueError);
+        }
+
+        // Insert into normalized virtual links table if online event
+        if (createdEventId && (values.mode === 'ONLINE' || values.mode === 'HYBRID') && values.virtualMeetingUrl) {
+          const { error: virtualError } = await supabase.from('event_virtual_links').insert({
+            event_id: createdEventId,
+            platform: (values.virtualPlatform as 'zoom' | 'teams' | 'meet' | 'webex' | 'discord' | 'other') || 'other',
+            meeting_url: values.virtualMeetingUrl,
+            meeting_id: values.virtualMeetingId?.trim() || null,
+            password: values.virtualPassword || null,
+            instructions: values.virtualInstructions?.trim() || null,
+            is_primary: true,
+          });
+          if (virtualError) console.error('Failed to save virtual link:', virtualError);
+        }
 
         // Save pending ticket tiers if this is a paid event
         if (createdEventId && pendingTiers.length > 0 && !values.isFreeEvent) {
@@ -788,8 +866,53 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
           }
         }
       } else {
+        // UPDATE MODE: Update event + upsert normalized tables
         const { error } = await supabase.from('events').update(payload).eq('id', eventId);
         if (error) throw error;
+
+        // Upsert venue data
+        if ((values.mode === 'OFFLINE' || values.mode === 'HYBRID') && values.venueName) {
+          const { error: venueError } = await supabase.from('event_venues').upsert({
+            event_id: eventId,
+            name: values.venueName.trim(),
+            address: values.venueAddress?.trim() || null,
+            city: values.venueCity?.trim() || null,
+            state: values.venueState?.trim() || null,
+            country: values.venueCountry?.trim() || null,
+            postal_code: values.venuePostalCode?.trim() || null,
+            capacity: values.venueCapacity ? Number(values.venueCapacity) : null,
+            accessibility_features: values.accessibilityFeatures || [],
+            accessibility_notes: values.accessibilityNotes?.trim() || null,
+          }, { onConflict: 'event_id' });
+          if (venueError) console.error('Failed to update venue:', venueError);
+        } else {
+          // If mode changed to ONLINE only, delete venue record
+          await supabase.from('event_venues').delete().eq('event_id', eventId);
+        }
+
+        // Upsert virtual link data
+        if ((values.mode === 'ONLINE' || values.mode === 'HYBRID') && values.virtualMeetingUrl) {
+          // Delete existing and insert new (simpler than complex upsert)
+          await supabase.from('event_virtual_links').delete().eq('event_id', eventId).eq('is_primary', true);
+          const { error: virtualError } = await supabase.from('event_virtual_links').insert({
+            event_id: eventId,
+            platform: (values.virtualPlatform as 'zoom' | 'teams' | 'meet' | 'webex' | 'discord' | 'other') || 'other',
+            meeting_url: values.virtualMeetingUrl,
+            meeting_id: values.virtualMeetingId?.trim() || null,
+            password: values.virtualPassword || null,
+            instructions: values.virtualInstructions?.trim() || null,
+            is_primary: true,
+          });
+          if (virtualError) console.error('Failed to update virtual link:', virtualError);
+        } else {
+          // If mode changed to OFFLINE only, delete virtual link
+          await supabase.from('event_virtual_links').delete().eq('event_id', eventId);
+        }
+      }
+
+      // Clear draft on successful save
+      if (mode === 'create') {
+        clearDraft();
       }
 
       toast({
