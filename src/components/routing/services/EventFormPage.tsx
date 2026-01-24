@@ -4,7 +4,6 @@ import { XMarkIcon, CheckIcon, ChevronDownIcon, SparklesIcon, CalendarDaysIcon, 
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useToast } from '@/hooks/use-toast';
 import { useForm, useWatch } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEventManagementPaths } from '@/hooks/useEventManagementPaths';
 import { useMyMemberOrganizations } from '@/hooks/useOrganization';
@@ -33,6 +32,9 @@ import { ImageUpload } from '@/components/ui/image-upload';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { EventImageGallery, type EventImage } from '@/components/events/form/EventImageGallery';
 import { EventFAQsSection, type EventFAQ } from '@/components/events/form/EventFAQsSection';
+
+// Enhanced validation schema with detailed messages
+import { eventFormSchema, type EventFormValues } from '@/lib/event-form-schema';
 
 import {
   Form,
@@ -185,87 +187,8 @@ interface EventFormPageProps {
   mode: 'create' | 'edit';
 }
 
-const eventSchema = z
-  .object({
-    name: z.string().trim().min(1, 'Event name is required'),
-    description: z.string().trim().min(1, 'Description is required'),
-    mode: z.enum(['ONLINE', 'OFFLINE', 'HYBRID'], { required_error: 'Mode is required' }),
-    visibility: z.enum(['PUBLIC', 'PRIVATE', 'UNLISTED']).optional(),
-    category: z.string().optional(),
-    organizationId: z.string().min(1, 'Organization is required'),
-    capacity: z
-      .string()
-      .optional()
-      .refine(
-        (val) => {
-          if (!val || val.trim() === '') return true;
-          const num = Number(val);
-          return !Number.isNaN(num) && num > 0;
-        },
-        { message: 'Capacity must be a positive number' },
-      ),
-    // Registration settings
-    registrationType: z.enum(['OPEN', 'INVITE_ONLY', 'APPROVAL_REQUIRED']).optional(),
-    isFreeEvent: z.boolean().optional(),
-    allowWaitlist: z.boolean().optional(),
-    tags: z.string().optional(),
-    // SEO fields (new)
-    metaDescription: z.string().max(160, 'Meta description must be 160 characters or less').optional(),
-    customSlug: z.string().optional(),
-    // Accessibility fields (new)
-    accessibilityLanguage: z.string().optional(),
-    ageRestrictionEnabled: z.boolean().optional(),
-    minAge: z.number().min(0).max(120).optional().nullable(),
-    maxAge: z.number().min(0).max(120).optional().nullable(),
-    // Schedule
-    startDate: z.string().min(1, 'Start date is required'),
-    endDate: z.string().min(1, 'End date is required'),
-    registrationDeadline: z.string().optional(),
-    timezone: z.string().min(1, 'Timezone is required'),
-    // Organizer contact
-    contactEmail: z.string().email('Valid email required').optional().or(z.literal('')),
-    contactPhone: z.string().optional(),
-    supportUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-    eventWebsite: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-    // Venue fields (for OFFLINE/HYBRID)
-    venueName: z.string().optional(),
-    venueAddress: z.string().optional(),
-    venueCity: z.string().optional(),
-    venueState: z.string().optional(),
-    venueCountry: z.string().optional(),
-    venuePostalCode: z.string().optional(),
-    venueCapacity: z.string().optional(),
-    accessibilityFeatures: z.array(z.string()).optional(),
-    accessibilityNotes: z.string().optional(),
-    // Virtual fields (for ONLINE/HYBRID)
-    virtualPlatform: z.string().optional(),
-    virtualMeetingUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-    virtualMeetingId: z.string().optional(),
-    virtualPassword: z.string().optional(),
-    virtualInstructions: z.string().optional(),
-    // Branding
-    primaryColor: z.string().optional(),
-    logoUrl: z.string().url('Logo URL must be a valid URL').optional().or(z.literal('')),
-    heroSubtitle: z.string().trim().optional(),
-    bannerUrl: z.string().url('Banner URL must be a valid URL').optional().or(z.literal('')),
-    primaryCtaLabel: z.string().trim().optional(),
-    secondaryCtaLabel: z.string().trim().optional(),
-    canvasState: z.any().optional(),
-  })
-  .refine(
-    (data) => {
-      if (!data.startDate || !data.endDate) return true;
-      const start = new Date(data.startDate);
-      const end = new Date(data.endDate);
-      return end > start;
-    },
-    {
-      message: 'End date must be after start date',
-      path: ['endDate'],
-    },
-  );
-
-export type EventFormValues = z.infer<typeof eventSchema>;
+// Using imported eventFormSchema from '@/lib/event-form-schema'
+// with comprehensive validation messages
 
 /**
  * EventFormPage provides a single-page form with collapsible sections for creating and editing events.
@@ -302,7 +225,7 @@ export const EventFormPage: React.FC<EventFormPageProps> = ({ mode }) => {
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const form = useForm<EventFormValues>({
-    resolver: zodResolver(eventSchema),
+    resolver: zodResolver(eventFormSchema),
     defaultValues: {
       name: '',
       description: '',
