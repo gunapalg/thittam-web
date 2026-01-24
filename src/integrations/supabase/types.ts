@@ -2650,6 +2650,47 @@ export type Database = {
           },
         ]
       }
+      event_faqs: {
+        Row: {
+          answer: string
+          created_at: string | null
+          event_id: string
+          id: string
+          is_published: boolean | null
+          question: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string | null
+          event_id: string
+          id?: string
+          is_published?: boolean | null
+          question: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          is_published?: boolean | null
+          question?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_faqs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_icebreakers: {
         Row: {
           created_at: string
@@ -2678,6 +2719,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "event_icebreakers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_images: {
+        Row: {
+          alt_text: string | null
+          caption: string | null
+          created_at: string | null
+          event_id: string
+          id: string
+          is_primary: boolean | null
+          sort_order: number | null
+          url: string
+        }
+        Insert: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string | null
+          event_id: string
+          id?: string
+          is_primary?: boolean | null
+          sort_order?: number | null
+          url: string
+        }
+        Update: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          is_primary?: boolean | null
+          sort_order?: number | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_images_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
@@ -3126,6 +3208,118 @@ export type Database = {
           },
         ]
       }
+      event_venues: {
+        Row: {
+          accessibility_features: string[] | null
+          accessibility_notes: string | null
+          address: string | null
+          capacity: number | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          event_id: string
+          google_place_id: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          postal_code: string | null
+          state: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          accessibility_features?: string[] | null
+          accessibility_notes?: string | null
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          event_id: string
+          google_place_id?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          postal_code?: string | null
+          state?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          accessibility_features?: string[] | null
+          accessibility_notes?: string | null
+          address?: string | null
+          capacity?: number | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          event_id?: string
+          google_place_id?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          postal_code?: string | null
+          state?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_venues_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_virtual_links: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          instructions: string | null
+          is_primary: boolean | null
+          meeting_id: string | null
+          meeting_url: string | null
+          password: string | null
+          platform: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          instructions?: string | null
+          is_primary?: boolean | null
+          meeting_id?: string | null
+          meeting_url?: string | null
+          password?: string | null
+          platform: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          instructions?: string | null
+          is_primary?: boolean | null
+          meeting_id?: string | null
+          meeting_url?: string | null
+          password?: string | null
+          platform?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_virtual_links_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_waitlist: {
         Row: {
           created_at: string
@@ -3210,65 +3404,98 @@ export type Database = {
       }
       events: {
         Row: {
+          allow_waitlist: boolean | null
           branding: Json | null
           canvas_state: Json | null
           capacity: number | null
           category: Database["public"]["Enums"]["event_category"] | null
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           description: string | null
           end_date: string
+          event_website: string | null
           id: string
+          is_free: boolean | null
           landing_page_data: Json | null
           landing_page_slug: string | null
+          language: string | null
+          max_age: number | null
+          min_age: number | null
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id: string | null
           owner_id: string | null
+          registration_deadline: string | null
+          registration_type: string | null
           slug: string | null
           start_date: string
           status: Database["public"]["Enums"]["event_status"]
+          timezone: string | null
           updated_at: string
           visibility: Database["public"]["Enums"]["event_visibility"]
         }
         Insert: {
+          allow_waitlist?: boolean | null
           branding?: Json | null
           canvas_state?: Json | null
           capacity?: number | null
           category?: Database["public"]["Enums"]["event_category"] | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           description?: string | null
           end_date: string
+          event_website?: string | null
           id?: string
+          is_free?: boolean | null
           landing_page_data?: Json | null
           landing_page_slug?: string | null
+          language?: string | null
+          max_age?: number | null
+          min_age?: number | null
           mode: Database["public"]["Enums"]["event_mode"]
           name: string
           organization_id?: string | null
           owner_id?: string | null
+          registration_deadline?: string | null
+          registration_type?: string | null
           slug?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["event_status"]
+          timezone?: string | null
           updated_at?: string
           visibility?: Database["public"]["Enums"]["event_visibility"]
         }
         Update: {
+          allow_waitlist?: boolean | null
           branding?: Json | null
           canvas_state?: Json | null
           capacity?: number | null
           category?: Database["public"]["Enums"]["event_category"] | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           description?: string | null
           end_date?: string
+          event_website?: string | null
           id?: string
+          is_free?: boolean | null
           landing_page_data?: Json | null
           landing_page_slug?: string | null
+          language?: string | null
+          max_age?: number | null
+          min_age?: number | null
           mode?: Database["public"]["Enums"]["event_mode"]
           name?: string
           organization_id?: string | null
           owner_id?: string | null
+          registration_deadline?: string | null
+          registration_type?: string | null
           slug?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["event_status"]
+          timezone?: string | null
           updated_at?: string
           visibility?: Database["public"]["Enums"]["event_visibility"]
         }
