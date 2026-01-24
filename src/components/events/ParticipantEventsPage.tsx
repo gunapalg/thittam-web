@@ -46,8 +46,8 @@ function mapRowToEvent(row: SupabaseEventRow): Event | null {
     agenda: [],
     prizes: [],
     sponsors: [],
-    organizationId: undefined,
-    inviteLink: undefined,
+    organizationId: null,
+    inviteLink: null,
     venue: undefined,
     virtualLinks: undefined,
     organization: undefined,
@@ -646,14 +646,14 @@ export function ParticipantEventsPage() {
                             <span>{startDate.time}</span>
                           </div>
                           {/* Category Badge */}
-                          {event.category && event.category !== EventCategory.OTHER && (
+                          {event.category && event.category !== EventCategory.OTHER && categoryConfig[event.category as EventCategory] && (
                             <div className="mt-2">
-                              <Badge variant="outline" className={`text-xs ${categoryConfig[event.category].color}`}>
+                              <Badge variant="outline" className={`text-xs ${categoryConfig[event.category as EventCategory].color}`}>
                                 {(() => {
-                                  const CategoryIcon = categoryConfig[event.category].icon;
+                                  const CategoryIcon = categoryConfig[event.category as EventCategory].icon;
                                   return <CategoryIcon className="h-3 w-3 mr-1" />;
                                 })()}
-                                {categoryConfig[event.category].label}
+                                {categoryConfig[event.category as EventCategory].label}
                               </Badge>
                             </div>
                           )}

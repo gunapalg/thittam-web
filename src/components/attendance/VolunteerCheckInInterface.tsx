@@ -52,7 +52,7 @@ export const VolunteerCheckInInterface: React.FC<VolunteerCheckInInterfaceProps>
         organizerId: data.organization_id || '',
         organizationId: data.organization_id || undefined,
         visibility: data.visibility as Event['visibility'],
-        inviteLink: undefined,
+        inviteLink: null,
         branding: { primaryColor: undefined, secondaryColor: undefined },
         venue: undefined,
         virtualLinks: undefined,
