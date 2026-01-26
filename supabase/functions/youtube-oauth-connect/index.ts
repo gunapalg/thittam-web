@@ -276,7 +276,7 @@ Deno.serve(async (req) => {
         refresh_token_secret_id: secretIds.refresh_id,
         expires_at: expiresAt,
         is_active: true,
-        encrypted_credentials: null, // Clear any legacy plaintext data
+        encrypted_credentials: {}, // Empty - tokens stored securely in Vault
         updated_at: new Date().toISOString(),
       }, { onConflict: 'workspace_id,platform' });
 
