@@ -3270,53 +3270,77 @@ export type Database = {
         Row: {
           chat_enabled: boolean | null
           created_at: string
+          description: string | null
           ended_at: string | null
           event_id: string
           id: string
           is_recording_available: boolean | null
           platform: string
+          privacy_status: string | null
           recording_url: string | null
+          scheduled_start: string | null
           session_id: string
           started_at: string | null
           stream_status: string
           stream_url: string
+          thumbnail_url: string | null
+          title: string | null
           updated_at: string | null
           video_id: string
           viewer_count: number | null
+          workspace_id: string | null
+          youtube_broadcast_id: string | null
+          youtube_stream_key: string | null
         }
         Insert: {
           chat_enabled?: boolean | null
           created_at?: string
+          description?: string | null
           ended_at?: string | null
           event_id: string
           id?: string
           is_recording_available?: boolean | null
           platform?: string
+          privacy_status?: string | null
           recording_url?: string | null
+          scheduled_start?: string | null
           session_id: string
           started_at?: string | null
           stream_status?: string
           stream_url: string
+          thumbnail_url?: string | null
+          title?: string | null
           updated_at?: string | null
           video_id: string
           viewer_count?: number | null
+          workspace_id?: string | null
+          youtube_broadcast_id?: string | null
+          youtube_stream_key?: string | null
         }
         Update: {
           chat_enabled?: boolean | null
           created_at?: string
+          description?: string | null
           ended_at?: string | null
           event_id?: string
           id?: string
           is_recording_available?: boolean | null
           platform?: string
+          privacy_status?: string | null
           recording_url?: string | null
+          scheduled_start?: string | null
           session_id?: string
           started_at?: string | null
           stream_status?: string
           stream_url?: string
+          thumbnail_url?: string | null
+          title?: string | null
           updated_at?: string | null
           video_id?: string
           viewer_count?: number | null
+          workspace_id?: string | null
+          youtube_broadcast_id?: string | null
+          youtube_stream_key?: string | null
         }
         Relationships: [
           {
@@ -3339,6 +3363,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "registration_stats_by_event"
             referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "event_live_streams_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }

@@ -168,6 +168,16 @@ export const queryKeys = {
     detail: (checklistId: string) => ['checklist', checklistId] as const,
     items: (checklistId: string) => ['checklist-items', checklistId] as const,
   },
+
+  // Live streaming queries
+  liveStreams: {
+    all: ['live-streams'] as const,
+    byWorkspace: (workspaceId: string) => ['live-streams', 'workspace', workspaceId] as const,
+    byEvent: (eventId: string) => ['live-streams', 'event', eventId] as const,
+    detail: (streamId: string) => ['live-streams', 'detail', streamId] as const,
+    analytics: (streamId: string) => ['live-streams', 'detail', streamId, 'analytics'] as const,
+    youtubeChannel: (workspaceId: string) => ['youtube-channel', workspaceId] as const,
+  },
 } as const;
 
 // Type helper for extracting query key types
