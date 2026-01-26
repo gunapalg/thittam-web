@@ -27,6 +27,7 @@ export function YouTubeChannelCard({
     channel: hookChannel,
     isLoading: hookLoading,
     isConnecting,
+    isRefreshing,
     connect,
     disconnect,
     refresh,
@@ -46,8 +47,8 @@ export function YouTubeChannelCard({
     onDisconnect?.();
   };
 
-  const handleRefresh = () => {
-    refresh();
+  const handleRefresh = async () => {
+    await refresh();
     onRefresh?.();
   };
 
@@ -202,9 +203,10 @@ export function YouTubeChannelCard({
               size="sm" 
               className="flex-1 gap-2"
               onClick={handleRefresh}
+              disabled={isRefreshing}
             >
-              <RefreshCw className="h-3.5 w-3.5" />
-              Refresh Token
+              <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh Token'}
             </Button>
             <Button 
               variant="ghost" 
