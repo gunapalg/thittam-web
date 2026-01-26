@@ -322,6 +322,25 @@ export const SOCIAL_PLATFORM_COLUMNS = {
   detail: 'id, workspace_id, platform, handle, followers_count, following_count, posts_count, engagement_rate, is_connected, last_synced_at, created_at, updated_at',
 } as const;
 
+// Live stream columns
+export const LIVE_STREAM_COLUMNS = {
+  list: 'id, workspace_id, event_id, session_id, platform, video_id, stream_status, viewer_count, title, thumbnail_url, scheduled_start, started_at, created_at',
+  detail: 'id, workspace_id, session_id, event_id, platform, video_id, stream_url, stream_status, youtube_broadcast_id, youtube_stream_key, title, description, privacy_status, scheduled_start, started_at, ended_at, viewer_count, chat_enabled, is_recording_available, recording_url, thumbnail_url, created_at, updated_at',
+  minimal: 'id, stream_status, viewer_count, title',
+} as const;
+
+// Stream viewer session columns
+export const STREAM_VIEWER_SESSION_COLUMNS = {
+  list: 'id, stream_id, user_id, started_at, watch_duration_seconds, device_type',
+  detail: 'id, stream_id, user_id, started_at, last_seen_at, watch_duration_seconds, quality_preference, device_type, created_at',
+} as const;
+
+// YouTube credential columns (for workspace social API credentials)
+export const YOUTUBE_CREDENTIAL_COLUMNS = {
+  list: 'id, workspace_id, platform, is_active, expires_at',
+  detail: 'id, workspace_id, platform, credential_type, is_active, last_used_at, expires_at, created_at',
+} as const;
+
 // Engagement report columns
 export const ENGAGEMENT_REPORT_COLUMNS = {
   list: 'id, workspace_id, platform, report_date, total_followers, total_posts, engagement_rate, created_at',
