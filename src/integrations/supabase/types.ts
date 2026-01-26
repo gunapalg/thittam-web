@@ -14270,6 +14270,10 @@ export type Database = {
       }
       workspace_social_api_credentials: {
         Row: {
+          access_token_secret_id: string | null
+          channel_id: string | null
+          channel_name: string | null
+          channel_thumbnail: string | null
           created_at: string | null
           created_by: string | null
           credential_type: string
@@ -14277,12 +14281,19 @@ export type Database = {
           expires_at: string | null
           id: string
           is_active: boolean | null
+          is_live_enabled: boolean | null
           last_used_at: string | null
           platform: string
+          refresh_token_secret_id: string | null
+          subscriber_count: number | null
           updated_at: string | null
           workspace_id: string
         }
         Insert: {
+          access_token_secret_id?: string | null
+          channel_id?: string | null
+          channel_name?: string | null
+          channel_thumbnail?: string | null
           created_at?: string | null
           created_by?: string | null
           credential_type: string
@@ -14290,12 +14301,19 @@ export type Database = {
           expires_at?: string | null
           id?: string
           is_active?: boolean | null
+          is_live_enabled?: boolean | null
           last_used_at?: string | null
           platform: string
+          refresh_token_secret_id?: string | null
+          subscriber_count?: number | null
           updated_at?: string | null
           workspace_id: string
         }
         Update: {
+          access_token_secret_id?: string | null
+          channel_id?: string | null
+          channel_name?: string | null
+          channel_thumbnail?: string | null
           created_at?: string | null
           created_by?: string | null
           credential_type?: string
@@ -14303,8 +14321,11 @@ export type Database = {
           expires_at?: string | null
           id?: string
           is_active?: boolean | null
+          is_live_enabled?: boolean | null
           last_used_at?: string | null
           platform?: string
+          refresh_token_secret_id?: string | null
+          subscriber_count?: number | null
           updated_at?: string | null
           workspace_id?: string
         }
@@ -16884,6 +16905,10 @@ export type Database = {
         Args: { quantity: number; ticket_id: string }
         Returns: undefined
       }
+      delete_youtube_tokens: {
+        Args: { p_workspace_id: string }
+        Returns: undefined
+      }
       generate_slug: { Args: { input_text: string }; Returns: string }
       get_audit_logs_cursor: {
         Args: {
@@ -17244,6 +17269,14 @@ export type Database = {
           type: string
         }[]
       }
+      get_youtube_tokens: {
+        Args: { p_workspace_id: string }
+        Returns: {
+          access_token: string
+          expires_at: string
+          refresh_token: string
+        }[]
+      }
       get_zone_team_members: {
         Args: { p_event_id: string }
         Returns: {
@@ -17382,6 +17415,17 @@ export type Database = {
           sent_at: string
         }[]
       }
+      store_youtube_oauth_tokens: {
+        Args: {
+          p_access_token: string
+          p_refresh_token: string
+          p_workspace_id: string
+        }
+        Returns: {
+          access_id: string
+          refresh_id: string
+        }[]
+      }
       toggle_comment_like: { Args: { p_comment_id: string }; Returns: Json }
       update_icebreaker_streak: {
         Args: { p_event_id: string; p_user_id: string }
@@ -17396,6 +17440,14 @@ export type Database = {
         Returns: undefined
       }
       update_user_streak: { Args: { user_uuid: string }; Returns: undefined }
+      update_youtube_access_token: {
+        Args: {
+          p_new_access_token: string
+          p_new_expires_at: string
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "organizer" | "participant" | "vendor"

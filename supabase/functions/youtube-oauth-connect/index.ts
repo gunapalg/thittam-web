@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,40 +12,37 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const youtubeClientId = Deno.env.get('YOUTUBE_CLIENT_ID')!;
 const youtubeClientSecret = Deno.env.get('YOUTUBE_CLIENT_SECRET')!;
 
-interface TokenResponse {
+const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3';
+
+// Required scopes for YouTube Live Streaming
+const YOUTUBE_SCOPES = [
+  'https://www.googleapis.com/auth/youtube.force-ssl',
+  'https://www.googleapis.com/auth/youtube.upload',
+  'https://www.googleapis.com/auth/youtube.readonly',
+].join(' ');
+
+interface OAuthState {
+  workspace_id: string;
+  redirect_uri: string;
+  user_id: string;
+  timestamp: number;
+}
+
+interface YouTubeTokenResponse {
   access_token: string;
-  refresh_token: string;
+  refresh_token?: string;
   expires_in: number;
   token_type: string;
-  scope: string;
 }
 
-interface YouTubeChannelResponse {
-  items: Array<{
-    id: string;
-    snippet: {
-      title: string;
-      thumbnails: {
-        default: { url: string };
-      };
-    };
-    statistics: {
-      subscriberCount: string;
-    };
-    status?: {
-      longUploadsStatus?: string;
-    };
-  }>;
-}
-
-interface EncryptedCredentials {
-  access_token: string;
-  refresh_token: string;
-  channel_id: string;
-  channel_name: string;
-  channel_thumbnail?: string;
-  subscriber_count?: number;
-  is_live_enabled: boolean;
+interface YouTubeChannelInfo {
+  id: string;
+  title: string;
+  thumbnailUrl?: string;
+  subscriberCount?: number;
+  isLiveEnabled: boolean;
 }
 
 /**
@@ -83,6 +80,62 @@ async function verifyWorkspaceAccess(
   return managementRoles.includes(member.role);
 }
 
+/**
+ * Fetch YouTube channel info using access token
+ */
+async function fetchYouTubeChannel(accessToken: string): Promise<YouTubeChannelInfo> {
+  const response = await fetch(
+    `${YOUTUBE_API_URL}/channels?part=snippet,statistics,status&mine=true`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error('YouTube API error:', error);
+    throw new Error('Failed to fetch YouTube channel info');
+  }
+
+  const data = await response.json();
+  if (!data.items || data.items.length === 0) {
+    throw new Error('No YouTube channel found for this account');
+  }
+
+  const channel = data.items[0];
+  return {
+    id: channel.id,
+    title: channel.snippet.title,
+    thumbnailUrl: channel.snippet.thumbnails?.default?.url,
+    subscriberCount: parseInt(channel.statistics.subscriberCount || '0', 10),
+    isLiveEnabled: channel.status?.longUploadsStatus === 'allowed',
+  };
+}
+
+/**
+ * Log OAuth activity for audit trail
+ */
+async function logOAuthActivity(
+  workspaceId: string,
+  userId: string,
+  action: string,
+  metadata?: Record<string, unknown>
+) {
+  try {
+    const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
+    await serviceClient.from('workspace_activity_log').insert({
+      workspace_id: workspaceId,
+      user_id: userId,
+      action_type: action,
+      entity_type: 'youtube_oauth',
+      entity_id: workspaceId,
+      metadata: metadata || {},
+    } as Record<string, unknown>);
+  } catch (err) {
+    console.error('Failed to log OAuth activity:', err);
+  }
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -93,11 +146,11 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
 
-    // Generate OAuth URL for initiating the flow
+    // Handle OAuth initialization
     if (action === 'init') {
       const workspaceId = url.searchParams.get('workspace_id');
-      const redirectUri = url.searchParams.get('redirect_uri');
-      
+      const redirectUri = url.searchParams.get('redirect_uri') || url.origin;
+
       if (!workspaceId) {
         return new Response(
           JSON.stringify({ error: 'workspace_id is required' }),
@@ -134,21 +187,24 @@ Deno.serve(async (req) => {
         );
       }
 
-      const state = btoa(JSON.stringify({ workspace_id: workspaceId, redirect_uri: redirectUri }));
-      const scopes = [
-        'https://www.googleapis.com/auth/youtube.force-ssl',
-        'https://www.googleapis.com/auth/youtube.upload',
-        'https://www.googleapis.com/auth/youtube.readonly'
-      ].join(' ');
+      // Create signed state parameter for CSRF protection
+      const state: OAuthState = {
+        workspace_id: workspaceId,
+        redirect_uri: redirectUri,
+        user_id: user.id,
+        timestamp: Date.now(),
+      };
+      const stateString = btoa(JSON.stringify(state));
 
-      const oauthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+      // Build OAuth URL
+      const oauthUrl = new URL(GOOGLE_AUTH_URL);
       oauthUrl.searchParams.set('client_id', youtubeClientId);
       oauthUrl.searchParams.set('redirect_uri', `${supabaseUrl}/functions/v1/youtube-oauth-connect`);
       oauthUrl.searchParams.set('response_type', 'code');
-      oauthUrl.searchParams.set('scope', scopes);
+      oauthUrl.searchParams.set('scope', YOUTUBE_SCOPES);
       oauthUrl.searchParams.set('access_type', 'offline');
       oauthUrl.searchParams.set('prompt', 'consent');
-      oauthUrl.searchParams.set('state', state);
+      oauthUrl.searchParams.set('state', stateString);
 
       return new Response(
         JSON.stringify({ oauth_url: oauthUrl.toString() }),
@@ -156,168 +212,199 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Handle OAuth callback (code exchange)
+    // Handle OAuth callback (from Google)
     const code = url.searchParams.get('code');
-    const state = url.searchParams.get('state');
+    const stateParam = url.searchParams.get('state');
     const error = url.searchParams.get('error');
 
     if (error) {
-      console.error('OAuth error:', error);
-      return new Response(
-        `<html><body><script>window.opener?.postMessage({ type: 'youtube-oauth-error', error: '${error}' }, '*'); window.close();</script></body></html>`,
-        { headers: { 'Content-Type': 'text/html' } }
-      );
+      console.error('OAuth error from Google:', error);
+      return generateCallbackHTML(false, error);
     }
 
-    if (!code || !state) {
+    if (!code || !stateParam) {
       return new Response(
         JSON.stringify({ error: 'Missing code or state parameter' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Decode state
-    let stateData: { workspace_id: string; redirect_uri?: string };
+    // Decode and validate state
+    let stateData: OAuthState;
     try {
-      stateData = JSON.parse(atob(state));
+      stateData = JSON.parse(atob(stateParam));
+      
+      // Validate state timestamp (10 minute expiry)
+      if (Date.now() - stateData.timestamp > 10 * 60 * 1000) {
+        throw new Error('State expired');
+      }
     } catch {
-      return new Response(
-        JSON.stringify({ error: 'Invalid state parameter' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.error('Invalid state parameter');
+      return generateCallbackHTML(false, 'Invalid or expired OAuth state');
     }
 
     // Exchange code for tokens
-    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        code,
         client_id: youtubeClientId,
         client_secret: youtubeClientSecret,
-        redirect_uri: `${supabaseUrl}/functions/v1/youtube-oauth-connect`,
+        code,
         grant_type: 'authorization_code',
+        redirect_uri: `${supabaseUrl}/functions/v1/youtube-oauth-connect`,
       }),
     });
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
       console.error('Token exchange failed:', errorText);
-      return new Response(
-        `<html><body><script>window.opener?.postMessage({ type: 'youtube-oauth-error', error: 'Token exchange failed' }, '*'); window.close();</script></body></html>`,
-        { headers: { 'Content-Type': 'text/html' } }
-      );
+      return generateCallbackHTML(false, 'Failed to exchange authorization code');
     }
 
-    const tokens: TokenResponse = await tokenResponse.json();
-
-    // Fetch channel info
-    const channelResponse = await fetch(
-      'https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,status&mine=true',
-      { headers: { Authorization: `Bearer ${tokens.access_token}` } }
-    );
-
-    if (!channelResponse.ok) {
-      console.error('Failed to fetch channel info:', await channelResponse.text());
-      return new Response(
-        `<html><body><script>window.opener?.postMessage({ type: 'youtube-oauth-error', error: 'Failed to fetch channel info' }, '*'); window.close();</script></body></html>`,
-        { headers: { 'Content-Type': 'text/html' } }
-      );
-    }
-
-    const channelData: YouTubeChannelResponse = await channelResponse.json();
+    const tokens: YouTubeTokenResponse = await tokenResponse.json();
     
-    if (!channelData.items || channelData.items.length === 0) {
-      return new Response(
-        `<html><body><script>window.opener?.postMessage({ type: 'youtube-oauth-error', error: 'No YouTube channel found' }, '*'); window.close();</script></body></html>`,
-        { headers: { 'Content-Type': 'text/html' } }
-      );
-    }
+    // Fetch channel info
+    const channel = await fetchYouTubeChannel(tokens.access_token);
 
-    const channel = channelData.items[0];
+    // Calculate token expiry
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
 
-    // Build encrypted credentials object (in production, actually encrypt this)
-    const encryptedCredentials: EncryptedCredentials = {
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      channel_id: channel.id,
-      channel_name: channel.snippet.title,
-      channel_thumbnail: channel.snippet.thumbnails.default.url,
-      subscriber_count: parseInt(channel.statistics.subscriberCount) || 0,
-      is_live_enabled: channel.status?.longUploadsStatus === 'allowed',
-    };
-
-    // Store credentials in database
+    // Store tokens securely using Supabase Vault
     const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Call the vault storage function
+    const { data: vaultResult, error: vaultError } = await serviceClient
+      .rpc('store_youtube_oauth_tokens', {
+        p_workspace_id: stateData.workspace_id,
+        p_access_token: tokens.access_token,
+        p_refresh_token: tokens.refresh_token || '',
+      });
 
-    // Check if record exists
-    const { data: existing } = await serviceClient
+    if (vaultError) {
+      console.error('Failed to store tokens in vault:', vaultError);
+      return generateCallbackHTML(false, 'Failed to securely store credentials');
+    }
+
+    // Get the secret IDs from vault result
+    const secretIds = vaultResult?.[0];
+    if (!secretIds) {
+      console.error('No secret IDs returned from vault');
+      return generateCallbackHTML(false, 'Failed to store credentials');
+    }
+
+    // Upsert credentials with vault references (no plaintext tokens)
+    const { error: dbError } = await serviceClient
       .from('workspace_social_api_credentials')
-      .select('id')
-      .eq('workspace_id', stateData.workspace_id)
-      .eq('platform', 'youtube')
-      .maybeSingle();
+      .upsert({
+        workspace_id: stateData.workspace_id,
+        platform: 'youtube',
+        credential_type: 'oauth',
+        channel_id: channel.id,
+        channel_name: channel.title,
+        channel_thumbnail: channel.thumbnailUrl,
+        subscriber_count: channel.subscriberCount,
+        is_live_enabled: channel.isLiveEnabled,
+        access_token_secret_id: secretIds.access_id,
+        refresh_token_secret_id: secretIds.refresh_id,
+        expires_at: expiresAt,
+        is_active: true,
+        encrypted_credentials: null, // Clear any legacy plaintext data
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'workspace_id,platform' });
 
-    let upsertError;
-    if (existing) {
-      // Update existing record
-      const { error } = await serviceClient
-        .from('workspace_social_api_credentials')
-        .update({
-          credential_type: 'oauth',
-          encrypted_credentials: encryptedCredentials,
-          expires_at: expiresAt,
-          is_active: true,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existing.id);
-      upsertError = error;
-    } else {
-      // Insert new record
-      const { error } = await serviceClient
-        .from('workspace_social_api_credentials')
-        .insert({
-          workspace_id: stateData.workspace_id,
-          platform: 'youtube',
-          credential_type: 'oauth',
-          encrypted_credentials: encryptedCredentials,
-          expires_at: expiresAt,
-          is_active: true,
-        });
-      upsertError = error;
+    if (dbError) {
+      console.error('Database error:', dbError);
+      return generateCallbackHTML(false, 'Failed to save channel connection');
     }
 
-    if (upsertError) {
-      console.error('Failed to store credentials:', upsertError);
-      return new Response(
-        `<html><body><script>window.opener?.postMessage({ type: 'youtube-oauth-error', error: 'Failed to store credentials' }, '*'); window.close();</script></body></html>`,
-        { headers: { 'Content-Type': 'text/html' } }
-      );
-    }
+    // Log successful connection
+    await logOAuthActivity(stateData.workspace_id, stateData.user_id, 'youtube_connected', {
+      channel_id: channel.id,
+      channel_name: channel.title,
+    });
 
-    // Success - close popup and notify parent
-    const successData = {
-      type: 'youtube-oauth-success',
-      channel: {
-        id: channel.id,
-        name: channel.snippet.title,
-        thumbnail: channel.snippet.thumbnails.default.url,
-        subscriberCount: parseInt(channel.statistics.subscriberCount) || 0,
-        isLiveEnabled: channel.status?.longUploadsStatus === 'allowed',
-      },
-    };
-
-    return new Response(
-      `<html><body><script>window.opener?.postMessage(${JSON.stringify(successData)}, '*'); window.close();</script></body></html>`,
-      { headers: { 'Content-Type': 'text/html' } }
-    );
+    // Return success HTML that posts message to parent
+    return generateCallbackHTML(true, undefined, {
+      id: channel.id,
+      name: channel.title,
+      thumbnail: channel.thumbnailUrl,
+      subscriberCount: channel.subscriberCount,
+      isLiveEnabled: channel.isLiveEnabled,
+    });
 
   } catch (err) {
-    console.error('Unexpected error:', err);
+    console.error('OAuth error:', err);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: err instanceof Error ? err.message : 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
+
+/**
+ * Generate HTML response for OAuth callback popup
+ */
+function generateCallbackHTML(
+  success: boolean, 
+  error?: string, 
+  channel?: { id: string; name: string; thumbnail?: string; subscriberCount?: number; isLiveEnabled: boolean }
+): Response {
+  const message = success
+    ? { type: 'youtube-oauth-success', channel }
+    : { type: 'youtube-oauth-error', error };
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YouTube Connection</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: white;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+    }
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.5rem;
+    }
+    p {
+      margin: 0;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">${success ? '✅' : '❌'}</div>
+    <h1>${success ? 'Connected Successfully!' : 'Connection Failed'}</h1>
+    <p>${success ? 'You can close this window.' : (error || 'Please try again.')}</p>
+  </div>
+  <script>
+    if (window.opener) {
+      window.opener.postMessage(${JSON.stringify(message)}, '*');
+      setTimeout(() => window.close(), 2000);
+    }
+  </script>
+</body>
+</html>
+  `;
+
+  return new Response(html, {
+    headers: { 'Content-Type': 'text/html' },
+  });
+}

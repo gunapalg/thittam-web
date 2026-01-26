@@ -3,16 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
-interface EncryptedCredentials {
-  access_token?: string;
-  refresh_token?: string;
-  channel_id?: string;
-  channel_name?: string;
-  channel_thumbnail?: string;
-  subscriber_count?: number;
-  is_live_enabled?: boolean;
-}
-
 export interface YouTubeChannel {
   id: string;
   channel_id: string;
@@ -30,19 +20,15 @@ interface UseYouTubeOAuthOptions {
   onError?: (error: string) => void;
 }
 
-function parseEncryptedCredentials(data: unknown): EncryptedCredentials | null {
-  if (typeof data === 'object' && data !== null) {
-    return data as EncryptedCredentials;
-  }
-  return null;
-}
+const SUPABASE_URL = 'https://ltsniuflqfahdcirrmjh.supabase.co';
 
 export function useYouTubeOAuth({ workspaceId, onSuccess, onError }: UseYouTubeOAuthOptions) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [channel, setChannel] = useState<YouTubeChannel | null>(null);
 
-  // Fetch existing channel connection
+  // Fetch existing channel connection from typed columns
   const fetchChannel = useCallback(async () => {
     if (!workspaceId) return;
     
@@ -50,29 +36,24 @@ export function useYouTubeOAuth({ workspaceId, onSuccess, onError }: UseYouTubeO
     try {
       const { data, error } = await supabase
         .from('workspace_social_api_credentials')
-        .select('id, encrypted_credentials, expires_at, is_active')
+        .select('id, channel_id, channel_name, channel_thumbnail, subscriber_count, is_live_enabled, expires_at, is_active')
         .eq('workspace_id', workspaceId)
         .eq('platform', 'youtube')
         .maybeSingle();
 
       if (error) throw error;
       
-      if (data) {
-        const creds = parseEncryptedCredentials(data.encrypted_credentials);
-        if (creds) {
-          setChannel({
-            id: data.id,
-            channel_id: creds.channel_id || '',
-            channel_name: creds.channel_name || '',
-            channel_thumbnail: creds.channel_thumbnail,
-            subscriber_count: creds.subscriber_count,
-            is_live_enabled: creds.is_live_enabled || false,
-            expires_at: data.expires_at || '',
-            is_active: data.is_active || false,
-          });
-        } else {
-          setChannel(null);
-        }
+      if (data && data.channel_id) {
+        setChannel({
+          id: data.id,
+          channel_id: data.channel_id,
+          channel_name: data.channel_name || '',
+          channel_thumbnail: data.channel_thumbnail || undefined,
+          subscriber_count: data.subscriber_count || undefined,
+          is_live_enabled: data.is_live_enabled || false,
+          expires_at: data.expires_at || '',
+          is_active: data.is_active || false,
+        });
       } else {
         setChannel(null);
       }
@@ -129,14 +110,13 @@ export function useYouTubeOAuth({ workspaceId, onSuccess, onError }: UseYouTubeO
 
     setIsConnecting(true);
     try {
-      // Get current session for auth token
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('You must be logged in to connect YouTube');
       }
 
       const response = await fetch(
-        `https://ltsniuflqfahdcirrmjh.supabase.co/functions/v1/youtube-oauth-connect?action=init&workspace_id=${workspaceId}&redirect_uri=${encodeURIComponent(window.location.href)}`,
+        `${SUPABASE_URL}/functions/v1/youtube-oauth-connect?action=init&workspace_id=${workspaceId}&redirect_uri=${encodeURIComponent(window.location.href)}`,
         {
           method: 'GET',
           headers: {
@@ -147,7 +127,8 @@ export function useYouTubeOAuth({ workspaceId, onSuccess, onError }: UseYouTubeO
       );
 
       if (!response.ok) {
-        throw new Error('Failed to initiate OAuth flow');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to initiate OAuth flow');
       }
 
       const { oauth_url } = await response.json();
@@ -184,16 +165,20 @@ export function useYouTubeOAuth({ workspaceId, onSuccess, onError }: UseYouTubeO
     }
   }, [workspaceId, onError]);
 
-  // Disconnect channel
+  // Disconnect channel using secure vault deletion
   const disconnect = useCallback(async () => {
     if (!workspaceId) return;
 
     try {
-      const { error } = await supabase
-        .from('workspace_social_api_credentials')
-        .delete()
-        .eq('workspace_id', workspaceId)
-        .eq('platform', 'youtube');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('You must be logged in');
+      }
+
+      // Use RPC to securely delete tokens from vault
+      const { error } = await supabase.rpc('delete_youtube_tokens', {
+        p_workspace_id: workspaceId,
+      });
 
       if (error) throw error;
 
@@ -205,16 +190,51 @@ export function useYouTubeOAuth({ workspaceId, onSuccess, onError }: UseYouTubeO
     }
   }, [workspaceId]);
 
-  // Refresh token
+  // Refresh token using dedicated Edge Function
   const refresh = useCallback(async () => {
-    // For now, reconnect to refresh
-    await connect();
-  }, [connect]);
+    if (!workspaceId) return;
+
+    setIsRefreshing(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('You must be logged in');
+      }
+
+      const response = await fetch(
+        `${SUPABASE_URL}/functions/v1/youtube-token-refresh`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ workspace_id: workspaceId }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to refresh token');
+      }
+
+      toast.success('Token refreshed successfully');
+      await fetchChannel(); // Reload channel data with new expiry
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to refresh token';
+      logger.error('Failed to refresh YouTube token', err);
+      toast.error(message);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [workspaceId, fetchChannel]);
 
   return {
     channel,
     isLoading,
     isConnecting,
+    isRefreshing,
     connect,
     disconnect,
     refresh,
