@@ -1,125 +1,189 @@
 
-# Make PublicEventPage Fully Replace Template with GrapesJS Content
+# Workspace Team Member Status Case Normalization
 
-## Current Behavior Comparison
+## Executive Summary
 
-| Page | GrapesJS Content Handling |
-|------|---------------------------|
-| `EventLandingPage.tsx` | **Full replacement** - Lines 244-267 return a completely custom page with only GrapesJS HTML/CSS, GlobalFooter, and CookieConsentBanner |
-| `PublicEventPage.tsx` | **Embedded section** - Lines 416-434 render GrapesJS content inside a `<Card>` within the default template (hero, sidebar, about sections still visible) |
-
-## Proposed Solution
-
-Modify `PublicEventPage.tsx` to add an early return when GrapesJS content is available, matching `EventLandingPage.tsx` behavior exactly.
+This plan addresses a **critical data integrity and security issue** where the `status` column in `workspace_team_members` has mixed-case values (`'active'` and `'ACTIVE'`), causing RLS policy failures and inconsistent query results.
 
 ---
 
-## Implementation Details
+## Problem Analysis
 
-### File: `src/components/events/PublicEventPage.tsx`
+### Current State
 
-Add an early return block **after** the error/not-found check (after line 234) and **before** the default template rendering (line 236):
+| Status Value | Row Count | Impact |
+|--------------|-----------|--------|
+| `'active'` (lowercase) | 22 rows | **Invisible to RLS** - blocked by security policies |
+| `'ACTIVE'` (uppercase) | 3 rows | Works correctly |
 
-```tsx
-// After line 234 (after error/not-found check, before const org = ...)
+### Root Cause
 
-// Prefer GrapesJS-built landing page when available (full page replacement)
-if (event.landing_page_data && (event.landing_page_data as any).html) {
-  const lp = event.landing_page_data as any as { 
-    html: string; 
-    css?: string | null; 
-    meta?: { title?: string; description?: string } 
-  };
+The database column defaults to `'ACTIVE'::text` but has no CHECK constraint to enforce case consistency. Historical code paths may have inserted lowercase values.
 
-  // Sanitize HTML and CSS to prevent XSS attacks
-  const sanitizedHTML = sanitizeLandingPageHTML(lp.html);
-  const sanitizedCSS = lp.css ? sanitizeLandingPageCSS(lp.css) : null;
+### Security Impact
 
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <SkipLink href="#main-content" />
-      <main id="main-content" className="flex-1">
-        <section className="border-b border-border bg-background">
-          {/* Inject sanitized GrapesJS CSS into the page scope */}
-          {sanitizedCSS && <style dangerouslySetInnerHTML={{ __html: sanitizedCSS }} />}
-          <div
-            className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
-            dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
-          />
-        </section>
-      </main>
-      <GlobalFooter />
-      <CookieConsentBanner />
-    </div>
+The `is_workspace_member()` security function (used in RLS policies) only checks for uppercase:
+
+```sql
+SELECT EXISTS (
+  SELECT 1 FROM workspace_team_members
+  WHERE workspace_id = _workspace_id
+  AND user_id = _user_id
+  AND status = 'ACTIVE'  -- Only uppercase!
+);
+```
+
+**Result:** 88% of members (22/25) with lowercase status are effectively locked out from RLS-protected workspace data.
+
+---
+
+## Files with Case Inconsistencies
+
+### Querying lowercase `'active'` (2 files - causing data to be missed):
+
+| File | Line | Issue |
+|------|------|-------|
+| `src/components/workspace/WorkspaceHierarchyTree.tsx` | 103 | `.eq('status', 'active')` |
+| `src/hooks/useAllPendingApprovals.ts` | 53 | `.eq('status', 'active')` |
+
+### Existing workaround (1 file):
+
+| File | Line | Workaround |
+|------|------|-----------|
+| `src/hooks/useMemberDirectory.ts` | 61 | `.or('status.ilike.active,status.eq.ACTIVE')` |
+
+### Correctly using uppercase `'ACTIVE'` (50+ files):
+
+Most files correctly use uppercase, including all edge functions and the majority of hooks.
+
+---
+
+## Solution Overview
+
+### Phase 1: Database Migration
+
+1. Normalize existing data to uppercase
+2. Add CHECK constraint to prevent future inconsistencies
+3. Update the RLS helper function to be case-insensitive (defensive)
+
+### Phase 2: Code Updates
+
+1. Fix `WorkspaceHierarchyTree.tsx` - change to uppercase
+2. Fix `useAllPendingApprovals.ts` - change to uppercase
+3. Remove workaround from `useMemberDirectory.ts` - simplify to uppercase only
+
+---
+
+## Technical Implementation
+
+### Database Migration
+
+```sql
+-- 1. Normalize all existing status values to uppercase
+UPDATE workspace_team_members
+SET status = 'ACTIVE'
+WHERE status = 'active';
+
+-- 2. Add CHECK constraint to enforce uppercase values going forward
+ALTER TABLE workspace_team_members
+ADD CONSTRAINT workspace_team_members_status_check
+CHECK (status IN ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'PENDING'));
+
+-- 3. (Defensive) Update RLS function to be case-insensitive
+CREATE OR REPLACE FUNCTION public.is_workspace_member(
+  _workspace_id UUID,
+  _user_id UUID DEFAULT auth.uid()
+)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM workspace_team_members
+    WHERE workspace_id = _workspace_id
+    AND user_id = _user_id
+    AND UPPER(status) = 'ACTIVE'
   );
-}
+$$;
 ```
 
-### Remove Embedded Card Rendering
+### Code Changes
 
-Since we now handle GrapesJS content with a full page replacement, remove the embedded rendering (lines 416-434):
+**File 1: `src/components/workspace/WorkspaceHierarchyTree.tsx` (line 103)**
 
-**Before:**
-```tsx
-{/* Render custom landing page if available (sanitized to prevent XSS) */}
-{event.landing_page_data && (event.landing_page_data as any).html && (
-  <Card id="custom-content">
-    <CardContent className="pt-6">
-      {(event.landing_page_data as any).css && (
-        <style
-          dangerouslySetInnerHTML={{ 
-            __html: sanitizeLandingPageCSS((event.landing_page_data as any).css) 
-          }}
-        />
-      )}
-      <div
-        dangerouslySetInnerHTML={{ 
-          __html: sanitizeLandingPageHTML((event.landing_page_data as any).html) 
-        }}
-      />
-    </CardContent>
-  </Card>
-)}
+```diff
+-        .eq('status', 'active');
++        .eq('status', 'ACTIVE');
 ```
 
-**After:** Remove this entire block (it will never be reached since we return early)
+**File 2: `src/hooks/useAllPendingApprovals.ts` (line 53)**
+
+```diff
+-        .eq('status', 'active');
++        .eq('status', 'ACTIVE');
+```
+
+**File 3: `src/hooks/useMemberDirectory.ts` (line 61)**
+
+```diff
+-        .or('status.ilike.active,status.eq.ACTIVE');
++        .eq('status', 'ACTIVE');
+```
 
 ---
 
-## Behavior After Change
+## Validation Steps
 
-| Scenario | PublicEventPage Behavior |
-|----------|--------------------------|
-| Event has GrapesJS landing page | Full page replacement with custom HTML/CSS + footer + cookie banner |
-| Event has no GrapesJS content | Default template with hero, about, sidebar, organizer card |
+1. **Pre-migration**: Confirm current state
+   ```sql
+   SELECT status, COUNT(*) FROM workspace_team_members GROUP BY status;
+   ```
+   
+2. **Post-migration**: Verify normalization
+   ```sql
+   SELECT status, COUNT(*) FROM workspace_team_members GROUP BY status;
+   -- Expected: Only 'ACTIVE' (25 rows)
+   ```
+
+3. **Constraint test**: Attempt lowercase insert (should fail)
+   ```sql
+   INSERT INTO workspace_team_members (workspace_id, user_id, role, status)
+   VALUES ('...', '...', 'VOLUNTEER_COORDINATOR', 'active');
+   -- Expected: CHECK constraint violation
+   ```
+
+---
+
+## Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Data loss during migration | Low | High | `UPDATE` only changes existing rows, no deletions |
+| Application downtime | Low | Medium | Migration is atomic, code changes are non-breaking |
+| Future lowercase inserts | Low | Low | CHECK constraint prevents this |
+| Edge function compatibility | None | - | All edge functions already use uppercase |
 
 ---
 
 ## Files to Modify
 
-| File | Change Type |
-|------|-------------|
-| `src/components/events/PublicEventPage.tsx` | Edit - Add early return for GrapesJS, remove embedded Card rendering |
-
----
-
-## Preserved Functionality
-
-The following will still work after this change:
-- SEO hooks (`useSeo`) - already runs before the early return
-- JSON-LD structured data - already runs before the early return
-- UTM tracking and page view tracking - already runs before the early return
-- Section deep-linking - works within GrapesJS content if sections have IDs
-- Language attribute setting - already runs before the early return
-- Cookie consent and global footer - included in the early return block
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `supabase/migrations/YYYYMMDD_*.sql` | Create | Data normalization + CHECK constraint |
+| `src/components/workspace/WorkspaceHierarchyTree.tsx` | Edit | Line 103: `'active'` → `'ACTIVE'` |
+| `src/hooks/useAllPendingApprovals.ts` | Edit | Line 53: `'active'` → `'ACTIVE'` |
+| `src/hooks/useMemberDirectory.ts` | Edit | Line 61: Simplify `.or()` to `.eq()` |
 
 ---
 
 ## Testing Checklist
 
-- [ ] Create an event with a custom landing page via the page builder
-- [ ] Publish the landing page
-- [ ] Visit `/event/:slug` - should show only the custom GrapesJS content
-- [ ] Verify GlobalFooter and CookieConsentBanner are present
-- [ ] Verify event without custom landing page shows default template
-- [ ] Test "View Full Details" link still works from GrapesJS pages (if included as a block)
+- [ ] Run migration against test database
+- [ ] Verify all 25 rows have `status = 'ACTIVE'`
+- [ ] Test workspace hierarchy tree displays all members
+- [ ] Test pending approvals shows correct workspaces
+- [ ] Test member directory no longer needs `.or()` workaround
+- [ ] Attempt to insert lowercase status value (should fail)
+- [ ] Verify RLS policies work correctly for all members
