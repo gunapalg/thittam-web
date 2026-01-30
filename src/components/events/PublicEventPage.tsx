@@ -4,16 +4,18 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { useSeo } from '@/hooks/useSeo';
 import { usePageViewTracking } from '@/hooks/usePageViewTracking';
-import { Calendar, MapPin, Users, Clock, Globe, ExternalLink, Ticket } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Globe, ExternalLink, Ticket, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import { EventScrollSpy } from './EventScrollSpy';
 import { sanitizeLandingPageHTML, sanitizeLandingPageCSS } from '@/utils/sanitize';
 import { getTierSaleStatus, TicketTier } from '@/types/ticketTier';
 import { SkipLink } from '@/components/accessibility';
+import { AccessibilityBadges, EventCountdown, EventSocialLinks } from './shared';
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   INR: '₹',
@@ -317,8 +319,35 @@ export function PublicEventPage() {
               )}
             </div>
 
+            {/* Countdown timer */}
+            {new Date(event.start_date) > new Date() && (
+              <div className="mb-6">
+                <EventCountdown targetDate={event.start_date} variant="hero" />
+              </div>
+            )}
+
+            {/* Accessibility badges */}
+            {branding.accessibility?.features && Array.isArray(branding.accessibility.features) && branding.accessibility.features.length > 0 && (
+              <div className="mb-6">
+                <AccessibilityBadges enabledFeatures={branding.accessibility.features} showLabels />
+              </div>
+            )}
+
+            {/* Age restriction warning */}
+            {branding.accessibility?.ageRestriction?.enabled && (
+              <Alert className="mb-6 bg-background/20 border-background/30 text-primary-foreground">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  This event requires attendees to be 
+                  {branding.accessibility.ageRestriction.minAge && ` at least ${branding.accessibility.ageRestriction.minAge}`}
+                  {branding.accessibility.ageRestriction.minAge && branding.accessibility.ageRestriction.maxAge && ' and'}
+                  {branding.accessibility.ageRestriction.maxAge && ` no more than ${branding.accessibility.ageRestriction.maxAge}`} years old.
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* CTA - 44px min touch targets for accessibility */}
-            <div className="flex flex-wrap gap-3" role="group" aria-label="Event actions">
+            <div className="flex flex-wrap gap-3 mb-6" role="group" aria-label="Event actions">
               <Button
                 size="lg"
                 variant="secondary"
@@ -340,6 +369,11 @@ export function PublicEventPage() {
                 Share Event
               </Button>
             </div>
+
+            {/* Social links from event branding */}
+            {branding.socialLinks && (
+              <EventSocialLinks links={branding.socialLinks} variant="hero" showLabels />
+            )}
           </div>
         </div>
       </section>
