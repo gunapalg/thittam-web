@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { AuthProvider, useAuth } from '../../hooks/useAuth';
@@ -27,6 +27,8 @@ import { PortfolioPreviewCard } from '../portfolio/PortfolioPreviewCard';
 import { OrganizationLandingPage } from '../organization/OrganizationLandingPage';
 import { OrganizationProductsLandingPage } from '../organization/OrganizationProductsLandingPage';
 import { CertificateVerification } from '../certificates';
+import { ForgotPasswordForm } from '../auth/ForgotPasswordForm';
+import { ResetPasswordForm } from '../auth/ResetPasswordForm';
 
 import AttendflowLanding from '@/pages/AttendflowLanding';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
@@ -80,70 +82,20 @@ const queryClient = new QueryClient({
 const ForgotPasswordPage = () => {
   return (
     <AuthLayout>
-      <div className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-3">
-            Forgot your password?
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Password reset functionality will be implemented in upcoming updates.
-          </p>
-        </div>
-
-        <div className="relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
-          <div className="space-y-4 text-center">
-            <div>
-              <h3 className="text-base font-semibold text-foreground mb-1">Coming soon</h3>
-              <p className="text-sm text-muted-foreground">
-                You&apos;ll be able to request a secure reset link to your email from here.
-              </p>
-            </div>
-
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center w-full py-3 px-6 rounded-xl text-sm font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              Back to login
-            </Link>
-          </div>
-        </div>
-      </div>
+      <ForgotPasswordForm />
     </AuthLayout>
   );
 };
 
-// Password Reset page placeholder using shared AuthLayout
+// Password Reset page using shared AuthLayout
 const ResetPasswordPage = () => {
   return (
     <AuthLayout>
-      <div className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-coral to-teal bg-clip-text text-transparent mb-3">
-            Reset your password
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            The secure password reset experience will be available soon.
-          </p>
-        </div>
-
-        <div className="relative bg-card/5 backdrop-blur-2xl rounded-3xl border border-background/15 p-8 shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
-          <div className="space-y-4 text-center">
-            <p className="text-sm text-muted-foreground">
-              Once implemented, this page will let you choose a new password after opening a
-              verified reset link from your email.
-            </p>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center w-full py-3 px-6 rounded-xl text-sm font-medium text-primary-foreground bg-gradient-to-r from-coral to-coral-light shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              Back to login
-            </Link>
-          </div>
-        </div>
-      </div>
+      <ResetPasswordForm />
     </AuthLayout>
   );
 };
+
 
 // Redirect component for backward compatibility from /e/:slug to /event/:slug
 const SlugRedirect = () => {
