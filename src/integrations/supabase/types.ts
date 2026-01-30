@@ -9641,6 +9641,67 @@ export type Database = {
           },
         ]
       }
+      sponsorship_benefits: {
+        Row: {
+          benefit: string
+          created_at: string
+          event_id: string
+          id: string
+          sort_order: number | null
+          tier_bronze: boolean | null
+          tier_gold: boolean | null
+          tier_platinum: boolean | null
+          tier_silver: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          benefit: string
+          created_at?: string
+          event_id: string
+          id?: string
+          sort_order?: number | null
+          tier_bronze?: boolean | null
+          tier_gold?: boolean | null
+          tier_platinum?: boolean | null
+          tier_silver?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          benefit?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          sort_order?: number | null
+          tier_bronze?: boolean | null
+          tier_gold?: boolean | null
+          tier_platinum?: boolean | null
+          tier_silver?: boolean | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsorship_benefits_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsorship_benefits_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsorship_benefits_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+        ]
+      }
       starred_messages: {
         Row: {
           id: string
@@ -12419,6 +12480,56 @@ export type Database = {
           },
           {
             foreignKeyName: "workspace_checklists_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_content_assets: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          size_bytes: number | null
+          type: string
+          updated_at: string
+          url: string
+          workspace_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          size_bytes?: number | null
+          type: string
+          updated_at?: string
+          url: string
+          workspace_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          size_bytes?: number | null
+          type?: string
+          updated_at?: string
+          url?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_content_assets_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
