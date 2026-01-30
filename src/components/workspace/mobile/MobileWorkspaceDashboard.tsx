@@ -71,7 +71,7 @@ export function MobileWorkspaceDashboard({ workspaceId, orgSlug }: MobileWorkspa
     );
   }
 
-  // Quick action grid items (2x2 layout like Attendflow)
+  // Quick action grid items (2x2 layout like Thittam1Hub)
   const quickActionCards = [
     { icon: Users, label: 'Contacts', color: 'text-primary' },
     { icon: SlidersHorizontal, label: 'Segments', color: 'text-primary' },
@@ -221,7 +221,7 @@ export function MobileWorkspaceDashboard({ workspaceId, orgSlug }: MobileWorkspa
         <Plus className="w-6 h-6" />
       </button>
 
-      {/* Bottom Navigation - Attendflow style */}
+      {/* Bottom Navigation - Thittam1Hub style */}
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
         <div className="flex justify-around items-center h-16 px-2 pb-safe">
           <button
