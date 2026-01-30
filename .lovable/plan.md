@@ -75,7 +75,7 @@
 | Metric | Original | Current | Target | Status |
 |--------|----------|---------|--------|--------|
 | Mock data files | 47 | **38** | 0 | 🔄 |
-| Console.log statements | 358 | **~115** | 0 | 🔄 |
+| Console.log statements | 358 | **~95** | 0 | 🔄 |
 | ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
 | Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
 | Mobile usability score | Unknown | Improved | 90+ | 🔄 |
@@ -426,7 +426,7 @@ NORMAL  | Security &  |   UI/UX     |
 | Metric | Original | Current | Target | Status |
 |--------|----------|---------|--------|--------|
 | Mock data files | 47 | **38** | 0 | 🔄 |
-| Console.log statements | 358 | **~115** | 0 | 🔄 |
+| Console.log statements | 358 | **~95** | 0 | 🔄 |
 | ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
 | Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
 | Mobile usability score | Unknown | Improved | 90+ | 🔄 |
@@ -460,6 +460,8 @@ NORMAL  | Security &  |   UI/UX     |
 - [x] `WorkspaceSettingsContent.tsx` - Removed 4 console.error statements (toast handles errors)
 - [x] `useVolunteerShifts.ts` - Removed 7 console.error statements (toast handles errors)
 - [x] `useTaskApprovalPolicies.ts` - Removed 5 console.error/warn statements (toast handles errors)
+- [x] `useOperationsDepartmentData.ts` - Removed 16 console.error statements (toast handles errors)
+- [x] `usePageBuilderSections.ts` - Removed 3 console.error statements (toast handles errors)
 
 #### 4.2 RLS Audit - SKIPPED
 - Table schema not accessible from current context
