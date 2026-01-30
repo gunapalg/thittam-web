@@ -138,8 +138,8 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
         setRecordingTime(prev => prev + 1);
       }, 1000);
 
-    } catch (error) {
-      console.error('Failed to start voice recording:', error);
+    } catch (_error) {
+      // Microphone access denied or failed
       alert('Failed to access microphone. Please check permissions.');
     }
   };
@@ -181,8 +181,8 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
       });
 
       queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel.id] });
-    } catch (error) {
-      console.error('Failed to send voice message:', error);
+    } catch (_error) {
+      // Voice message upload failed
       alert('Failed to send voice message. Please try again.');
     }
   };
@@ -211,8 +211,8 @@ export function MobileCommunication({ workspaceId }: MobileCommunicationProps) {
       });
 
       queryClient.invalidateQueries({ queryKey: ['channel-messages', selectedChannel.id] });
-    } catch (error) {
-      console.error('Failed to upload photo:', error);
+    } catch (_error) {
+      // Photo upload failed
       alert('Failed to upload photo. Please try again.');
     }
   };
