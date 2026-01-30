@@ -47,12 +47,12 @@ const AdminLoadingFallback = () => (
 const OrgConsoleHeader: React.FC<{ user: any; onLogout: () => Promise<void> }> = ({ user, onLogout }) => {
   const { toggleSidebar } = useSidebar();
 
-  const handleServiceChange = useCallback((service: string) => {
-    console.log('Org console service change:', service);
+  const handleServiceChange = useCallback((_service: string) => {
+    /* Service change handler - ready for future navigation logic */
   }, []);
 
-  const handleSearch = useCallback((query: string) => {
-    console.log('Org console global search:', query);
+  const handleSearch = useCallback((_query: string) => {
+    /* Global search handler - ready for future search implementation */
   }, []);
 
   return (

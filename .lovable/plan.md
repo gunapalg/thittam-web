@@ -75,7 +75,7 @@
 | Metric | Original | Current | Target | Status |
 |--------|----------|---------|--------|--------|
 | Mock data files | 47 | **38** | 0 | 🔄 |
-| Console.log statements | 358 | **~280** | 0 | 🔄 |
+| Console.log statements | 358 | **~170** | 0 | 🔄 |
 | ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
 | Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
 | Mobile usability score | Unknown | Improved | 90+ | 🔄 |
@@ -426,7 +426,7 @@ NORMAL  | Security &  |   UI/UX     |
 | Metric | Original | Current | Target | Status |
 |--------|----------|---------|--------|--------|
 | Mock data files | 47 | **38** | 0 | 🔄 |
-| Console.log statements | 358 | **~200** | 0 | 🔄 |
+| Console.log statements | 358 | **~170** | 0 | 🔄 |
 | ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
 | Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
 | Mobile usability score | Unknown | Improved | 90+ | 🔄 |
@@ -448,6 +448,9 @@ NORMAL  | Security &  |   UI/UX     |
 - [x] `useChannelPresence.ts` - Removed join/leave logs
 - [x] `useAdminSessionTimeout.ts` - Removed timeout log
 - [x] `useWebhookNotifications.ts` - Removed notification logs
+- [x] `offlineService.ts` - Removed 7 debug/error logs (graceful degradation)
+- [x] `notificationService.ts` - Removed 12 debug/warn/error logs (graceful degradation)
+- [x] `OrgScopedLayout.tsx` - Removed service change and search logs
 
 #### 4.2 RLS Audit - SKIPPED
 - Table schema not accessible from current context
