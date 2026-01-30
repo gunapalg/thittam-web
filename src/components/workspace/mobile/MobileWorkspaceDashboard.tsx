@@ -17,6 +17,8 @@ import { MobileTaskSummary } from './MobileTaskSummary';
 import { MobileWorkspaceHeader } from './MobileWorkspaceHeader';
 import { MobileNavigation } from './MobileNavigation';
 import { MobileWorkspaceDashboardSkeleton } from './MobileWorkspaceDashboardSkeleton';
+import { MobileWorkspaceAnalytics } from './MobileWorkspaceAnalytics';
+import { MobileWorkspaceSearch } from './MobileWorkspaceSearch';
 import { useWorkspaceShell } from '@/hooks/useWorkspaceShell';
 
 interface MobileWorkspaceDashboardProps {
@@ -193,18 +195,20 @@ export function MobileWorkspaceDashboard({ workspaceId, orgSlug }: MobileWorkspa
         {mobileActiveTab === 'analytics' && (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-foreground">Analytics</h2>
-            <div className="py-8 text-center text-muted-foreground">
-              Analytics coming soon
-            </div>
+            <MobileWorkspaceAnalytics workspace={workspace} />
           </div>
         )}
 
         {mobileActiveTab === 'search' && (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-foreground">Search</h2>
-            <div className="py-8 text-center text-muted-foreground">
-              Search functionality coming soon
-            </div>
+            <MobileWorkspaceSearch 
+              workspace={workspace}
+              onResultClick={(type, id) => {
+                // Handle navigation based on result type
+                console.log('Navigate to:', type, id);
+              }}
+            />
           </div>
         )}
       </div>
