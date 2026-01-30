@@ -37,7 +37,7 @@ export function LoginForm() {
     description:
       'Sign in to Thittam1Hub to access your event workspaces, registrations, attendance, and certificates.',
     canonicalPath: '/login',
-    ogImagePath: '/images/attendflow-og.png',
+    ogImagePath: '/images/thittam1hub-og.png',
     ogType: 'website',
   });
 

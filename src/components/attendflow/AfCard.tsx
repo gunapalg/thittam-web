@@ -6,7 +6,7 @@ export interface AfCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Attendflow-style surface card used across dashboards, auth, and event flows.
+ * Thittam1Hub-style surface card used across dashboards, auth, and event flows.
  */
 export const AfCard = React.forwardRef<HTMLDivElement, AfCardProps>(
   ({ className, subtle = false, ...props }, ref) => {

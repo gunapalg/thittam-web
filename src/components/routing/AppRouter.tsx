@@ -30,7 +30,7 @@ import { CertificateVerification } from '../certificates';
 import { ForgotPasswordForm } from '../auth/ForgotPasswordForm';
 import { ResetPasswordForm } from '../auth/ResetPasswordForm';
 
-import AttendflowLanding from '@/pages/AttendflowLanding';
+import Thittam1HubLanding from '@/pages/Thittam1HubLanding';
 import { usePrimaryOrganization } from '@/hooks/usePrimaryOrganization';
 import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import PricingPage from '@/pages/PricingPage';
@@ -409,7 +409,7 @@ const RootLandingRoute: React.FC = () => {
     return <Navigate to={primaryOrg?.slug ? `/${primaryOrg.slug}/dashboard` : '/dashboard'} replace />;
   }
 
-  return <AttendflowLanding />;
+  return <Thittam1HubLanding />;
 };
 
 const SupportService = () => {
@@ -477,7 +477,7 @@ export const AppRouter: React.FC = () => {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-             {/* Attendflow-style marketing landing at root */}
+             {/* Thittam1Hub-style marketing landing at root */}
              <Route path="/" element={<RootLandingRoute />} />
              <Route path="/pricing" element={<PricingPage />} />
              
