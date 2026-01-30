@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/looseClient';
 import { Event, EventMode, EventVisibility, TimelineItem, PrizeInfo, SponsorInfo } from '../../types';
@@ -13,6 +13,8 @@ import type { TicketTier } from '@/types/ticketTier';
 import { getTierSaleStatus, getTierStatusLabel, getTierStatusColor } from '@/types/ticketTier';
 import { SkipLink } from '@/components/accessibility';
 
+type TabType = 'overview' | 'schedule' | 'prizes' | 'sponsors';
+
 interface EventLandingPageProps {
   eventId?: string;
 }
@@ -21,10 +23,27 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
   const { eventId: paramEventId } = useParams<{ eventId: string }>();
   const eventId = propEventId || paramEventId;
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated, user } = useAuth();
   const { data: primaryOrg } = usePrimaryOrganization();
-  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'prizes' | 'sponsors'>('overview');
+  
+  // Parse tab from URL query param for deep linking
+  const tabParam = searchParams.get('tab') as TabType | null;
+  const validTabs: TabType[] = ['overview', 'schedule', 'prizes', 'sponsors'];
+  const initialTab = tabParam && validTabs.includes(tabParam) ? tabParam : 'overview';
+  
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  
+  // Sync URL with active tab
+  useEffect(() => {
+    if (activeTab !== 'overview') {
+      searchParams.set('tab', activeTab);
+    } else {
+      searchParams.delete('tab');
+    }
+    setSearchParams(searchParams, { replace: true });
+  }, [activeTab]);
 
   // Fetch event details directly from Supabase
   const { data: event, isLoading, error } = useQuery({
