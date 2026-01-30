@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Ticket } from 'lucide-react';
 import type { TicketTier } from '@/types/ticketTier';
 import { getTierSaleStatus, getTierStatusLabel, getTierStatusColor } from '@/types/ticketTier';
+import { SkipLink } from '@/components/accessibility';
 
 interface EventLandingPageProps {
   eventId?: string;
@@ -242,8 +243,11 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip link for keyboard navigation - WCAG 2.1 AA */}
+      <SkipLink href="#main-content" />
+      
       {/* Hero Section with Branding (Requirements 10.2, 10.3) */}
-      <div
+      <header
         className="relative text-primary-foreground bg-gradient-to-r from-primary to-accent overflow-hidden"
         style={{
           backgroundColor: event.branding.primaryColor || undefined,
@@ -384,7 +388,7 @@ export function EventLandingPage({ eventId: propEventId }: EventLandingPageProps
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Navigation Tabs */}
       <div className="bg-card/80 border-b border-border/60 backdrop-blur sticky top-0 z-10">

@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { EventScrollSpy } from './EventScrollSpy';
 import { sanitizeLandingPageHTML, sanitizeLandingPageCSS } from '@/utils/sanitize';
 import { getTierSaleStatus, TicketTier } from '@/types/ticketTier';
+import { SkipLink } from '@/components/accessibility';
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   INR: '₹',
@@ -216,8 +217,12 @@ export function PublicEventPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip link for keyboard navigation - WCAG 2.1 AA */}
+      <SkipLink href="#main-content" />
+      
       {/* Scroll-spy navigation */}
       <EventScrollSpy />
+      
       {/* Hero Section */}
       <section
         id="hero"
@@ -312,23 +317,25 @@ export function PublicEventPage() {
               )}
             </div>
 
-            {/* CTA */}
-            <div className="flex flex-wrap gap-3">
+            {/* CTA - 44px min touch targets for accessibility */}
+            <div className="flex flex-wrap gap-3" role="group" aria-label="Event actions">
               <Button
                 size="lg"
                 variant="secondary"
                 onClick={() => navigate(`/events/${event.id}`)}
-                className="font-semibold"
+                className="font-semibold min-h-[44px] min-w-[44px]"
+                aria-label={`Register for ${event.name}`}
               >
                 {branding.primaryCtaLabel || 'Register Now'}
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 min-h-[44px] min-w-[44px]"
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
                 }}
+                aria-label="Copy event link to clipboard"
               >
                 Share Event
               </Button>
@@ -337,8 +344,9 @@ export function PublicEventPage() {
         </div>
       </section>
 
-      {/* Event Details */}
-      <section id="details" className="container mx-auto px-4 py-10">
+      {/* Event Details - Main content region */}
+      <main id="main-content" tabIndex={-1}>
+        <section id="details" className="container mx-auto px-4 py-10" aria-label="Event details">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
             <Card id="about">
@@ -467,7 +475,8 @@ export function PublicEventPage() {
             )}
           </aside>
         </div>
-      </section>
+        </section>
+      </main>
     </div>
   );
 }
