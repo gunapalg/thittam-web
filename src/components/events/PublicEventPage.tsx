@@ -135,6 +135,23 @@ export function PublicEventPage() {
     return () => clearTimeout(timer);
   }, [sectionId, event]);
 
+  // Set HTML lang attribute based on event language setting
+  useEffect(() => {
+    if (!event) return;
+    
+    const branding = event.branding as Record<string, unknown> | null;
+    const accessibility = branding?.accessibility as Record<string, unknown> | null;
+    const language = (accessibility?.language as string) || 'en';
+    
+    // Save original lang to restore on unmount
+    const originalLang = document.documentElement.lang;
+    document.documentElement.lang = language;
+    
+    return () => {
+      document.documentElement.lang = originalLang || 'en';
+    };
+  }, [event]);
+
   // JSON-LD for events
   useEffect(() => {
     if (!event) return;

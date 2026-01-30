@@ -153,6 +153,11 @@ export function HeroCarousel() {
       />
 
       <div className="container relative">
+        {/* Live region for screen readers */}
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          Slide {activeIndex + 1} of {slides.length}: {slides[activeIndex].badge}
+        </div>
+        
         <Carousel
           setApi={setApi}
           opts={{ loop: true, align: "start" }}
