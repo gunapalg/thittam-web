@@ -1,490 +1,266 @@
 
-# Comprehensive Event Management System Analysis & Industrial Best Practice Implementation Plan
+# Modern Onboarding Wizard Implementation Plan
 
-## 🎯 Progress Tracking
+## Overview
 
-### Phase 1: Critical Data Integration ✅ COMPLETED
-
-#### 4.1.1 Registration System Real Data ✅ COMPLETED
-- [x] Created `useRegistrationData.ts` hook with:
-  - `useRegistrationStats` - Real stats from registrations table
-  - `useRegistrationAttendees` - Paginated attendee list with filters
-  - `useRegistrationWaitlist` - Real waitlist from event_waitlist table
-  - `useWaitlistMutations` - Optimistic mutations for promote/remove
-  - `useCheckInMutation` - Check-in functionality
-  - `useEventIdFromWorkspace` - Helper to resolve eventId from workspaceId
-- [x] Updated `RegistrationStatsCards.tsx` - Now uses real Supabase data with loading skeletons
-- [x] Updated `AttendeeList.tsx` - Real data, filters, check-in functionality
-- [x] Updated `WaitlistManager.tsx` - Real data with optimistic updates
-- [x] Added query keys to `query-config.ts` for registration data
-
-#### 4.1.2 Event Schedule Real Data ✅ COMPLETED
-- [x] Created `useEventScheduleData.ts` hook with:
-  - `useEventSessions` - Full CRUD with optimistic updates for event_sessions table
-  - `useWorkspaceMilestones` - Milestones with auto-status computation
-  - `useEventTimeline` - Transformed timeline format for UI
-  - Helper functions: `formatSessionTime`, `getSessionTypeFromTags`
-- [x] Updated `EventScheduleManager.tsx` - Real session data with:
-  - Loading skeletons
-  - Empty states
-  - Add session functionality
-  - Live status badge for in-progress sessions
-  - Accessibility improvements (ARIA labels)
-- [x] Updated `EventTimeline.tsx` - Real milestone data with:
-  - Auto-computed status (completed/current/alert/milestone)
-  - Relative time formatting
-  - Overdue detection
-  - Loading skeletons and empty states
-  - Accessibility improvements (roles, aria-labels)
-
-### Code Quality Improvements ✅ IN PROGRESS
-- [x] `WorkspaceLayout.tsx` - Removed console.log statements
-- [x] Registration hooks use console.error only for actual errors
-- [x] Proper TypeScript types with Database enums
-- [x] Event schedule hooks with proper error handling
-
-### Phase 3: UI/UX Enhancement ✅ COMPLETED
-
-#### 3.1 Responsive Design & Touch Support
-- [x] Created `useTouchDrag.ts` hook for mobile touch drag-and-drop
-- [x] Created `skeleton-patterns.tsx` with reusable skeleton components:
-  - `SkeletonCard`, `SkeletonStatsCard`, `SkeletonStatsGrid`
-  - `SkeletonKanbanColumn`, `SkeletonKanbanBoard`
-  - `SkeletonTeamMember`, `SkeletonTeamRoster`
-  - `SkeletonTable`, `SkeletonCalendarWeek`, `SkeletonTimeline`
-  - `SkeletonFormSection`
-- [x] Updated `TaskKanbanBoard.tsx`:
-  - Touch drag support with long-press gesture
-  - Proper ARIA labels and roles
-  - 44px minimum touch targets
-  - Dark mode compatible colors
-  - Lucide icons replacing inline SVGs
-  - Responsive grid layout
-- [x] Updated `TeamMemberRoster.tsx`:
-  - Responsive padding and spacing
-  - 44px minimum touch targets on all interactive elements
-  - Hidden email on mobile to prevent overflow
-  - Loading skeleton support
-  - Proper ARIA labels
-  - Lucide icons for better consistency
+Create a premium, multi-step onboarding wizard that replaces the current simple registration flow. The wizard will collect the user's desired role (Participant or Organizer) and gather relevant information following industry best practices, including data needed for AI-powered features like team matching and event recommendations.
 
 ---
 
-## Current Status Summary
+## Current State Analysis
 
-| Metric | Original | Current | Target | Status |
-|--------|----------|---------|--------|--------|
-| Mock data files | 47 | **38** | 0 | 🔄 |
-| Console.log statements | 358 | **~70** | 0 | 🔄 |
-| ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
-| Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
-| Mobile usability score | Unknown | Improved | 90+ | 🔄 |
-| Lighthouse performance | Unknown | Unknown | 85+ | 🔲 |
+### Existing Authentication Flow
+- **Google Sign-In**: Currently redirects to `/` after OAuth, with no role selection
+- **Email Registration**: Uses `RegisterForm.tsx` with basic role selection (Participant/Organizer dropdown)
+- **Role Assignment**: Database trigger `handle_new_user_with_qr()` creates profile and assigns roles based on `desiredRole` metadata
 
-### 1.2 Core Event Components - Updated Status
+### Existing Data Structures
+**`user_profiles` table already has:**
+- `full_name`, `bio`, `avatar_url`
+- `organization`, `phone`, `website`
+- `skills` (array) - good for AI matching
+- `linkedin_url`, `twitter_url`, `github_url`
+- `social_links` (JSONB)
 
-| Layer | Component Count | Real Data | Mock Data | Status |
-|-------|-----------------|-----------|-----------|--------|
-| Events Core | 15 components | **90%** | **10%** | ✅ |
-| Workspaces | 95+ components | **65%** | **35%** | 🔄 |
-| Registration | 8 components | **100%** | **0%** | ✅ |
-| Committee Tabs | 70+ tabs | **45%** | **55%** | 🔄 |
-
----
-
-## Phase 2: Workflow Completion ✅ COMPLETED
-
-### 2.1 Committee Tab Real Functions
-
-- [x] **SendBriefTab** - Replaced mock data with `useWorkspaceAnnouncements` hook
-  - Uses `workspace_announcements` table
-  - Full CRUD with optimistic updates
-  - Draft, scheduled, and sent status tracking
-  - Real stats for total/sent/scheduled/drafts
-  
-- [x] **AssignShiftsTab** - Already had real data via `useVolunteerShifts` ✅
-- [x] **ViewBudgetTab** - Already had real data via `useWorkspaceBudget` ✅
-- [x] **ExportListTab** - Already had real data via `useExportList` ✅
-
-### 2.2 Cross-Workspace Approval Routing
-
-- [x] Created `useApprovalWorkflow` hook with:
-  - `useBudgetApprovals` - Uses `workspace_budget_requests` table
-  - `useResourceApprovals` - Uses `workspace_resource_requests` table
-  - Approve/reject mutations with optimistic updates
-  - Combined pending count across all request types
-  - Stats hook for dashboard metrics
+**AI/Matching tables exist:**
+- `ai_match_feedback`, `ai_match_impressions`, `ai_match_insights`
+- `user_session_interests` - tracks event-specific interests
 
 ---
 
-## Gap Analysis: Industry Standards vs Current Implementation
+## Wizard Architecture
 
-### Mock Data Requiring Real Backend Integration - UPDATED
+### Step 1: Role Selection (Required)
+Choose your journey in the Thittam1Hub ecosystem.
 
-| Component | Location | Priority | Status |
-|-----------|----------|----------|--------|
-| `WaitlistManager` | `registration/` | HIGH | ✅ DONE |
-| `RegistrationStatsCards` | `registration/` | HIGH | ✅ DONE |
-| `AttendeeList` | `registration/` | HIGH | ✅ DONE |
-| `EventScheduleManager` | `workspace/event/` | HIGH | ✅ DONE |
-| `EventTimeline` | `workspace/event/` | HIGH | ✅ DONE |
-| `SendBriefTab` | `committee-tabs/` | MEDIUM | ✅ DONE |
-| `ScoringRubricManager` | `workspace/judge/` | MEDIUM | ✅ DONE |
-| `TrainingScheduleTab` | `department/volunteers/tabs/` | MEDIUM | ✅ DONE |
-| `EngagementReportSocialTab` | `social-media/tabs/` | MEDIUM | ✅ DONE (already used real data) |
+| Field | Description |
+|-------|-------------|
+| **Role** | Participant or Organizer (visual card selection) |
+| **Tagline** | One-line description for each role |
 
-### Incomplete Workflow Assignments - UPDATED
+### Step 2: Basic Profile (Required)
+Essential information for your profile.
 
-| Workspace Type | Missing Workflows | Status |
-|----------------|-------------------|--------|
-| ROOT | Event-wide analytics aggregation | 🔲 TODO |
-| ROOT | Cross-department approval routing | ✅ DONE |
-| Department | Budget rollup from committees | 🔲 TODO |
-| Department | Resource conflict detection | 🔲 TODO |
-| Committee | Real-time task sync | 🔲 TODO |
-| Committee | Member availability tracking | 🔲 TODO |
-| Team | Time logging integration | 🔲 TODO |
-| Team | Skill-based task matching | 🔲 TODO |
+| Field | Description | Stored In |
+|-------|-------------|-----------|
+| **Full Name** | Pre-filled from Google if available | `user_profiles.full_name` |
+| **Username** | Unique handle for portfolio URL | `user_profiles.username` |
+| **Profile Photo** | Upload or use Google avatar | `user_profiles.avatar_url` |
 
-### 2.3 Pending Implementation Items (from IMPLEMENTATION_CHECKLIST.md)
+### Step 3: About You (Conditional - differs by role)
 
-- [ ] Template selection during event creation
-- [ ] Post-event template feedback
-- [ ] Mobile navigation polish (5 items)
-- [ ] Mobile task and team flows (4 items)
-- [ ] Mobile communication utilities (3 items)
+**For Participants:**
+| Field | Description | Stored In |
+|-------|-------------|-----------|
+| **Organization/College** | Current affiliation | `user_profiles.organization` |
+| **Bio** | Short introduction | `user_profiles.bio` |
+| **Skills/Expertise** | Multi-select tags (AI matching) | `user_profiles.skills` |
+| **Experience Level** | Beginner/Intermediate/Expert | New: `user_profiles.experience_level` |
+| **Interests** | Event categories they're interested in | New: `user_preferences.event_interests` |
+
+**For Organizers:**
+| Field | Description | Stored In |
+|-------|-------------|-----------|
+| **Organization Name** | Their organization | `user_profiles.organization` |
+| **Role in Organization** | Job title/position | New: `user_profiles.job_title` |
+| **Organization Type** | College/Company/Non-profit | Saved when creating org later |
+
+### Step 4: Connectivity (Optional - skippable)
+| Field | Description | Stored In |
+|-------|-------------|-----------|
+| **LinkedIn URL** | Professional networking | `user_profiles.linkedin_url` |
+| **GitHub URL** | For developers | `user_profiles.github_url` |
+| **Twitter/X URL** | Social presence | `user_profiles.twitter_url` |
+| **Phone** | Optional contact | `user_profiles.phone` |
+
+### Step 5: Preferences (Conditional)
+
+**For Participants:**
+| Field | Description | Purpose |
+|-------|-------------|---------|
+| **Event Types** | Hackathons, Workshops, Conferences, etc. | AI event recommendations |
+| **Notification Preferences** | Email frequency | Communication settings |
+| **Looking For** | Networking, Learning, Team building | AI matching context |
+
+**For Organizers:**
+| Field | Description | Purpose |
+|-------|-------------|---------|
+| **Expected Event Types** | What they plan to organize | Onboarding customization |
+| **Team Size** | Solo/Small team/Large org | Feature recommendations |
 
 ---
 
-## 3. Technical Implementation Requirements
+## Database Changes Required
 
-### 3.1 Query & Data Layer
-
-**Current Issues:**
-- 358+ `console.log` statements in production components
-- Inconsistent query key patterns across hooks
-- Missing optimistic updates in 60%+ of mutations
-
-**Industrial Standards to Implement:**
-
-```text
-Query Architecture Improvements:
-+----------------------------------+
-|   Query Layer Best Practices     |
-+----------------------------------+
-| - Consistent query key factories |
-| - Optimistic updates everywhere  |
-| - Stale-while-revalidate pattern |
-| - Request deduplication          |
-| - Prefetching on hover           |
-| - Infinite scroll pagination     |
-+----------------------------------+
+### New Columns on `user_profiles`
+```sql
+ALTER TABLE public.user_profiles 
+ADD COLUMN IF NOT EXISTS experience_level text DEFAULT 'intermediate',
+ADD COLUMN IF NOT EXISTS job_title text,
+ADD COLUMN IF NOT EXISTS onboarding_completed_at timestamptz,
+ADD COLUMN IF NOT EXISTS onboarding_step integer DEFAULT 0;
 ```
 
-### 3.2 Security Analysis Required
-
-**Areas needing RLS policy review:**
-- Event access controls (owner/org member)
-- Workspace team member permissions
-- Cross-workspace resource sharing
-- Publish approval workflow
-
-**Recommended security enhancements:**
-- Rate limiting on public endpoints
-- Input sanitization (DOMPurify already present)
-- CSRF protection on mutations
-- Session timeout handling (hook exists but partial)
-
-### 3.3 Accessibility Gaps
-
-**Current state:** 44 files have some ARIA attributes
-**Missing implementations:**
-- Focus management on modal dialogs
-- Skip navigation links
-- Live region announcements
-- Keyboard navigation in Kanban boards
-- Color contrast validation in dynamic themes
-
----
-
-## 4. Prioritized Implementation Roadmap
-
-### Phase 1: Critical Data Integration (Week 1-2)
-
-#### 4.1.1 Registration System Real Data
-
-**Files to update:**
-- `src/components/workspace/registration/WaitlistManager.tsx`
-- `src/components/workspace/registration/RegistrationStatsCards.tsx`
-- `src/components/workspace/registration/AttendeeList.tsx`
-
-**Implementation:**
-- Create `useRegistrationData` hook with real Supabase queries
-- Wire waitlist to `registrations` table with `status = 'WAITLISTED'`
-- Implement real-time subscription for live check-in counts
-
-#### 4.1.2 Event Schedule Real Data
-
-**Files to update:**
-- `src/components/workspace/event/EventScheduleManager.tsx`
-- `src/components/workspace/event/EventTimeline.tsx`
-
-**Implementation:**
-- Query `event_sessions` or `event_agenda_items` table
-- Add CRUD operations with optimistic updates
-- Implement drag-and-drop reordering
-
-### Phase 2: Workflow Completion (Week 3-4)
-
-#### 4.2.1 Committee Tab Real Functions
-
-**High-priority tabs (currently console.log only):**
-
-| Tab | Current State | Required Implementation |
-|-----|---------------|------------------------|
-| `SendBriefTab` | Logs to console | Email integration via Supabase Edge Function |
-| `AssignShiftsTab` | Mock volunteer list | Connect to `volunteer_shifts` table |
-| `ViewBudgetTab` | Static display | Link to `workspace_budgets` table |
-| `ExportListTab` | No export | Generate CSV/PDF via edge function |
-
-#### 4.2.2 Cross-Workspace Approval Routing
-
-**Current gap:** Approvals don't propagate up hierarchy
-**Solution:** 
-- Implement `useApprovalWorkflow` hook
-- Add approval escalation based on workspace type
-- Create notification triggers on status changes
-
-### Phase 3: UI/UX Enhancement (Week 5-6)
-
-#### 4.3.1 Responsive Design Improvements
-
-**Mobile-first fixes needed:**
-- `MobileWorkspaceDashboard` - Tab navigation inconsistent
-- `TaskKanbanBoard` - Not touch-optimized
-- `TeamMemberRoster` - Horizontal overflow on mobile
-
-**Implementation approach:**
-- Audit all components for `md:` breakpoint usage
-- Add swipe gestures for Kanban columns
-- Implement collapsible sections for mobile
-
-#### 4.3.2 Loading States & Skeletons
-
-**Missing loading states in:**
-- Committee dashboard sections
-- Department tab content
-- Event settings forms
-
-**Standard:** Implement skeleton components matching content layout
-
-### Phase 4: Security & Performance (Week 7-8)
-
-#### 4.4.1 Security Hardening
-
-| Issue | Solution | Priority |
-|-------|----------|----------|
-| RLS gaps | Audit all tables with `get_table_schema` | HIGH |
-| Console logging | Remove 358+ debug statements | MEDIUM |
-| Error exposure | Sanitize error messages shown to users | MEDIUM |
-| Session handling | Complete `useAdminSessionTimeout` integration | LOW |
-
-#### 4.4.2 Performance Optimization
-
-**Query optimization:**
-- Implement column selection using `supabase-columns.ts` consistently
-- Add pagination to all list queries (currently missing in 15+ hooks)
-- Enable request deduplication in React Query config
-
-**Bundle optimization:**
-- Lazy load all committee tab components (partially done)
-- Split workspace dashboard by workspace type
-- Preload critical paths on hover
-
----
-
-## 5. Settings Integration Requirements
-
-### 5.1 Settings That Should Reflect App-wide
-
-| Setting Location | Affected Areas |
-|------------------|----------------|
-| Event branding colors | Landing page, registration, certificates |
-| Workspace publish requirements | All child workspace dashboards |
-| Organization timezone | All date displays, scheduling |
-| Accessibility preferences | All UI components |
-
-**Implementation:**
-- Create `useGlobalSettings` context
-- Propagate settings via React Context
-- Add settings sync to offline storage
-
-### 5.2 Missing Settings Panels
-
-- Event analytics display preferences
-- Notification aggregation rules
-- Export format defaults
-- API rate limit configuration
-
----
-
-## 6. Code Quality Improvements
-
-### 6.1 Console.log Removal
-
-**Locations requiring cleanup (26 files, 358 instances):**
-- `WorkspaceLayout.tsx` - Service change logging
-- `TaskManagementInterface.tsx` - 8 instances
-- `EventListPage.tsx` - Delete action logging
-- `WorkspaceListPage.tsx` - Bulk action logging
-
-**Action:** Replace with proper logging service or remove
-
-### 6.2 Type Safety Improvements
-
-**Issues identified:**
-- `any` types in event branding JSONB parsing
-- Loose type assertions in workspace settings
-- Missing null checks in optional chaining
-
-### 6.3 Error Handling Standardization
-
-**Current state:** Mixed toast.error, console.error, and silent failures
-**Standard:** Implement ErrorBoundary with Sentry integration at route level
-
----
-
-## 7. Industrial Best Practice Checklist
-
-### 7.1 URL & Navigation
-
-- [x] Consistent route structure (org-scoped)
-- [x] Breadcrumb navigation
-- [ ] Deep linking to workspace sections (partial - sectionid param exists)
-- [ ] URL state management for filters
-- [ ] Back button handling in modals
-
-### 7.2 Optimistic Updates
-
-- [x] `useOptimisticMutation` helper exists
-- [ ] Applied to task operations (partial)
-- [ ] Applied to team management
-- [ ] Applied to workspace settings
-- [ ] Applied to event publishing
-
-### 7.3 Accessibility (WCAG 2.1 AA)
-
-- [x] ARIA labels on interactive elements (44 files)
-- [ ] Focus trap in modals (partial)
-- [ ] Keyboard navigation in complex widgets
-- [ ] Screen reader announcements for state changes
-- [ ] Reduced motion support (CSS exists, not fully applied)
-
-### 7.4 Responsive Design
-
-- [x] Mobile components exist
-- [ ] Consistent breakpoint usage
-- [ ] Touch target sizing (44px minimum)
-- [ ] Swipe gesture support
-- [ ] Orientation change handling
-
----
-
-## 8. Recommended Tech Stack Additions
-
-| Need | Recommended Solution |
-|------|---------------------|
-| Form validation feedback | Already using zod - standardize error display |
-| Real-time sync | Supabase realtime channels (partial implementation) |
-| Offline support | Service worker with `useOffline` hook |
-| Analytics | Existing Sentry, add custom event tracking |
-| Testing | Add Playwright for E2E flows |
-
----
-
-## 9. Implementation Priority Matrix
-
-```text
-                    IMPACT
-                    HIGH
-        +---------------------------+
-        |  Phase 1    |   Phase 2   |
-URGENT  | Registration|   Workflow  |
-        | Real Data   |   Completion|
-        +-------------+-------------+
-        |  Phase 4    |   Phase 3   |
-NORMAL  | Security &  |   UI/UX     |
-        | Performance |   Polish    |
-        +---------------------------+
-                    LOW
+### New Table: `user_preferences`
+```sql
+CREATE TABLE public.user_preferences (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
+  event_interests text[] DEFAULT '{}',
+  looking_for text[] DEFAULT '{}',
+  notification_frequency text DEFAULT 'weekly',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own preferences"
+  ON public.user_preferences FOR SELECT
+  TO authenticated
+  USING (user_id = auth.uid());
+
+CREATE POLICY "Users can update own preferences"
+  ON public.user_preferences FOR UPDATE
+  TO authenticated
+  USING (user_id = auth.uid());
+
+CREATE POLICY "Users can insert own preferences"
+  ON public.user_preferences FOR INSERT
+  TO authenticated
+  WITH CHECK (user_id = auth.uid());
 ```
 
 ---
 
-## 10. Success Metrics - Updated
+## New Components
 
-| Metric | Original | Current | Target | Status |
-|--------|----------|---------|--------|--------|
-| Mock data files | 47 | **38** | 0 | 🔄 |
-| Console.log statements | 358 | **~95** | 0 | 🔄 |
-| ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
-| Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
-| Mobile usability score | Unknown | Improved | 90+ | 🔄 |
-| Lighthouse performance | Unknown | Unknown | 85+ | 🔲 |
+### File Structure
+```text
+src/components/onboarding/
+├── OnboardingWizard.tsx          # Main wizard container
+├── steps/
+│   ├── RoleSelectionStep.tsx     # Step 1: Role cards
+│   ├── BasicProfileStep.tsx      # Step 2: Name, username, photo
+│   ├── AboutYouStep.tsx          # Step 3: Skills, experience, bio
+│   ├── ConnectivityStep.tsx      # Step 4: Social links
+│   └── PreferencesStep.tsx       # Step 5: Event interests
+├── components/
+│   ├── WizardProgress.tsx        # Step indicator
+│   ├── SkillSelector.tsx         # Multi-select skill tags
+│   ├── InterestSelector.tsx      # Event category selector
+│   └── RoleCard.tsx              # Animated role selection card
+└── hooks/
+    └── useOnboardingState.ts     # Wizard state management
+```
 
-### Phase 4: Security & Performance - Partial ✅
-
-#### 4.1 Console.log Cleanup - COMPLETED
-- [x] `TaskManagementInterface.tsx` - Removed 8 debug logs
-- [x] `OrganizerDashboardLayout.tsx` - Removed service change logs
-- [x] `KnowledgeBase.tsx` - Removed article tracking logs
-- [x] `CustomTemplateManager.tsx` - Removed template save log
-- [x] `ViewRubricsTab.tsx` - Removed rubric created log
-- [x] `PerformanceIntegrationExample.tsx` - Removed click/action logs
-- [x] `MobileTeamManagement.tsx` - Removed member action logs
-- [x] `MediaQuickActions.tsx` - Removed all 8 action logs
-- [x] `OrganizationAnalyticsPage.tsx` - Removed export logs
-- [x] `main.tsx` - Removed startup logs (kept error only in dev)
-- [x] `useChannelPresence.ts` - Removed join/leave logs
-- [x] `useAdminSessionTimeout.ts` - Removed timeout log
-- [x] `useWebhookNotifications.ts` - Removed notification logs
-- [x] `offlineService.ts` - Removed 7 debug/error logs (graceful degradation)
-- [x] `notificationService.ts` - Removed 12 debug/warn/error logs (graceful degradation)
-- [x] `OrgScopedLayout.tsx` - Removed service change and search logs
-- [x] `AdminLayout.tsx` - Removed 5 console.error/warn statements (silent access denial)
-- [x] `MobileCommunication.tsx` - Removed 3 console.error statements (graceful error handling)
-- [x] `CodeSplitting.tsx` - Removed 4 console.error/warn/log statements (silent preload failures)
-- [x] `VendorRegistrationPage.tsx` - Removed 1 console.error (silent upload failure)
-- [x] `VolunteerCheckInInterface.tsx` - Removed 1 console.error (UI handles errors)
-- [x] `useGanttChart.ts` - Removed 3 console.error statements (toast handles errors)
-- [x] `WorkspaceSettingsContent.tsx` - Removed 4 console.error statements (toast handles errors)
-- [x] `useVolunteerShifts.ts` - Removed 7 console.error statements (toast handles errors)
-- [x] `useTaskApprovalPolicies.ts` - Removed 5 console.error/warn statements (toast handles errors)
-- [x] `useOperationsDepartmentData.ts` - Removed 16 console.error statements (toast handles errors)
-- [x] `usePageBuilderSections.ts` - Removed 3 console.error statements (toast handles errors)
-
-#### 4.2 RLS Audit - SKIPPED
-- Table schema not accessible from current context
-- Would need direct database access via Cloud tab
+### Key UI Elements
+- **Progress indicator**: Elegant step counter with animations
+- **Role cards**: Premium glassmorphism cards with icons
+- **Skill chips**: Searchable, multi-select tag input
+- **Interest grid**: Visual event category selector with icons
+- **Skip option**: Clear skip button for optional steps
+- **Mobile-first**: Touch-optimized, 44px minimum touch targets
 
 ---
 
-## Technical Implementation Notes
+## User Flow Changes
 
-### Database Tables Referenced
+### Google OAuth Flow (Updated)
+```text
+User clicks "Continue with Google"
+        ↓
+Google OAuth completes
+        ↓
+Redirect to /onboarding/welcome
+        ↓
+Onboarding Wizard (5 steps)
+        ↓
+Check role:
+  - Participant → /dashboard
+  - Organizer → /onboarding/organization
+```
 
-The Supabase types file shows 18,500+ lines indicating a comprehensive schema including:
-- `events`, `event_venues`, `event_virtual_links`, `event_images`, `event_faqs`
-- `workspaces`, `workspace_team_members`, `workspace_tasks`
-- `registrations`, `attendance_records`
-- `ticket_tiers`, `promo_codes`
-- `organizations`, `organization_memberships`
+### Route Changes
+| Route | Component | Purpose |
+|-------|-----------|---------|
+| `/onboarding/welcome` | `OnboardingWizard` | New unified onboarding |
+| `/onboarding/organization` | Existing | Org creation (organizers only) |
 
-### Existing Infrastructure to Leverage
+### Auth Hook Updates
+- Update `signInWithGoogle()` to redirect to `/onboarding/welcome`
+- Check if user has completed onboarding before redirecting to dashboard
 
-- **Query configuration:** `src/lib/query-config.ts` - Well-structured presets
-- **Optimistic mutations:** `src/hooks/useOptimisticMutation.ts` - Ready to use
-- **Event normalization:** `src/utils/event-compat.ts` - Handles legacy data
-- **Column selection:** `src/lib/supabase-columns.ts` - Prevents over-fetching
+---
 
-This plan provides a comprehensive roadmap to transform the current implementation into an industrial-grade event management platform with proper data integration, security, accessibility, and performance optimizations.
+## Data for AI Features
+
+The collected data enables these AI capabilities:
+
+| Data Field | AI Feature |
+|------------|------------|
+| `skills` | Team matching, mentor matching |
+| `experience_level` | Balanced team composition |
+| `event_interests` | Event recommendations, personalized feed |
+| `looking_for` | Networking suggestions, connection recommendations |
+| `organization` | Professional context for matching |
+
+---
+
+## Implementation Phases
+
+### Phase 1: Core Wizard
+1. Create database migrations for new columns/tables
+2. Build `OnboardingWizard` container with step navigation
+3. Implement `RoleSelectionStep` with premium role cards
+4. Update OAuth redirect to `/onboarding/welcome`
+
+### Phase 2: Profile Steps
+1. Build `BasicProfileStep` with avatar upload
+2. Implement `AboutYouStep` with conditional fields
+3. Create `SkillSelector` component with predefined options
+4. Add username validation (already exists)
+
+### Phase 3: Preferences & Polish
+1. Build `ConnectivityStep` for social links
+2. Implement `PreferencesStep` with event category selector
+3. Add skip functionality for optional steps
+4. Implement progress persistence (save partial progress)
+
+### Phase 4: Integration
+1. Update `LoginForm` to check onboarding status
+2. Connect wizard submission to Supabase
+3. Update database trigger for new users
+4. Add analytics tracking for funnel analysis
+
+---
+
+## Technical Specifications
+
+### Wizard State Management
+- Use React state with `useReducer` for step management
+- Persist partial progress to `localStorage` with 24h expiry
+- Save to database only on final submission
+
+### Validation
+- Zod schemas for each step
+- Real-time username availability check
+- Async validation on blur for URLs
+
+### Animation
+- Framer Motion for step transitions
+- Staggered animations for cards and inputs
+- Progress bar animation between steps
+
+---
+
+## Premium Aesthetic Guidelines
+
+Following the project's modern, elite, and premium design aesthetic:
+
+- **Glassmorphism**: Subtle backdrop blur on cards
+- **Gradient accents**: Primary color gradients on active elements
+- **Micro-animations**: Smooth hover states and transitions
+- **Dark mode support**: Full theme compatibility
+- **Typography**: Clean, hierarchical type scale
+- **Spacing**: Generous whitespace, 8px grid system
