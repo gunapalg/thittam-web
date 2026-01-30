@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Globe, MapPin, Users, Clock, ArrowRight, Zap, XCircle, CheckCircle, Calendar } from "lucide-react";
 import { useCountdown } from "@/hooks/useCountdown";
+import { usePrefetchEvent } from "@/hooks/usePrefetch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -72,12 +73,22 @@ export function FlagshipEventCard({ event }: { event: FlagshipEvent }) {
   const bannerUrl = event.branding?.bannerUrl;
   const eventLink = event.landing_page_slug ? `/e/${event.landing_page_slug}` : `/events/${event.id}`;
   const isClickable = status === "register_now" || status === "coming_soon" || status === "live";
+  
+  // Prefetch event data on hover for faster navigation
+  const { prefetchBySlug } = usePrefetchEvent();
+  
+  const handleMouseEnter = () => {
+    if (event.landing_page_slug) {
+      prefetchBySlug(event.landing_page_slug);
+    }
+  };
 
   return (
     <motion.div
       whileHover={{ y: -4, scale: 1.01 }}
       transition={{ duration: 0.2 }}
       className="group relative h-full rounded-xl border border-border/60 bg-card overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all duration-300"
+      onMouseEnter={handleMouseEnter}
     >
       {/* Banner Image */}
       <div className="relative h-40 overflow-hidden bg-gradient-to-br from-primary/20 to-secondary/20">
@@ -85,6 +96,8 @@ export function FlagshipEventCard({ event }: { event: FlagshipEvent }) {
           <img 
             src={bannerUrl} 
             alt={event.name} 
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -114,6 +127,8 @@ export function FlagshipEventCard({ event }: { event: FlagshipEvent }) {
               <img 
                 src={event.organizations.logo_url} 
                 alt={event.organizations.name}
+                loading="lazy"
+                decoding="async"
                 className="w-5 h-5 rounded-full object-cover"
               />
             ) : (

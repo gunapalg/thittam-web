@@ -178,6 +178,8 @@ export function TestimonialsSection({
                   <img
                     src={currentTestimonial.avatarUrl}
                     alt={currentTestimonial.authorName}
+                    loading="lazy"
+                    decoding="async"
                     className="w-12 h-12 rounded-full object-cover border-2 border-border"
                   />
                 ) : (
