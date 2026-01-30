@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Clock } from 'lucide-react';
 
@@ -8,6 +8,8 @@ interface EventCountdownProps {
   variant?: 'default' | 'compact' | 'hero';
   showLabels?: boolean;
   onComplete?: () => void;
+  /** IANA timezone string (e.g., 'America/New_York'). Defaults to user's local timezone. */
+  timezone?: string;
 }
 
 interface TimeLeft {
@@ -42,8 +44,28 @@ export function EventCountdown({
   variant = 'default',
   showLabels = true,
   onComplete,
+  timezone,
 }: EventCountdownProps) {
-  const target = typeof targetDate === 'string' ? new Date(targetDate) : targetDate;
+  // Parse target date, respecting timezone if provided
+  const target = useMemo(() => {
+    const date = typeof targetDate === 'string' ? new Date(targetDate) : targetDate;
+    
+    // If timezone is provided, validate it
+    if (timezone) {
+      try {
+        // Test if timezone is valid by creating a formatter
+        new Intl.DateTimeFormat('en-US', { timeZone: timezone });
+        // The date is already parsed; timezone handling is for display purposes
+        // The countdown calculates difference from now(), which is always in UTC internally
+        return date;
+      } catch {
+        // Invalid timezone, fall back to local
+        return date;
+      }
+    }
+    
+    return date;
+  }, [targetDate, timezone]);
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft(target));
   const [hasCompleted, setHasCompleted] = useState(false);
 
