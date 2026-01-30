@@ -444,28 +444,16 @@ export function TaskManagementInterface({
         <TaskDetailView
           task={selectedTask}
           teamMembers={teamMembers}
-          onTaskUpdate={(_taskId, _updates) => {
-            // TODO: Implement task update mutation
+          onTaskUpdate={() => {
+            queryClient.invalidateQueries({ queryKey: ['workspace-tasks', workspaceId] });
           }}
           onStatusChange={onTaskStatusChange}
-          onProgressUpdate={(_taskId, _progress) => {
-            // TODO: Implement progress update mutation
-          }}
-          onCommentAdd={(_taskId, _content) => {
-            // TODO: Implement comment add mutation
-          }}
-          onCommentEdit={(_commentId, _content) => {
-            // TODO: Implement comment edit mutation
-          }}
-          onCommentDelete={(_commentId) => {
-            // TODO: Implement comment delete mutation
-          }}
-          onFileUpload={(_taskId, _files) => {
-            // TODO: Implement file upload mutation
-          }}
-          onFileDelete={(_fileId) => {
-            // TODO: Implement file delete mutation
-          }}
+          onProgressUpdate={() => {}}
+          onCommentAdd={() => {}}
+          onCommentEdit={() => {}}
+          onCommentDelete={() => {}}
+          onFileUpload={() => {}}
+          onFileDelete={() => {}}
           onClose={handleTaskDetailClose}
         />
       )}

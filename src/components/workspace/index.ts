@@ -18,6 +18,7 @@ export { TaskKanbanBoard } from './TaskKanbanBoard';
 export { TaskManagementInterface } from './TaskManagementInterface';
 export { TaskForm } from './TaskForm';
 export { TaskFormModal } from './TaskFormModal';
+export { TaskEditModal } from './TaskEditModal';
 export { TaskDetailView } from './TaskDetailView';
 export { CreateSubWorkspaceModal } from './CreateSubWorkspaceModal';
 export { WorkspaceHierarchyTree } from './WorkspaceHierarchyTree';

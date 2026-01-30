@@ -65,6 +65,12 @@ export {
   exportRegistrationsToCSV,
 } from './useEventRegistrations';
 
+// Content Assets
+export { useContentAssets } from './useContentAssets';
+
+// Sponsorship
+export { useSponsorshipBenefits } from './useSponsorshipBenefits';
+
 // Workspace & Approvals
 export { useApprovalMutations } from './useApprovalMutations';
 
