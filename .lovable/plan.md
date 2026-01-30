@@ -75,7 +75,7 @@
 | Metric | Original | Current | Target | Status |
 |--------|----------|---------|--------|--------|
 | Mock data files | 47 | **38** | 0 | 🔄 |
-| Console.log statements | 358 | **~170** | 0 | 🔄 |
+| Console.log statements | 358 | **~155** | 0 | 🔄 |
 | ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
 | Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
 | Mobile usability score | Unknown | Improved | 90+ | 🔄 |
@@ -426,7 +426,7 @@ NORMAL  | Security &  |   UI/UX     |
 | Metric | Original | Current | Target | Status |
 |--------|----------|---------|--------|--------|
 | Mock data files | 47 | **38** | 0 | 🔄 |
-| Console.log statements | 358 | **~170** | 0 | 🔄 |
+| Console.log statements | 358 | **~155** | 0 | 🔄 |
 | ARIA coverage | 44 files | **54 files** | 100% | 🔄 |
 | Optimistic update coverage | 40% | **75%** | 95% | 🔄 |
 | Mobile usability score | Unknown | Improved | 90+ | 🔄 |
@@ -451,6 +451,8 @@ NORMAL  | Security &  |   UI/UX     |
 - [x] `offlineService.ts` - Removed 7 debug/error logs (graceful degradation)
 - [x] `notificationService.ts` - Removed 12 debug/warn/error logs (graceful degradation)
 - [x] `OrgScopedLayout.tsx` - Removed service change and search logs
+- [x] `AdminLayout.tsx` - Removed 5 console.error/warn statements (silent access denial)
+- [x] `MobileCommunication.tsx` - Removed 3 console.error statements (graceful error handling)
 
 #### 4.2 RLS Audit - SKIPPED
 - Table schema not accessible from current context
