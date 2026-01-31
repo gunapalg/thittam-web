@@ -3399,6 +3399,53 @@ export type Database = {
         }
         Relationships: []
       }
+      escalation_rules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          escalate_to: string
+          id: string
+          is_active: boolean
+          item_type: string
+          notify_roles: string[] | null
+          trigger_after_hours: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          escalate_to?: string
+          id?: string
+          is_active?: boolean
+          item_type: string
+          notify_roles?: string[] | null
+          trigger_after_hours?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          escalate_to?: string
+          id?: string
+          is_active?: boolean
+          item_type?: string
+          notify_roles?: string[] | null
+          trigger_after_hours?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escalation_rules_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_announcements: {
         Row: {
           author_avatar: string | null
@@ -11459,6 +11506,92 @@ export type Database = {
           },
         ]
       }
+      volunteer_applications: {
+        Row: {
+          applicant_email: string
+          applicant_id: string | null
+          applicant_name: string
+          applicant_phone: string | null
+          availability: Json | null
+          created_at: string
+          event_id: string | null
+          experience: string | null
+          id: string
+          notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          role_applied: string
+          status: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          applicant_email: string
+          applicant_id?: string | null
+          applicant_name: string
+          applicant_phone?: string | null
+          availability?: Json | null
+          created_at?: string
+          event_id?: string | null
+          experience?: string | null
+          id?: string
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          role_applied: string
+          status?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          applicant_email?: string
+          applicant_id?: string | null
+          applicant_name?: string
+          applicant_phone?: string | null
+          availability?: Json | null
+          created_at?: string
+          event_id?: string | null
+          experience?: string | null
+          id?: string
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          role_applied?: string
+          status?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_applications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_applications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_applications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "volunteer_applications_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       volunteer_assignments: {
         Row: {
           check_in_time: string | null
@@ -11506,6 +11639,53 @@ export type Database = {
           },
         ]
       }
+      volunteer_recognitions: {
+        Row: {
+          awarded_at: string
+          awarded_by: string | null
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          recognition_type: string
+          title: string
+          volunteer_id: string
+          workspace_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          awarded_by?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          recognition_type: string
+          title: string
+          volunteer_id: string
+          workspace_id: string
+        }
+        Update: {
+          awarded_at?: string
+          awarded_by?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          recognition_type?: string
+          title?: string
+          volunteer_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_recognitions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       volunteer_shifts: {
         Row: {
           created_at: string
@@ -11549,6 +11729,143 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "volunteer_shifts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      volunteer_time_logs: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          check_in_time: string
+          check_out_time: string | null
+          created_at: string
+          event_id: string | null
+          hours_logged: number | null
+          id: string
+          notes: string | null
+          shift_id: string | null
+          status: string
+          updated_at: string
+          volunteer_id: string
+          workspace_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          check_in_time: string
+          check_out_time?: string | null
+          created_at?: string
+          event_id?: string | null
+          hours_logged?: number | null
+          id?: string
+          notes?: string | null
+          shift_id?: string | null
+          status?: string
+          updated_at?: string
+          volunteer_id: string
+          workspace_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          check_in_time?: string
+          check_out_time?: string | null
+          created_at?: string
+          event_id?: string | null
+          hours_logged?: number | null
+          id?: string
+          notes?: string | null
+          shift_id?: string | null
+          status?: string
+          updated_at?: string
+          volunteer_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_time_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_time_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_time_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "registration_stats_by_event"
+            referencedColumns: ["event_id"]
+          },
+          {
+            foreignKeyName: "volunteer_time_logs_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_time_logs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      volunteer_training_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          module_id: string
+          module_name: string
+          progress_percent: number | null
+          score: number | null
+          status: string
+          updated_at: string
+          volunteer_id: string
+          workspace_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_id: string
+          module_name: string
+          progress_percent?: number | null
+          score?: number | null
+          status?: string
+          updated_at?: string
+          volunteer_id: string
+          workspace_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_id?: string
+          module_name?: string
+          progress_percent?: number | null
+          score?: number | null
+          status?: string
+          updated_at?: string
+          volunteer_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_training_progress_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -17320,6 +17637,44 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspace_template_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          review: string | null
+          template_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          review?: string | null
+          template_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          review?: string | null
+          template_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_template_ratings_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_custom_templates"
             referencedColumns: ["id"]
           },
         ]
