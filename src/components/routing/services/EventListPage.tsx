@@ -16,7 +16,6 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import { EventHosting, ThinkingPerson } from '@/components/illustrations';
-import { RichTextDisplay, stripHtmlTags } from '@/components/ui/rich-text-display';
 
 interface EventListPageProps {
   filterBy?: 'templates' | 'active' | 'draft' | 'completed';
@@ -98,7 +97,7 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
       event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      stripHtmlTags(event.description).toLowerCase().includes(searchQuery.toLowerCase());
+      event.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'ALL' || event.status === statusFilter;
     const matchesMode = modeFilter === 'ALL' || event.mode === modeFilter;
     const matchesFilterBy =
@@ -407,11 +406,9 @@ export const EventListPage: React.FC<EventListPageProps> = ({ filterBy }) => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
                             <div className="text-sm font-medium text-foreground">{event.name}</div>
-                            <RichTextDisplay 
-                              content={event.description} 
-                              lineClamp={1}
-                              className="text-sm text-muted-foreground max-w-xs"
-                            />
+                            <div className="text-sm text-muted-foreground truncate max-w-xs">
+                              {event.description}
+                            </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

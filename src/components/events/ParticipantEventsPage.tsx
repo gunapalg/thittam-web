@@ -7,7 +7,6 @@ import { Calendar, MapPin, Globe, Users, ArrowRight, Search, Sparkles, Filter, X
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { RichTextDisplay, stripHtmlTags } from '@/components/ui/rich-text-display';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OrganizationsListView } from './OrganizationsListView';
 import { PublicPageLayout } from '@/components/layout/PublicPageLayout';
@@ -179,7 +178,7 @@ export function ParticipantEventsPage() {
     const matchesCategory = categoryFilter === 'ALL' || event.category === categoryFilter;
     const matchesSearch = !searchQuery || 
       event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      stripHtmlTags(event.description ?? '').toLowerCase().includes(searchQuery.toLowerCase());
+      event.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesDate && matchesMode && matchesCategory && matchesSearch;
   });
@@ -649,12 +648,9 @@ export function ParticipantEventsPage() {
                       </div>
 
                       {/* Description */}
-                      <RichTextDisplay
-                        content={event.description}
-                        fallback="No description available for this event."
-                        lineClamp={2}
-                        className="mt-4 text-sm text-muted-foreground flex-grow"
-                      />
+                      <p className="mt-4 text-sm text-muted-foreground line-clamp-2 flex-grow">
+                        {event.description || 'No description available for this event.'}
+                      </p>
 
                       {/* Footer */}
                       <div className="flex items-center justify-between mt-5 pt-4 border-t border-border/50">
