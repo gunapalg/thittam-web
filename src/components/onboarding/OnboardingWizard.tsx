@@ -207,25 +207,38 @@ export function OnboardingWizard() {
       clearProgress();
 
       // Refresh roles
-      await refreshUserRoles();
+      // Don't block navigation on role refresh (can occasionally stall due to network/RLS).
+      // The app will naturally re-resolve roles on subsequent auth/route checks.
+      void refreshUserRoles().catch(() => {
+        // Intentionally swallow to avoid blocking UX.
+      });
 
       toast.success('Welcome to Thittam1Hub! 🎉');
 
       // Navigate based on role and organization setup
       if (data.role === 'organizer') {
         const orgSetup = data.organizationSetup;
-        if (createdOrgSlug) {
+        const slugFromSetup = orgSetup?.action === 'create' ? orgSetup.slug : null;
+        const finalOrgSlug = createdOrgSlug ?? slugFromSetup;
+
+        if (finalOrgSlug) {
           // Created an organization - go to org dashboard
-          navigate(`/${createdOrgSlug}/dashboard`);
-        } else if (orgSetup?.action === 'join') {
-          // Requested to join - go to main dashboard with pending status
-          navigate('/dashboard');
-        } else {
-          // Skipped - go to organization setup page
-          navigate('/onboarding/organization');
+          navigate(`/${finalOrgSlug}/dashboard`, { replace: true });
+          return;
         }
+
+        if (orgSetup?.action === 'join') {
+          // Requested to join - go to main dashboard with pending status
+          navigate('/dashboard', { replace: true });
+          return;
+        }
+
+        // Skipped - go to organization setup page
+        navigate('/onboarding/organization', { replace: true });
+        return;
       } else {
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
+        return;
       }
     } catch (error: any) {
       console.error('Onboarding error:', error);
