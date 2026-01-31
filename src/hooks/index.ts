@@ -74,6 +74,13 @@ export { useSponsorshipBenefits } from './useSponsorshipBenefits';
 // Workspace & Approvals
 export { useApprovalMutations } from './useApprovalMutations';
 
+// Activity Feed & Real-time Updates
+export { 
+  useActivityFeed, 
+  useApprovalRealtimeUpdates, 
+  useTaskRealtimeUpdates 
+} from './useActivityFeed';
+
 // Note: For committee-specific hooks with potential naming conflicts, import directly:
 // import { useEmailCampaigns } from '@/hooks/committee/communication';
 // import { useSocialPosts } from '@/hooks/committee/social';
