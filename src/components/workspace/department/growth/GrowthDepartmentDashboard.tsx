@@ -14,8 +14,10 @@ import { ResourceApprovalPanel } from '../ResourceApprovalPanel';
 import { TaskSummaryCards } from '../../TaskSummaryCards';
 import { TeamMemberRoster } from '../../TeamMemberRoster';
 import { WorkspaceHierarchyMiniMap } from '../../WorkspaceHierarchyMiniMap';
+import { ActivityFeedWidget } from '../../ActivityFeedWidget';
 
 import { useWorkspaceBudget } from '@/hooks/useWorkspaceBudget';
+import { useTaskRealtimeUpdates } from '@/hooks/useActivityFeed';
 import { TrendingUp, Users, LayoutGrid } from 'lucide-react';
 
 interface GrowthDepartmentDashboardProps {
@@ -31,6 +33,9 @@ export function GrowthDepartmentDashboard({
 }: GrowthDepartmentDashboardProps) {
   const navigate = useNavigate();
   const { pendingRequests } = useWorkspaceBudget(workspace.id);
+
+  // Enable real-time task updates
+  useTaskRealtimeUpdates(workspace.id);
 
   // Fetch child committees for this department
   const { data: committees = [] } = useQuery({
@@ -137,6 +142,11 @@ export function GrowthDepartmentDashboard({
           <SponsorshipSummary />
           <SocialMediaSummary />
           <CommunicationSummary />
+          <ActivityFeedWidget 
+            eventId={workspace.eventId} 
+            maxItems={8}
+            showHeader={true}
+          />
         </div>
       </div>
 
